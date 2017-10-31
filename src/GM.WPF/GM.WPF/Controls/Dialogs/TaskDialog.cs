@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
+Created: 2017-10-30
 Author: Grega Mohorko
 */
 
@@ -30,39 +30,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using System.Windows.Input;
+using GM.WPF.Utility;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
+	/// A dialog that has an awaitable task.
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public class TaskDialog:BaseDialog
 	{
+		private AutoResetEvent endNotifier;
+
 		/// <summary>
-		/// Initializes a new instance of <see cref="ViewModel"/> class.
+		/// Shows the dialog and then waits on the current thread until the <see cref="EndDialog"/> is called.
 		/// </summary>
-		public ViewModel()
+		protected async Task WaitDialog()
 		{
-			if(IsInDesignMode) {
-				SetDesignData();
-			} else {
-				Init();
-			}
+			endNotifier = new AutoResetEvent(false);
+			Show();
+			this.MoveFocusNext();
+			await Task.Run(delegate
+			{
+				endNotifier.WaitOne();
+			});
+
+			endNotifier?.Dispose();
+			endNotifier = null;
 		}
 
 		/// <summary>
-		/// Initializes this view model. Do not use constructors, always initialize everything inside this method.
+		/// Resumes the waiting thread from where the <see cref="WaitDialog"/> was called.
 		/// </summary>
-		protected abstract void Init();
-
-		/// <summary>
-		/// When overriden in a derived class, will set design-time dummy data.
-		/// </summary>
-		protected virtual void SetDesignData()
+		protected void EndDialog()
 		{
-
+			endNotifier?.Set();
 		}
 	}
 }

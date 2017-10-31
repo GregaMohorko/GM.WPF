@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
+Created: 2017-10-30
 Author: Grega Mohorko
 */
 
@@ -31,38 +31,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using System.Windows;
+using GM.WPF.Controls;
+using GM.WPF.Utility;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Windows
 {
 	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
+	/// The base class for windows. Will always dispose the view model (if disposable) when closed.
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public class BaseWindow:Window
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ViewModel"/> class.
+		/// Disposes the view model (if disposable) and raises the <see cref="Window.Closed"/> event.
 		/// </summary>
-		public ViewModel()
+		/// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+		protected override void OnClosed(EventArgs e)
 		{
-			if(IsInDesignMode) {
-				SetDesignData();
-			} else {
-				Init();
+			// dispose the viewmodel of this window
+			if(DataContext is IDisposable vmDisposable) {
+				vmDisposable.Dispose();
 			}
-		}
 
-		/// <summary>
-		/// Initializes this view model. Do not use constructors, always initialize everything inside this method.
-		/// </summary>
-		protected abstract void Init();
+			// dispose the viewmodels of inner controls
+			var controls=this.GetVisualChildCollection<BaseControl>();
+			foreach(BaseControl control in controls) {
+				control.DisposeViewModel();
+			}
 
-		/// <summary>
-		/// When overriden in a derived class, will set design-time dummy data.
-		/// </summary>
-		protected virtual void SetDesignData()
-		{
-
+			base.OnClosed(e);
 		}
 	}
 }

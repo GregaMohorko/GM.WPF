@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
+Created: 2017-10-30
 Author: Grega Mohorko
 */
 
@@ -31,38 +31,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
+	/// Interaction logic for ProgressDialog.xaml
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public partial class ProgressDialog : BaseDialog
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ViewModel"/> class.
+		/// Initializes a new instance of <see cref="ProgressDialog"/>.
 		/// </summary>
-		public ViewModel()
+		public ProgressDialog()
 		{
-			if(IsInDesignMode) {
-				SetDesignData();
-			} else {
-				Init();
-			}
-		}
-
-		/// <summary>
-		/// Initializes this view model. Do not use constructors, always initialize everything inside this method.
-		/// </summary>
-		protected abstract void Init();
-
-		/// <summary>
-		/// When overriden in a derived class, will set design-time dummy data.
-		/// </summary>
-		protected virtual void SetDesignData()
-		{
-
+			InitializeComponent();
 		}
 	}
 }

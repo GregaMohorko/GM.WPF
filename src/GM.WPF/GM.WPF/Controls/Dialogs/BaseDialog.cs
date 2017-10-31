@@ -22,47 +22,68 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
+Created: 2017-10-30
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using System.Windows;
+using System.Windows.Media;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
+	/// The base class for dialogs.
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public class BaseDialog:BaseControl
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ViewModel"/> class.
+		/// The property for the dialog background.
 		/// </summary>
-		public ViewModel()
+		public static readonly DependencyProperty DialogBackgroundProperty = DependencyProperty.Register(nameof(DialogBackground), typeof(Brush), typeof(BaseDialog));
+		/// <summary>
+		/// Dialog background.
+		/// </summary>
+		[Bindable(true)]
+		[Category("Appearance")]
+		public Brush DialogBackground
 		{
-			if(IsInDesignMode) {
-				SetDesignData();
-			} else {
-				Init();
-			}
+			get => (Brush)GetValue(DialogBackgroundProperty);
+			set => SetValue(DialogBackgroundProperty, value);
 		}
 
 		/// <summary>
-		/// Initializes this view model. Do not use constructors, always initialize everything inside this method.
+		/// Initializes a new instance of <see cref="BaseDialog"/>.
 		/// </summary>
-		protected abstract void Init();
+		public BaseDialog()
+		{
+			if(IsInDesignMode) {
+				return;
+			}
+
+			Hide();
+		}
 
 		/// <summary>
-		/// When overriden in a derived class, will set design-time dummy data.
+		/// Shows this dialog and attempts to focus it.
 		/// </summary>
-		protected virtual void SetDesignData()
+		public void Show()
 		{
+			Visibility = Visibility.Visible;
+			Focus();
+		}
 
+		/// <summary>
+		/// Hides (collapses) this dialog.
+		/// </summary>
+		public void Hide()
+		{
+			Visibility = Visibility.Collapsed;
 		}
 	}
 }

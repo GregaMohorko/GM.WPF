@@ -22,47 +22,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
+Created: 2017-10-30
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using System.Windows;
+using System.Windows.Controls;
+using GM.WPF.MVVM;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Controls
 {
 	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
+	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) will be automatically disposed (if disposable) when window closes.
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public class BaseControl:UserControl
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ViewModel"/> class.
+		/// Gets a value indicating whether the control is in design mode (running under Blend or Visual Studio).
 		/// </summary>
-		public ViewModel()
+		protected bool IsInDesignMode => DesignerProperties.GetIsInDesignMode(this);
+
+		/// <summary>
+		/// Gets or sets the view model to the first child of this control. This is to enable DependencyProperty bindings. Also disposes the current view model, if possible.
+		/// <para>
+		/// The idea was taken from here: http://blog.jerrynixon.com/2013/07/solved-two-way-binding-inside-user.html and here: http://www.wintellect.com/devcenter/sloscialo/where-s-my-datacontext
+		/// </para>
+		/// </summary>
+		protected ViewModel ViewModel
 		{
-			if(IsInDesignMode) {
-				SetDesignData();
-			} else {
-				Init();
+			get => ((FrameworkElement)Content).DataContext as ViewModel;
+			set
+			{
+				DisposeViewModel();
+				((FrameworkElement)Content).DataContext = value;
 			}
 		}
 
-		/// <summary>
-		/// Initializes this view model. Do not use constructors, always initialize everything inside this method.
-		/// </summary>
-		protected abstract void Init();
-
-		/// <summary>
-		/// When overriden in a derived class, will set design-time dummy data.
-		/// </summary>
-		protected virtual void SetDesignData()
+		internal void DisposeViewModel()
 		{
-
+			if(ViewModel is IDisposable vmDisposable) {
+				vmDisposable.Dispose();
+			}
 		}
 	}
 }
