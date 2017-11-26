@@ -21,28 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Project: GM.WPF
-Created: 2017-10-29
+Project: GM.WPF.Test
+Created: 2017-11-26
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using GM.WPF.MVVM;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Test
 {
-	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
-	/// <para>For automatic injection of <see cref="INotifyPropertyChanged"/> code into properties at compile time, use PropertyChanged.Fody project from NuGet.</para>
-	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	class MainWindowViewModel : ViewModel
 	{
-		// is empty for now
-		// additional functionalities can be added at a later time if needed or desired
+		public bool IsDialogProgressShown { get; set; }
 	}
 }

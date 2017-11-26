@@ -32,22 +32,12 @@ Author: Grega Mohorko
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:local="clr-namespace:GM.WPF.Controls.Dialogs"
 		mc:Ignorable="d"
-		d:DesignHeight="300"
-		d:DesignWidth="300"
-		Foreground="White"
-		Background="BlueViolet"
-		DialogBackground="Red"
+		d:DesignHeight="500"
+		d:DesignWidth="500"
 		>
-	<UserControl.Resources>
-		<Style TargetType="Label">
-			<Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=local:BaseDialog},Path=Foreground}" />
-		</Style>
-	</UserControl.Resources>
-	<local:DialogContent>
-		<StackPanel MinWidth="200">
-			<Label Content="Title" FontSize="20" Padding="5 20 40 10" />
-			<Label Content="Message" FontSize="15" />
-			<ProgressBar Height="30" IsIndeterminate="True" />
-		</StackPanel>
-	</local:DialogContent>
+	<StackPanel MinWidth="200">
+		<Label Name="_Label_Title" Content="Title" FontSize="20" Padding="5 20 40 10" />
+		<Label Name="_Label_Message" Content="Message" FontSize="15" />
+		<ProgressBar Name="_ProgressBar" Height="30" IsIndeterminate="True" />
+	</StackPanel>
 </local:BaseDialog>

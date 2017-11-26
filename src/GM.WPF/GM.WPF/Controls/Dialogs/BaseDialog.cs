@@ -33,7 +33,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using GM.WPF.Utility;
 
 namespace GM.WPF.Controls.Dialogs
 {
@@ -43,19 +45,21 @@ namespace GM.WPF.Controls.Dialogs
 	public class BaseDialog:BaseControl
 	{
 		/// <summary>
-		/// The property for the dialog background.
+		/// Default dialog background.
 		/// </summary>
-		public static readonly DependencyProperty DialogBackgroundProperty = DependencyProperty.Register(nameof(DialogBackground), typeof(Brush), typeof(BaseDialog));
+		public static Brush DefaultBackground = new SolidColorBrush(Color.FromRgb(26, 117, 207));
 		/// <summary>
-		/// Dialog background.
+		/// Default dialog foreground.
 		/// </summary>
-		[Bindable(true)]
-		[Category("Appearance")]
-		public Brush DialogBackground
-		{
-			get => (Brush)GetValue(DialogBackgroundProperty);
-			set => SetValue(DialogBackgroundProperty, value);
-		}
+		public static Brush DefaultForeground = Brushes.White;
+		/// <summary>
+		/// Default dialog border brush.
+		/// </summary>
+		public static Brush DefaultBorderBrush = Brushes.White;
+		/// <summary>
+		/// Default dialog border thickness.
+		/// </summary>
+		public static Thickness DefaultBorderThickness = new Thickness(1);
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="BaseDialog"/>.
@@ -84,6 +88,50 @@ namespace GM.WPF.Controls.Dialogs
 		public void Hide()
 		{
 			Visibility = Visibility.Collapsed;
+		}
+
+		/// <summary>
+		/// Injects the <see cref="DialogContentWrapper"/> and passes on the brushes. Overrides <see cref="FrameworkElement.OnInitialized(EventArgs)"/>.
+		/// </summary>
+		/// <param name="e">The RoutedEventArgs that contains the event data.</param>
+		protected override void OnInitialized(EventArgs e)
+		{
+			var contentWrapper = new DialogContentWrapper();
+			contentWrapper._ContentPresenter.Content = Content;
+			
+			// if any of the default values were manually set, pass them on
+			if(!this.IsSet(ForegroundProperty)) {
+				Foreground = DefaultForeground;
+			}
+			if(this.IsSet(BackgroundProperty)) {
+				contentWrapper._Border.Background = Background;
+				Background = null;
+			}
+			if(this.IsSet(BorderBrushProperty)) {
+				contentWrapper._Border.BorderBrush = BorderBrush;
+				BorderBrush = null;
+			}
+			if(this.IsSet(BorderThicknessProperty)) {
+				contentWrapper._Border.BorderThickness = BorderThickness;
+				BorderThickness = new Thickness();
+			}
+			Brush foreground = this.IsSet(ForegroundProperty) ? Foreground : DefaultForeground;
+			IEnumerable<Visual> allLabelsAndTextBoxes = ((DependencyObject)Content).GetVisualChildCollection<Label,TextBlock>();
+			foreach(Visual labelOrTextBlock in allLabelsAndTextBoxes) {
+				if(labelOrTextBlock is Label label) {
+					if(!label.IsSet(ForegroundProperty)) {
+						label.Foreground = foreground;
+					}
+				} else if(labelOrTextBlock is TextBlock textBlock) {
+					if(!textBlock.IsSet(TextBlock.ForegroundProperty)) {
+						textBlock.Foreground = foreground;
+					}
+				}
+			}
+
+			Content = contentWrapper;
+
+			base.OnInitialized(e);
 		}
 	}
 }

@@ -28,6 +28,7 @@ Author: Grega Mohorko
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -44,62 +46,16 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ProgressDialog.xaml
+	/// Interaction logic for DialogContentWrapper.xaml
 	/// </summary>
-	public partial class ProgressDialog : BaseDialog
+	internal partial class DialogContentWrapper : BaseControl
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ProgressDialog"/>.
+		/// Initializes a new instance of <see cref="DialogContentWrapper"/>.
 		/// </summary>
-		public ProgressDialog()
+		public DialogContentWrapper()
 		{
 			InitializeComponent();
-		}
-
-		/// <summary>
-		/// Shows this progress bar and sets the information accordingly.
-		/// </summary>
-		/// <param name="titleContent">The title content.</param>
-		/// <param name="messageContent">The message content.</param>
-		/// <param name="progress">The progress value.</param>
-		public void Show(object titleContent,object messageContent=null,double? progress=null)
-		{
-			SetTitle(titleContent);
-			SetMessage(messageContent);
-			SetProgress(progress);
-			Show();
-		}
-
-		/// <summary>
-		/// Sets the title to the provided content.
-		/// </summary>
-		/// <param name="titleContent">The new content of the title.</param>
-		public void SetTitle(object titleContent)
-		{
-			_Label_Title.Content = titleContent;
-		}
-
-		/// <summary>
-		/// Sets the message to the provided content.
-		/// </summary>
-		/// <param name="messageContent">The new content of the message.</param>
-		public void SetMessage(object messageContent)
-		{
-			_Label_Message.Content = messageContent;
-		}
-
-		/// <summary>
-		/// Sets the progress to the specified value. If null, it is put in indeterminate mode.
-		/// </summary>
-		/// <param name="progress">The new progress value.</param>
-		public void SetProgress(double? progress=null)
-		{
-			if(progress == null || progress<0 || progress>100) {
-				_ProgressBar.IsIndeterminate=true;
-			} else {
-				_ProgressBar.IsIndeterminate = false;
-				_ProgressBar.Value = progress.Value;
-			}
 		}
 	}
 }

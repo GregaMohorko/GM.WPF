@@ -33,15 +33,38 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using GM.WPF.Controls;
+using GM.WPF.MVVM;
 using GM.WPF.Utility;
 
 namespace GM.WPF.Windows
 {
 	/// <summary>
 	/// The base class for windows. Will always dispose the view model (if disposable) when closed.
+	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
+	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
 	/// </summary>
 	public class BaseWindow:Window
 	{
+		/// <summary>
+		/// Gets or sets the view model. If setting, the current view model is first disposed.
+		/// </summary>
+		protected ViewModel ViewModel
+		{
+			get => DataContext as ViewModel;
+			set
+			{
+				DisposeViewModel();
+				DataContext = value;
+			}
+		}
+		
+		private void DisposeViewModel()
+		{
+			if(ViewModel is IDisposable vmDisposable) {
+				vmDisposable.Dispose();
+			}
+		}
+
 		/// <summary>
 		/// Disposes the view model (if disposable) and raises the <see cref="Window.Closed"/> event.
 		/// </summary>

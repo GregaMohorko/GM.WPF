@@ -40,6 +40,8 @@ namespace GM.WPF.Controls
 {
 	/// <summary>
 	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) will be automatically disposed (if disposable) when window closes.
+	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
+	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
 	/// </summary>
 	public class BaseControl:UserControl
 	{
@@ -49,7 +51,7 @@ namespace GM.WPF.Controls
 		protected bool IsInDesignMode => DesignerProperties.GetIsInDesignMode(this);
 
 		/// <summary>
-		/// Gets or sets the view model to the first child of this control. This is to enable DependencyProperty bindings. Also disposes the current view model, if possible.
+		/// Gets or sets the view model to the first child of this control. This is to enable DependencyProperty bindings. If setting, the current view model is first disposed.
 		/// <para>
 		/// The idea was taken from here: http://blog.jerrynixon.com/2013/07/solved-two-way-binding-inside-user.html and here: http://www.wintellect.com/devcenter/sloscialo/where-s-my-datacontext
 		/// </para>

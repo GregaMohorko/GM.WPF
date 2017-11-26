@@ -22,27 +22,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
+Created: 2017-11-26
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+using System.Windows;
 
-namespace GM.WPF.MVVM
+namespace GM.WPF.Utility
 {
 	/// <summary>
-	/// Base class for the ViewModel in the MVVM pattern.
-	/// <para>For automatic injection of <see cref="INotifyPropertyChanged"/> code into properties at compile time, use PropertyChanged.Fody project from NuGet.</para>
+	/// Utilities for <see cref="DependencyObject"/>.
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public static class DependencyObjectUtility
 	{
-		// is empty for now
-		// additional functionalities can be added at a later time if needed or desired
+		/// <summary>
+		/// Determines whether the specified property is manually set (for instance in XAML). Should be called after initialization.
+		/// </summary>
+		/// <param name="dependencyObject">The dependency object.</param>
+		/// <param name="property">The property to check if it was set or not.</param>
+		public static bool IsSet(this DependencyObject dependencyObject,DependencyProperty property)
+		{
+			object localValue = dependencyObject.ReadLocalValue(property);
+			return localValue != DependencyProperty.UnsetValue;
+		}
 	}
 }

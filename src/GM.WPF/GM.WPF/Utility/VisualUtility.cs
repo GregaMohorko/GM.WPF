@@ -48,6 +48,27 @@ namespace GM.WPF.Utility
 		/// <param name="parent">The parent visual whose children to look through.</param>
 		public static IEnumerable<T> GetVisualChildCollection<T>(this DependencyObject parent) where T : Visual
 		{
+			return GetVisualChildCollection(parent, new List<Type>() { typeof(T) }).Cast<T>();
+		}
+
+		/// <summary>
+		/// Returns all the child visual objects of the specified generic types within the specified parent.
+		/// </summary>
+		/// <typeparam name="T1">The first type of visuals to search for.</typeparam>
+		/// <typeparam name="T2">The second type of visuals to search for.</typeparam>
+		/// <param name="parent">The parent visual whose children to look through.</param>
+		public static IEnumerable<Visual> GetVisualChildCollection<T1,T2>(this DependencyObject parent) where T1:Visual where T2:Visual
+		{
+			return GetVisualChildCollection(parent, new List<Type>() { typeof(T1), typeof(T2) });
+		}
+
+		/// <summary>
+		/// Returns all the child visual objects of the specified types within the specified parent.
+		/// </summary>
+		/// <param name="parent">The parent visual whose children to look through.</param>
+		/// <param name="typesOfChildren">The types of visuals to search for. All the types should be child types of <see cref="Visual"/>.</param>
+		public static IEnumerable<Visual> GetVisualChildCollection(this DependencyObject parent, IEnumerable<Type> typesOfChildren)
+		{
 			var currentVisuals = new List<DependencyObject>
 			{
 				parent
@@ -61,8 +82,9 @@ namespace GM.WPF.Utility
 
 					for(int i = 0; i < count; ++i) {
 						DependencyObject child = VisualTreeHelper.GetChild(visual, i);
-						if(child is T) {
-							yield return (T)child;
+						Type childType = child.GetType();
+						if(typesOfChildren.Any(type => type.IsAssignableFrom(childType))) {
+							yield return (Visual)child;
 						}
 						if(child != null) {
 							newVisuals.Add(child);
