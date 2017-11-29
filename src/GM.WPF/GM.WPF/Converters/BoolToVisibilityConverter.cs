@@ -58,21 +58,23 @@ namespace GM.WPF.Converters
 		/// Converts the provided value with the specified parameter to <see cref="Visibility"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
-		/// <param name="parameter">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static Visibility? Convert(object value, object parameter)
+		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
+		public static Visibility? Convert(object value, ref string options)
 		{
-			bool? boolValue = BoolToBoolConverter.Convert(value, parameter);
+			bool? boolValue = BoolToBoolConverter.Convert(value, ref options);
 			if(boolValue == null) {
 				return null;
 			}
 
 			var falseEquivalent = Visibility.Hidden;
 			
-			if(parameter is string options) {
-				options = options.ToLower();
+			if(options!=null) {
+				// is already lowered in the BoolToBoolConverter
+				//options = options.ToLower();
 
 				if(options.Contains(PARAM_COLLAPSE)) {
 					falseEquivalent = Visibility.Collapsed;
+					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 				}
 			}
 
@@ -83,8 +85,8 @@ namespace GM.WPF.Converters
 		/// Converts the provided value with the specified parameter back to <see cref="bool"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
-		/// <param name="parameter">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static bool? ConvertBack(object value,object parameter)
+		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
+		public static bool? ConvertBack(object value,ref string options)
 		{
 			if(!(value is Visibility)) {
 				return null;
@@ -95,19 +97,22 @@ namespace GM.WPF.Converters
 			var invert = false;
 			var falseEquivalent = Visibility.Hidden;
 
-			if(parameter is string options) {
+			if(options!=null) {
 				options = options.ToLower();
 
 				if(options.Contains(PARAM_COLLAPSE)) {
+					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 					if(visibilityValue == Visibility.Hidden) {
 						return null;
 					}
 					falseEquivalent = Visibility.Collapsed;
-				}else if(visibilityValue == Visibility.Collapsed) {
+				} else if(visibilityValue == Visibility.Collapsed) {
+					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 					return null;
 				}
 				if(options.Contains(PARAM_INVERT)) {
 					invert = true;
+					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_INVERT);
 				}
 			}
 
@@ -129,7 +134,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return Convert(value, parameter);
+			string options = parameter as string;
+			return Convert(value, ref options);
 		}
 
 		/// <summary>
@@ -141,7 +147,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return ConvertBack(value, parameter);
+			string options = parameter as string;
+			return Convert(value, ref options);
 		}
 	}
 }

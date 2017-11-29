@@ -60,8 +60,8 @@ namespace GM.WPF.Converters
 		/// Converts the provided value with the specified parameter to <see cref="IList"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
-		/// <param name="parameter">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static IList Convert(object value,object parameter)
+		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
+		public static IList Convert(object value,ref string options)
 		{
 			var ilistValue = value as IList;
 			if(ilistValue == null) {
@@ -70,26 +70,27 @@ namespace GM.WPF.Converters
 			if(ilistValue.Count == 0) {
 				return ilistValue;
 			}
-
-			string options = parameter as string;
+			
 			if(options == null) {
 				return ilistValue;
 			}
 			options = options.ToLower();
 
-			ilistValue = Ignore(ilistValue, options);
-			ilistValue = Rotate(ilistValue, options);
+			ilistValue = Ignore(ilistValue, ref options);
+			ilistValue = Rotate(ilistValue, ref options);
 
 			return ilistValue;
 		}
 
-		private static IList Ignore(IList list,string options)
+		private static IList Ignore(IList list,ref string options)
 		{
 			var regex = new Regex($@"{PARAM_IGNORE}\((\d+)\)");
 			MatchCollection matches = regex.Matches(options);
 			if(matches.Count == 0) {
 				return list;
 			}
+
+			options = Utility.StringUtility.RemoveAllOf(options, PARAM_IGNORE);
 
 			List<int> indexesToIgnore = new List<int>(matches.Count);
 			foreach(Match match in matches) {
@@ -107,7 +108,7 @@ namespace GM.WPF.Converters
 			return list;
 		}
 
-		private static IList Rotate(IList list,string options)
+		private static IList Rotate(IList list,ref string options)
 		{
 			var regex = new Regex($@"{PARAM_ROTATE}\((\d+)\)");
 			MatchCollection matches = regex.Matches(options);
@@ -117,6 +118,8 @@ namespace GM.WPF.Converters
 			if(matches.Count > 1) {
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ROTATE}' criteria is allowed.");
 			}
+
+			options = Utility.StringUtility.RemoveAllOf(options, PARAM_ROTATE);
 
 			string rotateParameter = matches[0].Groups[1].Value;
 			int rotateValue = int.Parse(rotateParameter);
@@ -152,7 +155,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return Convert(value, parameter);
+			string options = parameter as string;
+			return Convert(value, ref options);
 		}
 
 		/// <summary>

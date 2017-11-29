@@ -66,15 +66,15 @@ namespace GM.WPF.Converters
 		/// Converts the provided value with the specified parameter to <see cref="Visibility"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
-		/// <param name="parameter">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static Visibility? Convert(object value,object parameter)
+		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
+		public static Visibility? Convert(object value,ref string options)
 		{
-			bool? boolValue = StringToBoolConverter.Convert(value, parameter);
+			bool? boolValue = StringToBoolConverter.Convert(value, ref options);
 			if(boolValue == null) {
 				return null;
 			}
 
-			return BoolToVisibilityConverter.Convert(boolValue.Value, parameter);
+			return BoolToVisibilityConverter.Convert(boolValue.Value, ref options);
 		}
 
 		/// <summary>
@@ -86,7 +86,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return Convert(value, parameter);
+			string options = parameter as string;
+			return Convert(value, ref options);
 		}
 
 		/// <summary>

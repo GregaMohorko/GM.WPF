@@ -56,16 +56,17 @@ namespace GM.WPF.Converters
 		/// Converts the provided value with the specified parameter to <see cref="bool"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
-		/// <param name="parameter">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static bool? Convert(object value,object parameter)
+		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
+		public static bool? Convert(object value,ref string options)
 		{
 			bool boolValue = value != null;
 
-			if(parameter is string options) {
+			if(options != null) {
 				options = options.ToLower();
 
 				if(options.Contains(PARAM_INVERT)) {
 					boolValue = !boolValue;
+					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_INVERT);
 				}
 			}
 
@@ -81,7 +82,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return Convert(value, parameter);
+			string options = parameter as string;
+			return Convert(value, ref options);
 		}
 
 		/// <summary>

@@ -73,8 +73,8 @@ namespace GM.WPF.Converters
 		/// Converts the provided value with the specified parameter to <see cref="Visibility"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
-		/// <param name="parameter">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static Visibility? Convert(object value,object parameter)
+		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
+		public static Visibility? Convert(object value,ref string options)
 		{
 			int? intValue = value as int?;
 			if(intValue == null) {
@@ -85,20 +85,21 @@ namespace GM.WPF.Converters
 
 			var falseEquivalent = Visibility.Hidden;
 			
-			if(parameter is string options) {
+			if(options!=null) {
 				options = options.ToLower();
 
 				if(options.Contains(PARAM_COLLAPSE)) {
 					falseEquivalent = Visibility.Collapsed;
+					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 				}
 
-				boolValue = IsBelow(intValue.Value, options) && IsAbove(intValue.Value,options) && IsBetween(intValue.Value,options);
+				boolValue = IsBelow(intValue.Value, ref options) && IsAbove(intValue.Value,ref options) && IsBetween(intValue.Value,ref options);
 			}
 
 			return boolValue ? Visibility.Visible : falseEquivalent;
 		}
 
-		private static bool IsBelow(int value,string options)
+		private static bool IsBelow(int value,ref string options)
 		{
 			var regex = new Regex($@"{PARAM_BELOW}\((\d+)\)");
 			MatchCollection matches = regex.Matches(options);
@@ -109,13 +110,15 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_BELOW}' criteria is allowed.", "parameter");
 			}
 
+			options = Utility.StringUtility.RemoveAllOf(options, PARAM_BELOW);
+
 			string belowParameter = matches[0].Groups[1].Value;
 			int belowValue = int.Parse(belowParameter);
 
 			return value < belowValue;
 		}
 
-		private static bool IsAbove(int value,string options)
+		private static bool IsAbove(int value,ref string options)
 		{
 			var regex = new Regex($@"{PARAM_ABOVE}\((\d+)\)");
 			MatchCollection matches = regex.Matches(options);
@@ -126,19 +129,23 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ABOVE}' criteria is allowed.", "parameter");
 			}
 
+			options = Utility.StringUtility.RemoveAllOf(options, PARAM_ABOVE);
+
 			string aboveParameter = matches[0].Groups[1].Value;
 			int aboveValue = int.Parse(aboveParameter);
 
 			return value > aboveValue;
 		}
 
-		private static bool IsBetween(int value,string options)
+		private static bool IsBetween(int value,ref string options)
 		{
 			var regex = new Regex($@"!?{PARAM_BETWEEN}\((\d+)-(\d+)\)");
 			MatchCollection matches = regex.Matches(options);
 			if(matches.Count == 0) {
 				return true;
 			}
+
+			options = Utility.StringUtility.RemoveAllOf(options, PARAM_BETWEEN);
 
 			bool isAtLeastOneTrue = false;
 			foreach(Match match in matches) {
@@ -176,7 +183,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return Convert(value, parameter);
+			string options = parameter as string;
+			return Convert(value, ref options);
 		}
 
 		/// <summary>
