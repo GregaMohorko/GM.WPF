@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2017-11-28
 Author: Grega Mohorko
 */
 
@@ -44,62 +44,54 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ProgressDialog.xaml
+	/// Interaction logic for ChooseDialog.xaml
 	/// </summary>
-	public partial class ProgressDialog : Dialog
+	public partial class ChooseDialog : TaskDialog
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ProgressDialog"/>.
+		/// Creates a new instance of <see cref="ChooseDialog"/>.
 		/// </summary>
-		public ProgressDialog()
+		public ChooseDialog()
 		{
 			InitializeComponent();
+
+			_WrapPanel_Buttons.Children.Clear();
 		}
 
 		/// <summary>
-		/// Shows this progress bar and sets the information accordingly.
+		/// Shows the choose dialog and waits for the users response. If the user cancels the dialog, this method will return null.
 		/// </summary>
-		/// <param name="titleContent">The title content.</param>
-		/// <param name="messageContent">The message content.</param>
-		/// <param name="progress">The progress value.</param>
-		public void Show(object titleContent,object messageContent=null,double? progress=null)
+		/// <param name="question">Question text.</param>
+		/// <param name="answers">The answers to choose from.</param>
+		public async Task<int?> Show(string question, params string[] answers)
 		{
-			SetTitle(titleContent);
-			SetMessage(messageContent);
-			SetProgress(progress);
-			Show();
-		}
+			_TextBlock_Question.Text = question;
+			_WrapPanel_Buttons.Children.Clear();
 
-		/// <summary>
-		/// Sets the title to the provided content.
-		/// </summary>
-		/// <param name="titleContent">The new content of the title.</param>
-		public void SetTitle(object titleContent)
-		{
-			_Label_Title.Content = titleContent;
-		}
+			int? response = null;
 
-		/// <summary>
-		/// Sets the message to the provided content.
-		/// </summary>
-		/// <param name="messageContent">The new content of the message.</param>
-		public void SetMessage(object messageContent)
-		{
-			_Label_Message.Content = messageContent;
-		}
+			for(int i = 0; i < answers.Length; i++) {
+				var answerButton = new Button();
+				answerButton.Content = answers[i];
+				answerButton.Tag = i;
+				answerButton.Click += delegate
+				{
+					response = (int)answerButton.Tag;
+					EndDialog();
+				};
 
-		/// <summary>
-		/// Sets the progress to the specified value. If null, it is put in indeterminate mode.
-		/// </summary>
-		/// <param name="progress">The new progress value.</param>
-		public void SetProgress(double? progress=null)
-		{
-			if(progress == null || progress<0 || progress>100) {
-				_ProgressBar.IsIndeterminate=true;
-			} else {
-				_ProgressBar.IsIndeterminate = false;
-				_ProgressBar.Value = progress.Value;
+				_WrapPanel_Buttons.Children.Add(answerButton);
 			}
+
+			await WaitDialog();
+			Hide();
+
+			return response;
+		}
+
+		private void Button_Cancel_Click(object sender, RoutedEventArgs e)
+		{
+			EndDialog(true);
 		}
 	}
 }

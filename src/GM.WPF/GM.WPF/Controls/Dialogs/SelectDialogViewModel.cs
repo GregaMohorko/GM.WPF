@@ -22,60 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2017-11-29
 Author: Grega Mohorko
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using GM.WPF.Utility;
+using System.Windows.Controls;
+using GM.WPF.MVVM;
 
 namespace GM.WPF.Controls.Dialogs
 {
-	/// <summary>
-	/// A dialog that has an awaitable task.
-	/// <para>Use method <see cref="WaitDialog"/> for asynchronous waiting and <see cref="EndDialog"/> for continuing.</para>
-	/// </summary>
-	public class TaskDialog:Dialog
+	class SelectDialogViewModel:ViewModel
 	{
-		/// <summary>
-		/// Determines whether the dialog was supposedly cancelled.
-		/// </summary>
-		protected bool WasCancelled { get; private set; }
-
-		private AutoResetEvent endNotifier;
-
-		/// <summary>
-		/// Shows the dialog and then waits until the <see cref="EndDialog"/> is called.
-		/// </summary>
-		protected async Task WaitDialog()
-		{
-			WasCancelled = false;
-			endNotifier = new AutoResetEvent(false);
-			Show();
-			this.MoveFocusNext();
-			await Task.Run(delegate
-			{
-				endNotifier.WaitOne();
-			});
-
-			endNotifier?.Dispose();
-			endNotifier = null;
-		}
-
-		/// <summary>
-		/// Resumes the waiting thread from where the <see cref="WaitDialog"/> was called.
-		/// </summary>
-		/// <param name="wasCancelled">Determines whether the dialog was cancelled. This sets the value of <see cref="WasCancelled"/>.</param>
-		protected void EndDialog(bool wasCancelled=false)
-		{
-			WasCancelled = wasCancelled;
-			endNotifier?.Set();
-		}
+		public string Message { get; set; }
+		public IEnumerable Items { get; set; }
+		public SelectionMode SelectionMode { get; set; }
 	}
 }

@@ -22,25 +22,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2017-11-29
 Author: Grega Mohorko
 -->
-<controls:BaseControl x:Class="GM.WPF.Controls.Dialogs.DialogContentWrapper"
+<local:TaskDialog x:Class="GM.WPF.Controls.Dialogs.SelectDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:controls="clr-namespace:GM.WPF.Controls"
 		xmlns:local="clr-namespace:GM.WPF.Controls.Dialogs"
+		xmlns:converters="clr-namespace:GM.WPF.Converters"
 		mc:Ignorable="d"
-		x:ClassModifier="internal"
-		d:DesignHeight="300"
+		d:DesignHeight="400"
 		d:DesignWidth="300"
-		x:Name="_Self"
+		MinHeight="400"
+		MinWidth="300"
+		FontSize="18"
+		d:DataContext="{d:DesignInstance Type=local:SelectDialogViewModel,IsDesignTimeCreatable=True}"
 		>
-	<Grid Background="#A0000000">
-		<Border Name="_Border" MinWidth="20" MinHeight="20" VerticalAlignment="Center" HorizontalAlignment="Center" Background="{x:Static local:Dialog.DefaultBackground}" BorderBrush="{x:Static local:Dialog.DefaultBorderBrush}" BorderThickness="{x:Static local:Dialog.DefaultBorderThickness}">
-			<ContentPresenter Name="_ContentPresenter" />
-		</Border>
+	<Grid Margin="20">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<TextBlock Text="{Binding Message,Mode=OneWay}" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" />
+		<ListView Name="_ListView" Grid.Row="1" MinWidth="50" ItemsSource="{Binding Items,Mode=OneWay}" SelectionMode="{Binding SelectionMode,Mode=OneWay}" />
+		<StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" Margin="20 0 0 0">
+			<Button Content="OK" IsEnabled="{Binding Mode=OneWay,ElementName=_ListView,Path=SelectedItem,Converter={converters:ObjectToBoolConverter}}" Padding="40 10" Margin="0 0 0 40" Click="Button_OK_Click" />
+			<Button Content="Cancel" Padding="10 0" HorizontalAlignment="Left" Click="Button_Cancel_Click" />
+		</StackPanel>
 	</Grid>
-</controls:BaseControl>
+</local:TaskDialog>

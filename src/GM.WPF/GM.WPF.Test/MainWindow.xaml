@@ -33,28 +33,58 @@ Author: Grega Mohorko
         xmlns:local="clr-namespace:GM.WPF.Test"
 		xmlns:windows="clr-namespace:GM.WPF.Windows;assembly=GM.WPF"
 		xmlns:dialogs="clr-namespace:GM.WPF.Controls.Dialogs;assembly=GM.WPF"
+		xmlns:converters="clr-namespace:GM.WPF.Converters;assembly=GM.WPF"
         mc:Ignorable="d"
         Title="GM.WPF.Test"
 		Height="500"
 		Width="700"
+		WindowStartupLocation="CenterScreen"
 		d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"
 		>
-	<DockPanel>
-		<Menu DockPanel.Dock="Top">
-			<MenuItem Header="_Dialogs">
-				<MenuItem Header="_Progress" IsCheckable="True" IsChecked="{Binding IsDialogProgressShown,Mode=OneWayToSource}" />
-			</MenuItem>
-		</Menu>
+	<Grid>
+		<DockPanel>
+			<Menu DockPanel.Dock="Top">
+				<MenuItem Header="_Dialogs">
+					<MenuItem Header="_Progress" IsCheckable="True" IsChecked="{Binding IsDialogProgressShown,Mode=OneWayToSource}" />
+					<MenuItem Header="_Message">
+						<MenuItem Header="_Normal" Click="MenuItem_Dialogs_Message_Normal_Click" />
+						<MenuItem Header="_Warning" Click="MenuItem_Dialogs_Message_Warning_Click" />
+						<MenuItem Header="_Error" Click="MenuItem_Dialogs_Message_Error_Click" />
+					</MenuItem>
+					<MenuItem Header="_Input">
+						<MenuItem Header="_Message" Click="MenuItem_Dialogs_Input_Message_Click" />
+						<MenuItem Header="_Message + Watermark" Click="MenuItem_Dialogs_Input_MessageWatermark_Click" />
+						<MenuItem Header="_Message + Watermark + Default text" Click="MenuItem_Dialogs_Input_MessageWatermarkDefaulttext_Click" />
+						<MenuItem Header="_Watermark" Click="MenuItem_Dialogs_Input_Watermark_Click" />
+						<MenuItem Header="_Watermark + Default text" Click="MenuItem_Dialogs_Input_WatermarkDefaulttext_Click" />
+						<MenuItem Header="_Default text" Click="MenuItem_Dialogs_Input_Defaulttext_Click" />
+						<MenuItem Header="_Empty" Click="MenuItem_Dialogs_Input_Empty_Click" />
+					</MenuItem>
+					<MenuItem Header="_Choose" Click="MenuItem_Dialogs_Choose_Click" />
+					<MenuItem Header="_Select">
+						<MenuItem Header="_Multiple" Click="MenuItem_Dialogs_Select_Multiple_Click" />
+						<MenuItem Header="_Single" Click="MenuItem_Dialogs_Select_Single_Click" />
+					</MenuItem>
+				</MenuItem>
+			</Menu>
+			<Grid>
+				<StackPanel>
+					<TextBlock>Some random content ...</TextBlock>
+					<TextBlock>Some random content ...</TextBlock>
+					<TextBlock>Some random content ...</TextBlock>
+					<TextBlock>Some random content ...</TextBlock>
+					<TextBlock>Some random content ...</TextBlock>
+					<TextBlock>Some random content ...</TextBlock>
+				</StackPanel>
+			</Grid>
+		</DockPanel>
+		<!--DIALOGS-->
 		<Grid>
-			<StackPanel>
-				<TextBlock>Some random content ...</TextBlock>
-				<TextBlock>Some random content ...</TextBlock>
-				<TextBlock>Some random content ...</TextBlock>
-				<TextBlock>Some random content ...</TextBlock>
-				<TextBlock>Some random content ...</TextBlock>
-				<TextBlock>Some random content ...</TextBlock>
-			</StackPanel>
-			<dialogs:ProgressDialog Name="_ProgressDialog" />
+			<dialogs:SelectDialog Name="_SelectDialog" />
+			<dialogs:ChooseDialog Name="_ChooseDialog" Visibility="Collapsed" />
+			<dialogs:InputDialog Name="_InputDialog" Visibility="Collapsed" />
+			<dialogs:MessageDialog Name="_MessageDialog" Visibility="Collapsed" />
+			<dialogs:ProgressDialog Name="_ProgressDialog" Visibility="Collapsed" />
 		</Grid>
-	</DockPanel>
+	</Grid>
 </windows:BaseWindow>

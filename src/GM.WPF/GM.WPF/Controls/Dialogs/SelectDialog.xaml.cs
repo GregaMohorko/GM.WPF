@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2017-11-29
 Author: Grega Mohorko
 */
 
@@ -44,62 +44,62 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ProgressDialog.xaml
+	/// Interaction logic for SelectDialog.xaml
 	/// </summary>
-	public partial class ProgressDialog : Dialog
+	public partial class SelectDialog : TaskDialog
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ProgressDialog"/>.
+		/// Creates a new instance of <see cref="SelectDialog"/>.
 		/// </summary>
-		public ProgressDialog()
+		public SelectDialog()
 		{
 			InitializeComponent();
 		}
 
-		/// <summary>
-		/// Shows this progress bar and sets the information accordingly.
-		/// </summary>
-		/// <param name="titleContent">The title content.</param>
-		/// <param name="messageContent">The message content.</param>
-		/// <param name="progress">The progress value.</param>
-		public void Show(object titleContent,object messageContent=null,double? progress=null)
+		public async Task<IEnumerable<T>> Show<T>(string message, IEnumerable<T> items)
 		{
-			SetTitle(titleContent);
-			SetMessage(messageContent);
-			SetProgress(progress);
-			Show();
-		}
+			await ShowAndWait(message, items, SelectionMode.Multiple);
 
-		/// <summary>
-		/// Sets the title to the provided content.
-		/// </summary>
-		/// <param name="titleContent">The new content of the title.</param>
-		public void SetTitle(object titleContent)
-		{
-			_Label_Title.Content = titleContent;
-		}
-
-		/// <summary>
-		/// Sets the message to the provided content.
-		/// </summary>
-		/// <param name="messageContent">The new content of the message.</param>
-		public void SetMessage(object messageContent)
-		{
-			_Label_Message.Content = messageContent;
-		}
-
-		/// <summary>
-		/// Sets the progress to the specified value. If null, it is put in indeterminate mode.
-		/// </summary>
-		/// <param name="progress">The new progress value.</param>
-		public void SetProgress(double? progress=null)
-		{
-			if(progress == null || progress<0 || progress>100) {
-				_ProgressBar.IsIndeterminate=true;
-			} else {
-				_ProgressBar.IsIndeterminate = false;
-				_ProgressBar.Value = progress.Value;
+			if(WasCancelled) {
+				return null;
 			}
+
+			return _ListView.SelectedItems.Cast<T>();
+		}
+
+		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items)
+		{
+			await ShowAndWait(message, items, SelectionMode.Single);
+
+			if(WasCancelled) {
+				return default(T);
+			}
+
+			return (T)_ListView.SelectedItem;
+		}
+
+		private async Task ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode)
+		{
+			var vm = new SelectDialogViewModel()
+			{
+				Message=message,
+				Items=items,
+				SelectionMode=selectionMode
+			};
+			ViewModel = vm;
+
+			await WaitDialog();
+			Hide();
+		}
+
+		private void Button_OK_Click(object sender, RoutedEventArgs e)
+		{
+			EndDialog();
+		}
+
+		private void Button_Cancel_Click(object sender, RoutedEventArgs e)
+		{
+			EndDialog(true);
 		}
 	}
 }

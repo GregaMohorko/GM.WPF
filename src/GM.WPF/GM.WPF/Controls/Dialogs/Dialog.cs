@@ -42,7 +42,7 @@ namespace GM.WPF.Controls.Dialogs
 	/// <summary>
 	/// The base class for dialogs.
 	/// </summary>
-	public class BaseDialog:BaseControl
+	public class Dialog:BaseControl
 	{
 		/// <summary>
 		/// Default dialog background.
@@ -62,9 +62,9 @@ namespace GM.WPF.Controls.Dialogs
 		public static Thickness DefaultBorderThickness = new Thickness(1);
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="BaseDialog"/>.
+		/// Initializes a new instance of <see cref="Dialog"/>.
 		/// </summary>
-		public BaseDialog()
+		public Dialog()
 		{
 			if(IsInDesignMode) {
 				return;
@@ -88,6 +88,16 @@ namespace GM.WPF.Controls.Dialogs
 		public void Hide()
 		{
 			Visibility = Visibility.Collapsed;
+		}
+
+		/// <summary>
+		/// Sets a new background of this dialog.
+		/// </summary>
+		/// <param name="background">A new background to set.</param>
+		public void SetBackground(Brush background)
+		{
+			var contentWrapper = Content as DialogContentWrapper;
+			contentWrapper._Border.Background = background;
 		}
 
 		/// <summary>

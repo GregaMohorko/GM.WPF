@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2017-11-28
 Author: Grega Mohorko
 */
 
@@ -40,66 +40,64 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GM.WPF.Converters;
 
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ProgressDialog.xaml
+	/// Interaction logic for InputDialog.xaml
 	/// </summary>
-	public partial class ProgressDialog : Dialog
+	public partial class InputDialog : TaskDialog
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="ProgressDialog"/>.
+		/// Creates a new instance of <see cref="InputDialog"/>.
 		/// </summary>
-		public ProgressDialog()
+		public InputDialog()
 		{
 			InitializeComponent();
+			
+			_TextBox.TextChanged += TextBox_TextChanged;
+		}
+		
+		private static readonly string TextBox_TextChanged_ConverterParameter = $"{StringToVisibilityConverter.PARAM_EMPTY}_{StringToVisibilityConverter.PARAM_INVERT}";
+
+		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			// this should be done in XAML using Binding, but it doesn't seem to work ...
+			string options = TextBox_TextChanged_ConverterParameter;
+			_Label_Watermark.Visibility = (Visibility)StringToVisibilityConverter.Convert(_TextBox.Text, ref options);
 		}
 
 		/// <summary>
-		/// Shows this progress bar and sets the information accordingly.
+		/// Shows the input dialog and waits for the users reponse. If the user cancels the dialog, this method will return null.
 		/// </summary>
-		/// <param name="titleContent">The title content.</param>
-		/// <param name="messageContent">The message content.</param>
-		/// <param name="progress">The progress value.</param>
-		public void Show(object titleContent,object messageContent=null,double? progress=null)
+		/// <param name="message">The message to show above the input box.</param>
+		/// <param name="watermark">The text to show in the input box.</param>
+		/// <param name="defaultText">The default text that will already be in the input box.</param>
+		public async Task<string> Show(string message = null, string watermark = null, string defaultText = null)
 		{
-			SetTitle(titleContent);
-			SetMessage(messageContent);
-			SetProgress(progress);
-			Show();
-		}
+			_TextBlock_Message.Text = message;
+			_Label_Watermark.Content = watermark;
+			_TextBox.Text = defaultText;
+			
+			await WaitDialog();
+			Hide();
 
-		/// <summary>
-		/// Sets the title to the provided content.
-		/// </summary>
-		/// <param name="titleContent">The new content of the title.</param>
-		public void SetTitle(object titleContent)
-		{
-			_Label_Title.Content = titleContent;
-		}
-
-		/// <summary>
-		/// Sets the message to the provided content.
-		/// </summary>
-		/// <param name="messageContent">The new content of the message.</param>
-		public void SetMessage(object messageContent)
-		{
-			_Label_Message.Content = messageContent;
-		}
-
-		/// <summary>
-		/// Sets the progress to the specified value. If null, it is put in indeterminate mode.
-		/// </summary>
-		/// <param name="progress">The new progress value.</param>
-		public void SetProgress(double? progress=null)
-		{
-			if(progress == null || progress<0 || progress>100) {
-				_ProgressBar.IsIndeterminate=true;
-			} else {
-				_ProgressBar.IsIndeterminate = false;
-				_ProgressBar.Value = progress.Value;
+			if(WasCancelled) {
+				return null;
 			}
+
+			return _TextBox.Text;
+		}
+
+		private void Button_OK_Click(object sender, RoutedEventArgs e)
+		{
+			EndDialog();
+		}
+
+		private void Button_Cancel_Click(object sender, RoutedEventArgs e)
+		{
+			EndDialog(true);
 		}
 	}
 }
