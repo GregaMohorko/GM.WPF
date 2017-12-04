@@ -72,6 +72,9 @@
     <Compile Include="Controls\Dialogs\DialogContentWrapper.xaml.cs">
       <DependentUpon>DialogContentWrapper.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Dialogs\DialogPanel.xaml.cs">
+      <DependentUpon>DialogPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Dialogs\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
@@ -115,6 +118,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Dialogs\DialogContentWrapper.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Dialogs\DialogPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

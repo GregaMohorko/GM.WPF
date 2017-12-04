@@ -22,12 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-11-28
+Created: 2017-12-4
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,54 +45,37 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ChooseDialog.xaml
+	/// A convenient panel for all dialogs. Simply place this where you want the dialogs to appear.
 	/// </summary>
-	public partial class ChooseDialog : TaskDialog
+	public partial class DialogPanel : UserControl
 	{
 		/// <summary>
-		/// Creates a new instance of <see cref="ChooseDialog"/>.
+		/// Creates a new instance of <see cref="DialogPanel"/>.
 		/// </summary>
-		public ChooseDialog()
+		public DialogPanel()
 		{
 			InitializeComponent();
-
-			_WrapPanel_Buttons.Children.Clear();
 		}
 
 		/// <summary>
-		/// Shows the choose dialog and waits for the users response. If the user cancels the dialog, this method will return null.
+		/// Creates a new dialog of the specified type and returns it.
 		/// </summary>
-		/// <param name="question">Question text.</param>
-		/// <param name="answers">The answers to choose from.</param>
-		public async Task<int?> Show(string question, params string[] answers)
+		/// <typeparam name="T">The type of the dialog to create.</typeparam>
+		public T Create<T>() where T:Dialog, new()
 		{
-			_TextBlock_Question.Text = question;
-			_WrapPanel_Buttons.Children.Clear();
+			T newDialog = new T();
+			newDialog.DialogPanel = this;
+			_Grid.Children.Add(newDialog);
 
-			int? response = null;
-
-			for(int i = 0; i < answers.Length; i++) {
-				var answerButton = new Button();
-				answerButton.Content = answers[i];
-				answerButton.Tag = i;
-				answerButton.Click += delegate
-				{
-					response = (int)answerButton.Tag;
-					EndDialog();
-				};
-
-				_WrapPanel_Buttons.Children.Add(answerButton);
-			}
-
-			await WaitDialog();
-			Close();
-
-			return response;
+			return newDialog;
 		}
 
-		private void Button_Cancel_Click(object sender, RoutedEventArgs e)
+		internal void Remove(Dialog dialog)
 		{
-			EndDialog(true);
+			Debug.Assert(dialog.DialogPanel == this);
+			_Grid.Children.Remove(dialog);
+
+			dialog.DisposeBaseControl();
 		}
 	}
 }

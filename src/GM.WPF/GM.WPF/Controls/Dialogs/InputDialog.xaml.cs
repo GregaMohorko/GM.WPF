@@ -81,7 +81,7 @@ namespace GM.WPF.Controls.Dialogs
 			_TextBox.Text = defaultText;
 			
 			await WaitDialog();
-			Hide();
+			Close();
 
 			if(WasCancelled) {
 				return null;

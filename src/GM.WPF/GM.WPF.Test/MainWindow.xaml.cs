@@ -81,16 +81,17 @@ namespace GM.WPF.Test
 		#region DIALOGS
 		private async void MenuItem_Dialogs_Message_Normal_Click(object sender, RoutedEventArgs e)
 		{
-			// LEFTHERE DialogPanel
-			// var messageDialog = _DialogPanel.Create<MessageDialog>();
-			// await messageDialog.Show("This is a normal message dialog.");
-			// po kazanju se avtomatsko odstrani iz dialog panela (pogleda, ce je sploh bil dodan preko njega)
-			await _MessageDialog.Show("This is a normal message dialog.");
+			// using the DialogPanel
+			MessageDialog messageDialog = _DialogPanel.Create<MessageDialog>();
+			await messageDialog.Show("This is a normal message dialog created using the MessageDialog.");
+
+			// using the manual reusable dialog
+			// await _MessageDialog.Show("This is a normal message dialog created using the manual reusable dialog.");
 		}
 
 		private async void MenuItem_Dialogs_Message_Warning_Click(object sender, RoutedEventArgs e)
 		{
-			await _MessageDialog.Show("This is a warning message.", MessageDialog.MessageType.WARNING);
+			await _MessageDialog.Show("This is a warning message created using the manual reusable dialog.", MessageDialog.MessageType.WARNING);
 		}
 
 		private async void MenuItem_Dialogs_Message_Error_Click(object sender, RoutedEventArgs e)

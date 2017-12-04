@@ -71,15 +71,20 @@ namespace GM.WPF.Windows
 		/// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
 		protected override void OnClosed(EventArgs e)
 		{
+			// dispose inner controls
+			var controls = this.GetVisualChildCollection<BaseControl>();
+			foreach(BaseControl control in controls) {
+				control.DisposeBaseControl();
+			}
+
+			// dispose the window, if disposable
+			if(this is IDisposable thisDisposable) {
+				thisDisposable.Dispose();
+			}
+
 			// dispose the viewmodel of this window
 			if(DataContext is IDisposable vmDisposable) {
 				vmDisposable.Dispose();
-			}
-
-			// dispose the viewmodels of inner controls
-			var controls=this.GetVisualChildCollection<BaseControl>();
-			foreach(BaseControl control in controls) {
-				control.DisposeViewModel();
 			}
 
 			base.OnClosed(e);

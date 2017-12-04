@@ -79,6 +79,10 @@ Author: Grega Mohorko
 			</Grid>
 		</DockPanel>
 		<!--DIALOGS-->
+		<!--There are 2 ways:-->
+		<!--1. Dialog panel ...-->
+		<dialogs:DialogPanel Name="_DialogPanel" />
+		<!--2. Manual (reusable) dialogs ...-->
 		<Grid>
 			<dialogs:SelectDialog Name="_SelectDialog" />
 			<dialogs:ChooseDialog Name="_ChooseDialog" Visibility="Collapsed" />

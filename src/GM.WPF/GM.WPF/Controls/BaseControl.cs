@@ -39,7 +39,7 @@ using GM.WPF.MVVM;
 namespace GM.WPF.Controls
 {
 	/// <summary>
-	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) will be automatically disposed (if disposable) when window closes.
+	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) and the control itself will both automatically be disposed (if disposable) when window closes.
 	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
 	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
 	/// </summary>
@@ -66,7 +66,21 @@ namespace GM.WPF.Controls
 			}
 		}
 
-		internal void DisposeViewModel()
+		/// <summary>
+		/// Disposes this control, if disposable. And the <see cref="ViewModel"/>, if disposable.
+		/// </summary>
+		internal void DisposeBaseControl()
+		{
+			// dispose this control
+			if(this is IDisposable thisDisposable) {
+				thisDisposable.Dispose();
+			}
+
+			// dispose the view model
+			DisposeViewModel();
+		}
+
+		private void DisposeViewModel()
 		{
 			if(ViewModel is IDisposable vmDisposable) {
 				vmDisposable.Dispose();

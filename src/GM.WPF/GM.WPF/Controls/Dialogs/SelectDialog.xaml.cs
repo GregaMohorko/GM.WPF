@@ -89,7 +89,7 @@ namespace GM.WPF.Controls.Dialogs
 			ViewModel = vm;
 
 			await WaitDialog();
-			Hide();
+			Close();
 		}
 
 		private void Button_OK_Click(object sender, RoutedEventArgs e)

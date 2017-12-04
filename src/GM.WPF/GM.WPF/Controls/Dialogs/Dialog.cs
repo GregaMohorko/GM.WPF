@@ -62,6 +62,11 @@ namespace GM.WPF.Controls.Dialogs
 		public static Thickness DefaultBorderThickness = new Thickness(1);
 
 		/// <summary>
+		/// The reference to the <see cref="DialogPanel"/> where this dialog was possibly created.
+		/// </summary>
+		internal DialogPanel DialogPanel { get; set; }
+
+		/// <summary>
 		/// Initializes a new instance of <see cref="Dialog"/>.
 		/// </summary>
 		public Dialog()
@@ -83,11 +88,24 @@ namespace GM.WPF.Controls.Dialogs
 		}
 
 		/// <summary>
-		/// Hides (collapses) this dialog.
+		/// Hides (collapses) this dialog. If this dialog was created using the <see cref="DialogPanel"/>, it is not removed from it.
+		/// <para>Use this method when you intend to reuse this dialog. Otherwise, use <see cref="Close"/>.</para>
 		/// </summary>
 		public void Hide()
 		{
 			Visibility = Visibility.Collapsed;
+		}
+
+		/// <summary>
+		/// Hides this dialog. Unlike <see cref="Hide"/>, if this dialog was created using the <see cref="DialogPanel"/>, it is removed from it.
+		/// <para>Use this method if don't intend on reusing this dialog. Otherwise, use <see cref="Hide"/>.</para>
+		/// </summary>
+		public void Close()
+		{
+			Hide();
+			if(DialogPanel != null) {
+				DialogPanel.Remove(this);
+			}
 		}
 
 		/// <summary>

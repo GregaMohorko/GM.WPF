@@ -115,7 +115,7 @@ namespace GM.WPF.Controls.Dialogs
 
 			Show();
 			await WaitDialog();
-			Hide();
+			Close();
 		}
 
 		private void Button_OK_Click(object sender,RoutedEventArgs e)
