@@ -38,5 +38,40 @@ namespace GM.WPF.Test
 	class MainWindowViewModel : ViewModel
 	{
 		public bool IsDialogProgressShown { get; set; }
+
+		#region PROGRESS OVERLAY
+		public string ProgressOverlay_Message { get; set; }
+		private double? _progressOverlay_Value;
+		public double? ProgressOverlay_Value
+		{
+			get => _progressOverlay_Value;
+			set
+			{
+				_progressOverlay_Value = value;
+				if(value != null) {
+					ProgressOverlay_IsIndeterminate = false;
+				}
+			}
+		}
+		private bool _progressOverlay_IsIndeterminate;
+		public bool ProgressOverlay_IsIndeterminate
+		{
+			get => _progressOverlay_IsIndeterminate;
+			set
+			{
+				_progressOverlay_IsIndeterminate = value;
+				if(value) {
+					ProgressOverlay_Value = null;
+				} else if(ProgressOverlay_Value==null) {
+					ProgressOverlay_Value = 0;
+				}
+			}
+		}
+		#endregion // ProgressOverlay
+
+		public MainWindowViewModel()
+		{
+			ProgressOverlay_Message = "Loading ...";
+		}
 	}
 }

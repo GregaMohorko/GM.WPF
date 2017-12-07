@@ -32,12 +32,13 @@ Author: Grega Mohorko
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GM.WPF.Test"
 		xmlns:windows="clr-namespace:GM.WPF.Windows;assembly=GM.WPF"
+		xmlns:controls="clr-namespace:GM.WPF.Controls;assembly=GM.WPF"
 		xmlns:dialogs="clr-namespace:GM.WPF.Controls.Dialogs;assembly=GM.WPF"
 		xmlns:converters="clr-namespace:GM.WPF.Converters;assembly=GM.WPF"
         mc:Ignorable="d"
         Title="GM.WPF.Test"
-		Height="500"
-		Width="700"
+		Height="700"
+		Width="1000"
 		WindowStartupLocation="CenterScreen"
 		d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"
 		>
@@ -67,16 +68,37 @@ Author: Grega Mohorko
 					</MenuItem>
 				</MenuItem>
 			</Menu>
-			<Grid>
-				<StackPanel>
-					<TextBlock>Some random content ...</TextBlock>
-					<TextBlock>Some random content ...</TextBlock>
-					<TextBlock>Some random content ...</TextBlock>
-					<TextBlock>Some random content ...</TextBlock>
-					<TextBlock>Some random content ...</TextBlock>
-					<TextBlock>Some random content ...</TextBlock>
-				</StackPanel>
-			</Grid>
+			<TabControl>
+				<TabItem Header="ProgressOverlay">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" MinWidth="150" />
+							<ColumnDefinition />
+						</Grid.ColumnDefinitions>
+						<StackPanel Background="LightGray">
+							<Label FontWeight="Bold">Message:</Label>
+							<TextBox Text="{Binding ProgressOverlay_Message,UpdateSourceTrigger=PropertyChanged,Mode=OneWayToSource}" Margin="5 0" />
+							<StackPanel Orientation="Horizontal">
+								<Label FontWeight="Bold">Progress value:</Label>
+								<Label Content="{Binding ProgressOverlay_Value,Mode=OneWay}" />
+							</StackPanel>
+							<Slider Value="{Binding ProgressOverlay_Value,Mode=TwoWay}" Maximum="100" Margin="10 0" TickFrequency="1" IsSnapToTickEnabled="True" />
+							<CheckBox IsChecked="{Binding ProgressOverlay_IsIndeterminate,Mode=TwoWay}" Content="Is indeterminate" Margin="10 10" />
+						</StackPanel>
+						<Grid Grid.Column="1">
+							<StackPanel>
+								<TextBlock>Some random content ...</TextBlock>
+								<TextBlock>Some random content ...</TextBlock>
+								<TextBlock>Some random content ...</TextBlock>
+								<TextBlock>Some random content ...</TextBlock>
+								<TextBlock>Some random content ...</TextBlock>
+								<TextBlock>Some random content ...</TextBlock>
+							</StackPanel>
+							<controls:ProgressOverlay Message="{Binding ProgressOverlay_Message,Mode=OneWay}" ProgressValue="{Binding ProgressOverlay_Value,Mode=OneWay}" />
+						</Grid>
+					</Grid>
+				</TabItem>
+			</TabControl>
 		</DockPanel>
 		<!--DIALOGS-->
 		<!--There are 2 ways:-->
@@ -84,7 +106,7 @@ Author: Grega Mohorko
 		<dialogs:DialogPanel Name="_DialogPanel" />
 		<!--2. Manual (reusable) dialogs ...-->
 		<Grid>
-			<dialogs:SelectDialog Name="_SelectDialog" />
+			<dialogs:SelectDialog Name="_SelectDialog" Visibility="Collapsed" />
 			<dialogs:ChooseDialog Name="_ChooseDialog" Visibility="Collapsed" />
 			<dialogs:InputDialog Name="_InputDialog" Visibility="Collapsed" />
 			<dialogs:MessageDialog Name="_MessageDialog" Visibility="Collapsed" />

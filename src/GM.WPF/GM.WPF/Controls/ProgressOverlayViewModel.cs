@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
+﻿/*
 MIT License
 
 Copyright (c) 2017 Grega Mohorko
@@ -23,13 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-29
-Author: Grega Mohorko
--->
-<packages>
-  <package id="CommonServiceLocator" version="1.3" targetFramework="net461" />
-  <package id="Fody" version="2.2.1.0" targetFramework="net461" developmentDependency="true" />
-  <package id="GM.Utility" version="1.1.1" targetFramework="net461" />
-  <package id="MvvmLightLibs" version="5.3.0.0" targetFramework="net461" />
-  <package id="PropertyChanged.Fody" version="2.2.3.0" targetFramework="net461" developmentDependency="true" />
-</packages>
+Created: 2017-12-7
+Author: GregaMohorko
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GM.WPF.MVVM;
+
+namespace GM.WPF.Controls
+{
+    class ProgressOverlayViewModel : ViewModel
+	{
+		public string Message { get; set; }
+		public double? ProgressValue { get; set; }
+
+		public bool IsVisible => !string.IsNullOrEmpty(Message) || ProgressValue != null;
+		public bool IsIndeterminate => ProgressValue == null;
+
+		public double ProgressValueNotNullable => ProgressValue != null ? ProgressValue.Value : 0;
+
+		public ProgressOverlayViewModel()
+		{
+			if(IsInDesignMode) {
+				Message = "This is an example of progress message ...";
+			}
+		}
+	}
+}

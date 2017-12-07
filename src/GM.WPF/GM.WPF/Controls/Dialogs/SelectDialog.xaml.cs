@@ -56,6 +56,12 @@ namespace GM.WPF.Controls.Dialogs
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// Shows the select dialog and waits for the user to select possibly multiple items and confirm. If the user cancels the dialog, this method will return null.
+		/// </summary>
+		/// <typeparam name="T">The type of items.</typeparam>
+		/// <param name="message">The message text.</param>
+		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
 		public async Task<IEnumerable<T>> Show<T>(string message, IEnumerable<T> items)
 		{
 			await ShowAndWait(message, items, SelectionMode.Multiple);
@@ -67,6 +73,12 @@ namespace GM.WPF.Controls.Dialogs
 			return _ListView.SelectedItems.Cast<T>();
 		}
 
+		/// <summary>
+		/// Shows the select dialog and waits for the user to select a single item and confirm. If the user cancels the dialog, this method returns null.
+		/// </summary>
+		/// <typeparam name="T">The type of items.</typeparam>
+		/// <param name="message">The message text.</param>
+		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
 		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items)
 		{
 			await ShowAndWait(message, items, SelectionMode.Single);
