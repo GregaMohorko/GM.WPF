@@ -30,10 +30,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using GM.Utility;
 using GM.WPF.MVVM;
 
 namespace GM.WPF.Controls
@@ -85,6 +87,57 @@ namespace GM.WPF.Controls
 			if(ViewModel is IDisposable vmDisposable) {
 				vmDisposable.Dispose();
 			}
+		}
+		
+		/// <summary>
+		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
+		/// </summary>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		/// <param name="viewModelType">The type of the view model.</param>
+		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
+		protected static DependencyProperty BindableVMProperty(string name,Type ownerType, Type viewModelType, string viewModelPropertyName=null)
+		{
+			if(viewModelPropertyName == null) {
+				viewModelPropertyName = name;
+			}
+
+			if(!ownerType.IsSubclassOf(typeof(BaseControl))) {
+				throw new ArgumentException("The owner type must be a child of BaseControl.", nameof(ownerType));
+			}
+			if(!viewModelType.IsSubclassOf(typeof(ViewModel))) {
+				throw new ArgumentException("The view model type must be a child of ViewModel.", nameof(viewModelType));
+			}
+			if(!viewModelType.HasProperty(viewModelPropertyName, true)) {
+				throw new ArgumentException("A property with the specified view model property name must exist in the specified view model type.", nameof(viewModelPropertyName));
+			}
+			
+			Type propertyType = GetPropertyTypeReal(ownerType, name);
+			
+			PropertyChangedCallback propertyChangedCallback = (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+			{
+				// the new value of the dependency property that was set
+				var newValue = d.GetPropertyValue(name);
+				// the view model of the control
+				var vm = ((BaseControl)d).ViewModel;
+				// sets the new value of the property to the property in the view model
+				vm.SetProperty(name, newValue);
+			};
+
+			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(propertyChangedCallback));
+		}
+
+
+		// FIXME GM.Utility
+		/// <summary>
+		/// Gets the type of the specified property in the type.
+		/// </summary>
+		/// <param name="type">The type that has the specified property.</param>
+		/// <param name="propertyName">The name of the property.</param>
+		private static Type GetPropertyTypeReal(Type type, string propertyName)
+		{
+			PropertyInfo property = ReflectionUtility.GetPropertyInfo(type, propertyName);
+			return property.PropertyType;
 		}
 	}
 }
