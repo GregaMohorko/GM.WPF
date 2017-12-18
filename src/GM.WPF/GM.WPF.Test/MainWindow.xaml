@@ -98,6 +98,26 @@ Author: Grega Mohorko
 						</Grid>
 					</Grid>
 				</TabItem>
+				<TabItem Header="TimeControl">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition Height="Auto" />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<controls:TimeControl Name="_TimeControl_Top" Time="{Binding ElementName=_TimeControl_Event_TextBox_Bottom,Path=Time,Mode=TwoWay}" TimeChanged="TimeControl_Top_TimeChanged" />
+						<controls:TimeControl Name="_TimeControl_Bottom" Time="{Binding ElementName=_TimeControl_Top,Path=Time,Mode=TwoWay}" TimeChanged="TimeControl_Bottom_TimeChanged" Grid.Row="2" Grid.Column="2" />
+						<TextBox Name="_TimeControl_Event_TextBox_Top" Grid.Column="2" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+						<TextBox Name="_TimeControl_Event_TextBox_Bottom" Grid.Row="2" IsReadOnly="True" HorizontalContentAlignment="Right" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+						<GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+						<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+					</Grid>
+				</TabItem>
 			</TabControl>
 		</DockPanel>
 		<!--DIALOGS-->

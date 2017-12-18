@@ -33,12 +33,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace GM.WPF.MVVM
 {
 	/// <summary>
 	/// Base class for the ViewModel in the MVVM pattern.
 	/// <para>For automatic injection of <see cref="INotifyPropertyChanged"/> code into properties at compile time, use PropertyChanged.Fody project from NuGet.</para>
+	/// <para>For commands, use <see cref="RelayCommand"/>.</para>
 	/// </summary>
 	public abstract class ViewModel : ViewModelBase
 	{

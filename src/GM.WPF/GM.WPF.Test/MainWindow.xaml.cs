@@ -183,5 +183,28 @@ namespace GM.WPF.Test
 		#endregion // Dialogs
 
 		#endregion // MainMenu
+
+		#region TimeControl
+		private void TimeControl_Top_TimeChanged(object sender, TimeSpan e)
+		{
+			TimeControl_TimeChanged(e, _TimeControl_Event_TextBox_Top);
+		}
+
+		private void TimeControl_Bottom_TimeChanged(object sender, TimeSpan e)
+		{
+			TimeControl_TimeChanged(e, _TimeControl_Event_TextBox_Bottom);
+		}
+
+		private void TimeControl_TimeChanged(TimeSpan newValue, TextBox associatedTextBox)
+		{
+			string text = $"TimeChanged event fired. Current time value: {newValue}";
+			if(!string.IsNullOrEmpty(associatedTextBox.Text)) {
+				text = Environment.NewLine + text;
+			}
+
+			associatedTextBox.AppendText(text);
+			associatedTextBox.ScrollToEnd();
+		}
+		#endregion // TimeControl
 	}
 }

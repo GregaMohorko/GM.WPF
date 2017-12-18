@@ -44,6 +44,7 @@ namespace GM.WPF.Controls
 	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) and the control itself will both automatically be disposed (if disposable) when window closes.
 	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
 	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
+	/// <para>For registering dependency properties with view models, use <see cref="BindableVMProperty(string, Type, Type, string)"/>.</para>
 	/// </summary>
 	public class BaseControl:UserControl
 	{
@@ -113,8 +114,8 @@ namespace GM.WPF.Controls
 			}
 			
 			Type propertyType = GetPropertyTypeReal(ownerType, name);
-			
-			PropertyChangedCallback propertyChangedCallback = (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+
+			void propertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
 				// the new value of the dependency property that was set
 				var newValue = d.GetPropertyValue(name);
@@ -122,7 +123,7 @@ namespace GM.WPF.Controls
 				var vm = ((BaseControl)d).ViewModel;
 				// sets the new value of the property to the property in the view model
 				vm.SetProperty(name, newValue);
-			};
+			}
 
 			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(propertyChangedCallback));
 		}
