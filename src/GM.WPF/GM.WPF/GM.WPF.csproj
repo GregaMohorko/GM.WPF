@@ -108,6 +108,10 @@
       <DependentUpon>TimeControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\TimeControlViewModel.cs" />
+    <Compile Include="Controls\TimePicker.xaml.cs">
+      <DependentUpon>TimePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TimePickerViewModel.cs" />
     <Compile Include="Converters\BaseConverter.cs" />
     <Compile Include="Converters\BoolToBoolConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
@@ -123,6 +127,7 @@
     <Compile Include="Utility\FrameworkElementUtility.cs" />
     <Compile Include="Utility\StringUtility.cs" />
     <Compile Include="Utility\TextBlockUtility.cs" />
+    <Compile Include="Utility\TypeUtility.cs" />
     <Compile Include="Utility\VisualUtility.cs" />
     <Compile Include="Utility\SizeUtility.cs" />
     <Compile Include="Windows\BaseWindow.cs" />
@@ -166,6 +171,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\TimeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TimePicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

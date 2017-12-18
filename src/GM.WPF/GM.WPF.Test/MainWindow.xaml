@@ -118,6 +118,27 @@ Author: Grega Mohorko
 						<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
 					</Grid>
 				</TabItem>
+				<TabItem Header="TimePicker">
+					<Grid Margin="20">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition Height="Auto" />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<controls:TimePicker Name="_TimePicker_Left" SelectedTimeChanged="TimePicker_Left_SelectedTimeChanged" SelectedTimeSelected="TimePicker_Left_SelectedTimeSelected" PopupOpened="TimePicker_Left_PopupOpened" HorizontalAlignment="Center" VerticalAlignment="Center" />
+						<controls:TimePicker Name="_TimePicker_Right" SelectedTime="{Binding ElementName=_TimePicker_Left,Path=SelectedTime,Mode=TwoWay}" SelectedTimeChanged="TimePicker_Right_SelectedTimeChanged" SelectedTimeSelected="TimePicker_Right_SelectedTimeSelected" PopupOpened="TimePicker_Right_PopupOpened" Grid.Column="2" Width="100" Height="30" />
+						<TextBox Name="_TimePicker_Event_TextBox_Left" Grid.Row="2" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+						<TextBox Name="_TimePicker_Event_TextBox_Right" Grid.Column="2" Grid.Row="2" IsReadOnly="True" HorizontalContentAlignment="Right" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+						<GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+						<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+						
+					</Grid>
+				</TabItem>
 			</TabControl>
 		</DockPanel>
 		<!--DIALOGS-->

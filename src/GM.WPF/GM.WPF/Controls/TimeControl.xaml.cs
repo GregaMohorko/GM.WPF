@@ -62,7 +62,7 @@ namespace GM.WPF.Controls
 		public static readonly RoutedEvent TimeChangedEvent = EventManager.RegisterRoutedEvent(nameof(TimeChanged), RoutingStrategy.Bubble, typeof(EventHandler<TimeSpan>), typeof(TimeControl));
 
 		/// <summary>
-		/// Invoked whenever the <see cref="Time"/> changes.
+		/// Occurs whenever the <see cref="Time"/> changes.
 		/// </summary>
 		public event EventHandler<TimeSpan> TimeChanged;
 
@@ -90,10 +90,13 @@ namespace GM.WPF.Controls
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			var vm = ViewModel as TimeControlViewModel;
+			var vm = (TimeControlViewModel)ViewModel;
 
 			switch(e.PropertyName) {
 				case nameof(TimeControlViewModel.Time):
+					if(Time == vm.Time) {
+						return;
+					}
 					Time = vm.Time;
 					TimeChanged?.Invoke(this, Time);
 					break;

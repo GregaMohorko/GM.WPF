@@ -37,6 +37,7 @@ using System.Windows;
 using System.Windows.Controls;
 using GM.Utility;
 using GM.WPF.MVVM;
+using GM.WPF.Utility;
 
 namespace GM.WPF.Controls
 {
@@ -89,7 +90,7 @@ namespace GM.WPF.Controls
 				vmDisposable.Dispose();
 			}
 		}
-		
+
 		/// <summary>
 		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
 		/// </summary>
@@ -98,6 +99,19 @@ namespace GM.WPF.Controls
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
 		protected static DependencyProperty BindableVMProperty(string name,Type ownerType, Type viewModelType, string viewModelPropertyName=null)
+		{
+			return BindableVMProperty(name, ownerType, null, viewModelType, viewModelPropertyName);
+		}
+
+		/// <summary>
+		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
+		/// </summary>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		/// <param name="defaultValue">The default value of this property.</param>
+		/// <param name="viewModelType">The type of the view model.</param>
+		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
+		protected static DependencyProperty BindableVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName = null)
 		{
 			if(viewModelPropertyName == null) {
 				viewModelPropertyName = name;
@@ -112,20 +126,25 @@ namespace GM.WPF.Controls
 			if(!viewModelType.HasProperty(viewModelPropertyName, true)) {
 				throw new ArgumentException("A property with the specified view model property name must exist in the specified view model type.", nameof(viewModelPropertyName));
 			}
-			
+
 			Type propertyType = GetPropertyTypeReal(ownerType, name);
 
 			void propertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
+				var baseControl = (BaseControl)d;
+				var vm = baseControl.ViewModel;
+
 				// the new value of the dependency property that was set
-				var newValue = d.GetPropertyValue(name);
-				// the view model of the control
-				var vm = ((BaseControl)d).ViewModel;
+				var newValue = baseControl.GetPropertyValue(name);
 				// sets the new value of the property to the property in the view model
 				vm.SetProperty(name, newValue);
 			}
 
-			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(propertyChangedCallback));
+			if(defaultValue == null) {
+				defaultValue = propertyType.GetDefault();
+			}
+
+			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(defaultValue, propertyChangedCallback));
 		}
 
 

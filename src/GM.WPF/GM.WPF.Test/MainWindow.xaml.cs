@@ -41,6 +41,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GM.WPF.Controls;
 using GM.WPF.Controls.Dialogs;
 using GM.WPF.Windows;
 
@@ -206,5 +207,48 @@ namespace GM.WPF.Test
 			associatedTextBox.ScrollToEnd();
 		}
 		#endregion // TimeControl
+
+		#region TimePicker
+		private void TimePicker_Left_SelectedTimeChanged(object sender, TimeSpan e)
+		{
+			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeChanged), (TimePicker)sender, _TimePicker_Event_TextBox_Left);
+		}
+
+		private void TimePicker_Right_SelectedTimeChanged(object sender, TimeSpan e)
+		{
+			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeChanged), (TimePicker)sender, _TimePicker_Event_TextBox_Right);
+		}
+
+		private void TimePicker_Left_SelectedTimeSelected(object sender, TimeSpan e)
+		{
+			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeSelected), (TimePicker)sender, _TimePicker_Event_TextBox_Left);
+		}
+
+		private void TimePicker_Right_SelectedTimeSelected(object sender, TimeSpan e)
+		{
+			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeSelected), (TimePicker)sender, _TimePicker_Event_TextBox_Right);
+		}
+
+		private void TimePicker_Left_PopupOpened(object sender, EventArgs e)
+		{
+			TimePicker_EventOccured(nameof(TimePicker.PopupOpened), (TimePicker)sender, _TimePicker_Event_TextBox_Left);
+		}
+
+		private void TimePicker_Right_PopupOpened(object sender, EventArgs e)
+		{
+			TimePicker_EventOccured(nameof(TimePicker.PopupOpened), (TimePicker)sender, _TimePicker_Event_TextBox_Right);
+		}
+
+		private void TimePicker_EventOccured(string eventName, TimePicker timePicker, TextBox associatedTextBox)
+		{
+			string text = $"{eventName}: {timePicker.SelectedTime}";
+			if(!string.IsNullOrEmpty(associatedTextBox.Text)) {
+				text = Environment.NewLine + text;
+			}
+
+			associatedTextBox.AppendText(text);
+			associatedTextBox.ScrollToEnd();
+		}
+		#endregion // TimePicker
 	}
 }
