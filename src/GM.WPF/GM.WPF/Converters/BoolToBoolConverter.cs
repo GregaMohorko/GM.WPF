@@ -67,7 +67,7 @@ namespace GM.WPF.Converters
 
 				if(options.Contains(PARAM_INVERT)) {
 					boolValue = !boolValue;
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_INVERT);
+					options = StringUtility.RemoveFirstOf(options, PARAM_INVERT);
 				}
 			}
 

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("GM.WPF")]
-[assembly: AssemblyDescription("Library with various utilities and base classes for MVVM driven WPF development.")]
+[assembly: AssemblyDescription("Library with various controls, utilities and base classes for MVVM driven WPF development.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Grega Mohorko")]
 [assembly: AssemblyProduct("GM.WPF")]

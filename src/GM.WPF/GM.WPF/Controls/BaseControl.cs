@@ -126,8 +126,8 @@ namespace GM.WPF.Controls
 			if(!viewModelType.HasProperty(viewModelPropertyName, true)) {
 				throw new ArgumentException("A property with the specified view model property name must exist in the specified view model type.", nameof(viewModelPropertyName));
 			}
-
-			Type propertyType = GetPropertyTypeReal(ownerType, name);
+			
+			Type propertyType = ownerType.GetPropertyTypeReal(name);
 
 			void propertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
@@ -145,19 +145,6 @@ namespace GM.WPF.Controls
 			}
 
 			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(defaultValue, propertyChangedCallback));
-		}
-
-
-		// FIXME GM.Utility
-		/// <summary>
-		/// Gets the type of the specified property in the type.
-		/// </summary>
-		/// <param name="type">The type that has the specified property.</param>
-		/// <param name="propertyName">The name of the property.</param>
-		private static Type GetPropertyTypeReal(Type type, string propertyName)
-		{
-			PropertyInfo property = ReflectionUtility.GetPropertyInfo(type, propertyName);
-			return property.PropertyType;
 		}
 	}
 }

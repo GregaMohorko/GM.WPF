@@ -35,6 +35,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using GM.Utility;
 
 namespace GM.WPF.Converters
 {
@@ -73,11 +74,11 @@ namespace GM.WPF.Converters
 
 				if(options.Contains(PARAM_EMPTY)) {
 					boolValue = boolValue && stringValue.Length > 0;
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_EMPTY);
+					options = StringUtility.RemoveFirstOf(options, PARAM_EMPTY);
 				}
 				if(options.Contains(PARAM_INVERT)) {
 					boolValue = !boolValue;
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_INVERT);
+					options = StringUtility.RemoveFirstOf(options, PARAM_INVERT);
 				}
 			}
 

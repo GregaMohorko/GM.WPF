@@ -35,6 +35,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using GM.Utility;
 
 namespace GM.WPF.Converters
 {
@@ -74,7 +75,7 @@ namespace GM.WPF.Converters
 
 				if(options.Contains(PARAM_COLLAPSE)) {
 					falseEquivalent = Visibility.Collapsed;
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
+					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 				}
 			}
 
@@ -101,18 +102,18 @@ namespace GM.WPF.Converters
 				options = options.ToLower();
 
 				if(options.Contains(PARAM_COLLAPSE)) {
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
+					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 					if(visibilityValue == Visibility.Hidden) {
 						return null;
 					}
 					falseEquivalent = Visibility.Collapsed;
 				} else if(visibilityValue == Visibility.Collapsed) {
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
+					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 					return null;
 				}
 				if(options.Contains(PARAM_INVERT)) {
 					invert = true;
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_INVERT);
+					options = StringUtility.RemoveFirstOf(options, PARAM_INVERT);
 				}
 			}
 

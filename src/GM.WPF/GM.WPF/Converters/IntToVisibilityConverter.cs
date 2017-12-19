@@ -90,7 +90,7 @@ namespace GM.WPF.Converters
 
 				if(options.Contains(PARAM_COLLAPSE)) {
 					falseEquivalent = Visibility.Collapsed;
-					options = Utility.StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
+					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
 				}
 
 				boolValue = IsBelow(intValue.Value, ref options) && IsAbove(intValue.Value,ref options) && IsBetween(intValue.Value,ref options);
@@ -110,7 +110,7 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_BELOW}' criteria is allowed.", "parameter");
 			}
 
-			options = Utility.StringUtility.RemoveAllOf(options, PARAM_BELOW);
+			options = StringUtility.RemoveAllOf(options, PARAM_BELOW);
 
 			string belowParameter = matches[0].Groups[1].Value;
 			int belowValue = int.Parse(belowParameter);
@@ -129,7 +129,7 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ABOVE}' criteria is allowed.", "parameter");
 			}
 
-			options = Utility.StringUtility.RemoveAllOf(options, PARAM_ABOVE);
+			options = StringUtility.RemoveAllOf(options, PARAM_ABOVE);
 
 			string aboveParameter = matches[0].Groups[1].Value;
 			int aboveValue = int.Parse(aboveParameter);
@@ -145,7 +145,7 @@ namespace GM.WPF.Converters
 				return true;
 			}
 
-			options = Utility.StringUtility.RemoveAllOf(options, PARAM_BETWEEN);
+			options = StringUtility.RemoveAllOf(options, PARAM_BETWEEN);
 
 			bool isAtLeastOneTrue = false;
 			foreach(Match match in matches) {

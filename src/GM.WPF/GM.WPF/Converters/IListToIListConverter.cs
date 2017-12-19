@@ -37,6 +37,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using GM.Utility;
 
 namespace GM.WPF.Converters
 {
@@ -90,7 +91,7 @@ namespace GM.WPF.Converters
 				return list;
 			}
 
-			options = Utility.StringUtility.RemoveAllOf(options, PARAM_IGNORE);
+			options = StringUtility.RemoveAllOf(options, PARAM_IGNORE);
 
 			List<int> indexesToIgnore = new List<int>(matches.Count);
 			foreach(Match match in matches) {
@@ -119,7 +120,7 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ROTATE}' criteria is allowed.");
 			}
 
-			options = Utility.StringUtility.RemoveAllOf(options, PARAM_ROTATE);
+			options = StringUtility.RemoveAllOf(options, PARAM_ROTATE);
 
 			string rotateParameter = matches[0].Groups[1].Value;
 			int rotateValue = int.Parse(rotateParameter);
