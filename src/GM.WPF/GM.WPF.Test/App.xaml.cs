@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -41,5 +42,23 @@ namespace GM.WPF.Test
 	/// </summary>
 	public partial class App : Application
 	{
+		private MainWindow mainWindow;
+
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			base.OnStartup(e);
+
+			mainWindow = new MainWindow();
+			MainWindow = mainWindow;
+			mainWindow.Show();
+		}
+
+		protected override void OnExit(ExitEventArgs e)
+		{
+			base.OnExit(e);
+
+			// make sure that the main window was disposed
+			Debug.Assert(mainWindow.IsDisposed);
+		}
 	}
 }

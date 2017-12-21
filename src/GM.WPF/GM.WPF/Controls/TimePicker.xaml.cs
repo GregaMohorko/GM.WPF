@@ -54,7 +54,7 @@ namespace GM.WPF.Controls
 		/// <summary>
 		/// Represents the <see cref="SelectedTime"/> property.
 		/// </summary>
-		public static readonly DependencyProperty SelectedTimeProperty = BindableVMProperty(nameof(SelectedTime), typeof(TimePicker), typeof(TimePickerViewModel));
+		public static readonly DependencyProperty SelectedTimeProperty = DependencyVMProperty(nameof(SelectedTime), typeof(TimePicker), typeof(TimePickerViewModel));
 
 		/// <summary>
 		/// Represents the <see cref="SelectedTimeChanged"/> event.

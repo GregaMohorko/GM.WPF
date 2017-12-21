@@ -26,11 +26,11 @@ Created: 2017-11-10
 Author: Grega Mohorko
 -->
 <Application x:Class="GM.WPF.Test.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:GM.WPF.Test"
-             StartupUri="MainWindow.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:GM.WPF.Test"
+		>
+	<Application.Resources>
+		
+	</Application.Resources>
 </Application>

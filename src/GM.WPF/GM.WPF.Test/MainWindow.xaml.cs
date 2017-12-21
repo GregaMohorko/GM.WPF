@@ -29,6 +29,7 @@ Author: Grega Mohorko
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace GM.WPF.Test
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : BaseWindow
+	public partial class MainWindow : BaseWindow, IDisposable
 	{
 		public MainWindow()
 		{
@@ -59,6 +60,13 @@ namespace GM.WPF.Test
 			var vm = new MainWindowViewModel();
 			vm.PropertyChanged += Vm_PropertyChanged;
 			ViewModel = vm;
+		}
+
+		public bool IsDisposed { get; private set; }
+		public void Dispose()
+		{
+			Debug.Assert(!IsDisposed);
+			IsDisposed = true;
 		}
 
 		private void Vm_PropertyChanged(object sender, PropertyChangedEventArgs e)

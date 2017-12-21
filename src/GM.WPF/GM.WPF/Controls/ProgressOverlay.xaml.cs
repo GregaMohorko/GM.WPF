@@ -52,11 +52,11 @@ namespace GM.WPF.Controls
 		/// <summary>
 		/// Represents the <see cref="Message"/> property.
 		/// </summary>
-		public static readonly DependencyProperty MessageProperty = BindableVMProperty(nameof(Message), typeof(ProgressOverlay), typeof(ProgressOverlayViewModel));
+		public static readonly DependencyProperty MessageProperty = DependencyVMProperty(nameof(Message), typeof(ProgressOverlay), typeof(ProgressOverlayViewModel));
 		/// <summary>
 		/// Represents the <see cref="ProgressValue"/> property.
 		/// </summary>
-		public static readonly DependencyProperty ProgressValueProperty = BindableVMProperty(nameof(ProgressValue),typeof(ProgressOverlay),typeof(ProgressOverlayViewModel));
+		public static readonly DependencyProperty ProgressValueProperty = DependencyVMProperty(nameof(ProgressValue),typeof(ProgressOverlay),typeof(ProgressOverlayViewModel));
 
 		/// <summary>
 		/// Get or set the message.

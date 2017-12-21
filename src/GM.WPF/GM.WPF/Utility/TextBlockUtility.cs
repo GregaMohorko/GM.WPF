@@ -44,10 +44,10 @@ namespace GM.WPF.Utility
 	public static class TextBlockUtility
 	{
 		/// <summary>
-		/// Measures the provided text block and returns it's size when drawn in WPF application.
+		/// Measures this text block and returns it's size when drawn in WPF application.
 		/// </summary>
 		/// <param name="textBlock">The text block to measure.</param>
-		public static Size MeasureText(TextBlock textBlock)
+		public static Size MeasureText(this TextBlock textBlock)
 		{
 			return MeasureText(textBlock.Text, textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch, textBlock.FontSize);
 		}

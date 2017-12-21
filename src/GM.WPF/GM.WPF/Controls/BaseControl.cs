@@ -45,7 +45,7 @@ namespace GM.WPF.Controls
 	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) and the control itself will both automatically be disposed (if disposable) when window closes.
 	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
 	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
-	/// <para>For registering dependency properties with view models, use <see cref="BindableVMProperty(string, Type, Type, string)"/>.</para>
+	/// <para>For registering dependency properties with view models, use <see cref="DependencyVMProperty(string, Type, Type, string)"/>.</para>
 	/// </summary>
 	public class BaseControl:UserControl
 	{
@@ -98,9 +98,9 @@ namespace GM.WPF.Controls
 		/// <param name="ownerType">The type of the control.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
-		protected static DependencyProperty BindableVMProperty(string name,Type ownerType, Type viewModelType, string viewModelPropertyName=null)
+		protected static DependencyProperty DependencyVMProperty(string name,Type ownerType, Type viewModelType, string viewModelPropertyName=null)
 		{
-			return BindableVMProperty(name, ownerType, null, viewModelType, viewModelPropertyName);
+			return DependencyVMProperty(name, ownerType, null, viewModelType, viewModelPropertyName);
 		}
 
 		/// <summary>
@@ -111,7 +111,7 @@ namespace GM.WPF.Controls
 		/// <param name="defaultValue">The default value of this property.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
-		protected static DependencyProperty BindableVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName = null)
+		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName = null)
 		{
 			if(viewModelPropertyName == null) {
 				viewModelPropertyName = name;

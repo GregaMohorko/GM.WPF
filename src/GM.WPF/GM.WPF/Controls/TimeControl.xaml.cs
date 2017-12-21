@@ -54,7 +54,7 @@ namespace GM.WPF.Controls
 		/// <summary>
 		/// Represents the <see cref="Time"/> property.
 		/// </summary>
-		public static readonly DependencyProperty TimeProperty = BindableVMProperty(nameof(Time), typeof(TimeControl), typeof(TimeControlViewModel));
+		public static readonly DependencyProperty TimeProperty = DependencyVMProperty(nameof(Time), typeof(TimeControl), typeof(TimeControlViewModel));
 
 		/// <summary>
 		/// Represents the <see cref="TimeChanged"/> event.
@@ -84,8 +84,9 @@ namespace GM.WPF.Controls
 
 			var vm = new TimeControlViewModel();
 			vm.PropertyChanged += ViewModel_PropertyChanged;
-
 			ViewModel = vm;
+
+			Time = vm.Time;
 		}
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
