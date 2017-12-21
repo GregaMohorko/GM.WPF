@@ -4,6 +4,9 @@
 [![Latest release](https://img.shields.io/github/release/GregaMohorko/GM.WPF.svg?style=flat-square)](https://github.com/GregaMohorko/GM.WPF/releases/latest)
 [![NuGet](https://img.shields.io/nuget/v/GM.WPF.svg?style=flat-square)](https://www.nuget.org/packages/GM.WPF)
 
+## Documentation
+You can read the documentation and how-to's under the [Wiki](https://github.com/GregaMohorko/GM.WPF/wiki).
+
 ## Requirements
 .NET Framework 4.6.1
 
