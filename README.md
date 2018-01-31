@@ -7,6 +7,10 @@
 ## Documentation
 You can read the documentation and how-to's under the [Wiki](https://github.com/GregaMohorko/GM.WPF/wiki).
 
+## Similar projects
+- [GM.Utility](https://github.com/GregaMohorko/GM.Utility)
+- [GM.Windows.Utility](https://github.com/GregaMohorko/GM.Windows.Utility)
+
 ## Requirements
 .NET Framework 4.6.1
 
