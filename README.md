@@ -9,6 +9,7 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 
 ## Similar projects
 - [GM.Utility](https://github.com/GregaMohorko/GM.Utility)
+- [GM.Tools](https://github.com/GregaMohorko/GM.Tools)
 - [GM.Windows.Utility](https://github.com/GregaMohorko/GM.Windows.Utility)
 
 ## Requirements
