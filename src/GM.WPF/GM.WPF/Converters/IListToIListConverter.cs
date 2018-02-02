@@ -91,7 +91,7 @@ namespace GM.WPF.Converters
 				return list;
 			}
 
-			options = StringUtility.RemoveAllOf(options, PARAM_IGNORE);
+			options = StringUtility.RemoveAllOf(options, $"{PARAM_IGNORE}(");
 
 			List<int> indexesToIgnore = new List<int>(matches.Count);
 			foreach(Match match in matches) {
@@ -101,6 +101,10 @@ namespace GM.WPF.Converters
 			}
 
 			indexesToIgnore.Sort();
+
+			if(list.IsFixedSize) {
+				list = new ArrayList(list);
+			}
 
 			for(int i = indexesToIgnore.Count - 1; i >= 0; i--) {
 				list.RemoveAt(i);
@@ -120,7 +124,7 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ROTATE}' criteria is allowed.");
 			}
 
-			options = StringUtility.RemoveAllOf(options, PARAM_ROTATE);
+			options = StringUtility.RemoveAllOf(options, $"{PARAM_ROTATE}(");
 
 			string rotateParameter = matches[0].Groups[1].Value;
 			int rotateValue = int.Parse(rotateParameter);
@@ -133,7 +137,6 @@ namespace GM.WPF.Converters
 			if(rotateValue == 0) {
 				return list;
 			}
-
 
 			IList sortedList = new ArrayList(list.Count);
 

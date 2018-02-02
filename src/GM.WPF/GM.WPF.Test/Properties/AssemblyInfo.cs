@@ -40,7 +40,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Grega Mohorko")]
 [assembly: AssemblyProduct("GM.WPF.Test")]
-[assembly: AssemblyCopyright("Copyright © Grega Mohorko 2017")]
+[assembly: AssemblyCopyright("Copyright © Grega Mohorko 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -6,8 +6,8 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://github.com/GregaMohorko/GM.Utility/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/GregaMohorko/GM.Utility</projectUrl>
+    <licenseUrl>https://github.com/GregaMohorko/GM.WPF/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/GregaMohorko/GM.WPF</projectUrl>
     <iconUrl>https://mohorko.info/favicon.ico</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
