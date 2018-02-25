@@ -18,6 +18,6 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 ## Author and License
 Grega Mohorko ([www.mohorko.info](https://www.mohorko.info))
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2018 Grega Mohorko
 
 [MIT License](./LICENSE)
