@@ -11,7 +11,7 @@
     <iconUrl>https://mohorko.info/favicon.ico</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-	<summary>$description$</summary>
+	<releaseNotes>Improved the behavior of TaskDialog.</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>WPF MVVM controls utility extensions dialogs converters behaviors windows</tags>
   </metadata>

@@ -47,25 +47,19 @@ namespace GM.WPF.Controls.Dialogs
 		/// Determines whether the dialog was supposedly cancelled.
 		/// </summary>
 		protected bool WasCancelled { get; private set; }
-
-		private AutoResetEvent endNotifier;
+		
+		private TaskCompletionSource<object> dialogAwaiter;
 
 		/// <summary>
 		/// Shows the dialog and then waits until the <see cref="EndDialog"/> is called.
 		/// </summary>
-		protected async Task WaitDialog()
+		protected Task WaitDialog()
 		{
 			WasCancelled = false;
-			endNotifier = new AutoResetEvent(false);
 			Show();
 			this.MoveFocusNext();
-			await Task.Run(delegate
-			{
-				endNotifier.WaitOne();
-			});
-
-			endNotifier?.Dispose();
-			endNotifier = null;
+			dialogAwaiter = new TaskCompletionSource<object>();
+			return dialogAwaiter.Task;
 		}
 
 		/// <summary>
@@ -75,7 +69,7 @@ namespace GM.WPF.Controls.Dialogs
 		protected void EndDialog(bool wasCancelled=false)
 		{
 			WasCancelled = wasCancelled;
-			endNotifier?.Set();
+			dialogAwaiter.SetResult(null);
 		}
 	}
 }
