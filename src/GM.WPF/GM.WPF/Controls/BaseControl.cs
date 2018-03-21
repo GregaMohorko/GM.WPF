@@ -94,6 +94,18 @@ namespace GM.WPF.Controls
 		/// <summary>
 		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
 		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <typeparam name="TViewModel">The type of the view model.</typeparam>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
+		protected static DependencyProperty DependencyVMProperty<TOwner, TViewModel>(string name, string viewModelPropertyName = null)
+		{
+			return DependencyVMProperty(name, typeof(TOwner), typeof(TViewModel), viewModelPropertyName);
+		}
+
+		/// <summary>
+		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
+		/// </summary>
 		/// <param name="name">The name of the dependency property.</param>
 		/// <param name="ownerType">The type of the control.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
@@ -101,6 +113,19 @@ namespace GM.WPF.Controls
 		protected static DependencyProperty DependencyVMProperty(string name,Type ownerType, Type viewModelType, string viewModelPropertyName=null)
 		{
 			return DependencyVMProperty(name, ownerType, null, viewModelType, viewModelPropertyName);
+		}
+
+		/// <summary>
+		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
+		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <typeparam name="TViewModel">The type of the view model.</typeparam>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="defaultValue">The default value of this property.</param>
+		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
+		protected static DependencyProperty DependencyVMProperty<TOwner,TViewModel>(string name,object defaultValue,string viewModelPropertyName=null)
+		{
+			return DependencyVMProperty(name, typeof(TOwner), defaultValue, typeof(TViewModel), viewModelPropertyName);
 		}
 
 		/// <summary>
@@ -137,7 +162,7 @@ namespace GM.WPF.Controls
 				// the new value of the dependency property that was set
 				var newValue = baseControl.GetPropertyValue(name);
 				// sets the new value of the property to the property in the view model
-				vm.SetProperty(name, newValue);
+				vm.SetProperty(viewModelPropertyName, newValue);
 			}
 
 			if(defaultValue == null) {
