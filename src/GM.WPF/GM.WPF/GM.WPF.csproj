@@ -133,6 +133,7 @@
     <Compile Include="Utility\DependencyObjectUtility.cs" />
     <Compile Include="Utility\FrameworkElementUtility.cs" />
     <Compile Include="Utility\TextBlockUtility.cs" />
+    <Compile Include="Utility\TreeViewUtility.cs" />
     <Compile Include="Utility\VisualUtility.cs" />
     <Compile Include="Utility\SizeUtility.cs" />
     <Compile Include="Windows\BaseWindow.cs" />
