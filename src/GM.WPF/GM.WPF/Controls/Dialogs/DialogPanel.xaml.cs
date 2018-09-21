@@ -47,7 +47,7 @@ namespace GM.WPF.Controls.Dialogs
 	/// <summary>
 	/// A convenient panel for all dialogs. Simply place this where you want the dialogs to appear.
 	/// </summary>
-	public partial class DialogPanel : UserControl
+	public partial class DialogPanel : BaseControl, IDisposable
 	{
 		/// <summary>
 		/// Creates a new instance of <see cref="DialogPanel"/>.
@@ -59,9 +59,10 @@ namespace GM.WPF.Controls.Dialogs
 
 		/// <summary>
 		/// Creates a new dialog of the specified type and returns it.
+		/// <para>The dialog is then automatically removed when it closes.</para>
 		/// </summary>
 		/// <typeparam name="T">The type of the dialog to create.</typeparam>
-		public T Create<T>() where T:Dialog, new()
+		public T Create<T>() where T : Dialog, new()
 		{
 			T newDialog = new T();
 			newDialog.DialogPanel = this;
@@ -76,6 +77,16 @@ namespace GM.WPF.Controls.Dialogs
 			_Grid.Children.Remove(dialog);
 
 			dialog.DisposeBaseControl();
+		}
+
+		/// <summary>
+		/// Disposes all dialogs.
+		/// </summary>
+		public void Dispose()
+		{
+			foreach(Dialog dialog in _Grid.Children) {
+				dialog.DisposeBaseControl();
+			}
 		}
 	}
 }
