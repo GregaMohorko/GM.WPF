@@ -83,9 +83,7 @@ namespace GM.WPF.Windows
 			}
 
 			// dispose the viewmodel of this window
-			if(DataContext is IDisposable vmDisposable) {
-				vmDisposable.Dispose();
-			}
+			DisposeViewModel();
 
 			base.OnClosed(e);
 		}
