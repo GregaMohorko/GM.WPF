@@ -98,7 +98,7 @@ namespace GM.WPF.Controls.Dialogs
 
 		/// <summary>
 		/// Hides this dialog. Unlike <see cref="Hide"/>, if this dialog was created using the <see cref="DialogPanel"/>, it is removed from it.
-		/// <para>Use this method if don't intend on reusing this dialog. Otherwise, use <see cref="Hide"/>.</para>
+		/// <para>Use this method if you don't intend on reusing this dialog. Otherwise, use <see cref="Hide"/>.</para>
 		/// </summary>
 		public void Close()
 		{
