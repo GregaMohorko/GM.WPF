@@ -41,24 +41,19 @@ namespace GM.WPF.Controls.Dialogs
 	/// A dialog that has an awaitable task.
 	/// <para>Use method <see cref="WaitDialog"/> for asynchronous waiting and <see cref="EndDialog"/> for continuing.</para>
 	/// </summary>
-	public class TaskDialog:Dialog
+	public class TaskDialog : Dialog
 	{
-		/// <summary>
-		/// Determines whether the dialog was supposedly cancelled.
-		/// </summary>
-		protected bool WasCancelled { get; private set; }
-		
-		private TaskCompletionSource<object> dialogAwaiter;
+		private TaskCompletionSource<bool> dialogAwaiter;
 
 		/// <summary>
 		/// Shows the dialog and then waits until the <see cref="EndDialog"/> is called.
+		/// <para>The returned value determines whether the dialog was supposedly cancelled.</para>
 		/// </summary>
-		protected Task WaitDialog()
+		protected Task<bool> WaitDialog()
 		{
-			WasCancelled = false;
 			Show();
 			this.MoveFocusNext();
-			dialogAwaiter = new TaskCompletionSource<object>();
+			dialogAwaiter = new TaskCompletionSource<bool>();
 			return dialogAwaiter.Task;
 		}
 
@@ -66,10 +61,9 @@ namespace GM.WPF.Controls.Dialogs
 		/// Resumes the waiting thread from where the <see cref="WaitDialog"/> was called.
 		/// </summary>
 		/// <param name="wasCancelled">Determines whether the dialog was cancelled. This sets the value of <see cref="WasCancelled"/>.</param>
-		protected void EndDialog(bool wasCancelled=false)
+		protected void EndDialog(bool wasCancelled = false)
 		{
-			WasCancelled = wasCancelled;
-			dialogAwaiter.SetResult(null);
+			dialogAwaiter.SetResult(wasCancelled);
 		}
 	}
 }
