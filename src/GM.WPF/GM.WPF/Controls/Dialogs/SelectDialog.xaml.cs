@@ -64,9 +64,8 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
 		public async Task<IEnumerable<T>> Show<T>(string message, IEnumerable<T> items)
 		{
-			await ShowAndWait(message, items, SelectionMode.Multiple);
-
-			if(WasCancelled) {
+			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Multiple);
+			if(wasCancelled) {
 				return null;
 			}
 
@@ -81,16 +80,15 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
 		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items)
 		{
-			await ShowAndWait(message, items, SelectionMode.Single);
-
-			if(WasCancelled) {
+			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Single);
+			if(wasCancelled) {
 				return default(T);
 			}
 
 			return (T)_ListView.SelectedItem;
 		}
 
-		private async Task ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode)
+		private async Task<bool> ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode)
 		{
 			var vm = new SelectDialogViewModel()
 			{
@@ -100,8 +98,9 @@ namespace GM.WPF.Controls.Dialogs
 			};
 			ViewModel = vm;
 
-			await WaitDialog();
+			bool wasCancelled = await WaitDialog();
 			Close();
+			return wasCancelled;
 		}
 
 		private void Button_OK_Click(object sender, RoutedEventArgs e)
