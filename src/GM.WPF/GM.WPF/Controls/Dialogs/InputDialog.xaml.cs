@@ -80,10 +80,10 @@ namespace GM.WPF.Controls.Dialogs
 			_Label_Watermark.Content = watermark;
 			_TextBox.Text = defaultText;
 			
-			await WaitDialog();
+			bool wasCancelled = await WaitDialog();
 			Close();
 
-			if(WasCancelled) {
+			if(wasCancelled) {
 				return null;
 			}
 
