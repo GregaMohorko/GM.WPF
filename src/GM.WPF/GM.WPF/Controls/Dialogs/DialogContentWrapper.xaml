@@ -39,7 +39,7 @@ Author: Grega Mohorko
 		x:Name="_Self"
 		>
 	<Grid Background="#A0000000">
-		<Border Name="_Border" MinWidth="20" MinHeight="20" VerticalAlignment="Center" HorizontalAlignment="Center" Background="{x:Static local:Dialog.DefaultBackground}" BorderBrush="{x:Static local:Dialog.DefaultBorderBrush}" BorderThickness="{x:Static local:Dialog.DefaultBorderThickness}">
+		<Border Name="_Border" Margin="20" MinWidth="20" MinHeight="20" VerticalAlignment="Center" HorizontalAlignment="Center" Background="{x:Static local:Dialog.DefaultBackground}" BorderBrush="{x:Static local:Dialog.DefaultBorderBrush}" BorderThickness="{x:Static local:Dialog.DefaultBorderThickness}">
 			<ContentPresenter Name="_ContentPresenter" />
 		</Border>
 	</Grid>
