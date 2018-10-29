@@ -86,6 +86,11 @@ namespace GM.WPF.Controls
 
 		private void DisposeViewModel()
 		{
+			// only dispose the current view model if it is not inherited from parent control
+			if(ReferenceEquals(DataContext, ViewModel)) {
+				// this view model was inherited from parent control, do not dispose it!
+				return;
+			}
 			if(ViewModel is IDisposable vmDisposable) {
 				vmDisposable.Dispose();
 			}
