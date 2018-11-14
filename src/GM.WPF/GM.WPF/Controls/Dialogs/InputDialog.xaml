@@ -34,6 +34,7 @@ Author: Grega Mohorko
 		mc:Ignorable="d"
 		d:DesignHeight="300"
 		d:DesignWidth="500"
+		d:DataContext="{d:DesignInstance Type=local:InputDialogViewModel,IsDesignTimeCreatable=True}"
 		>
 	<Grid Margin="20 20 20 10" MinWidth="300" MaxWidth="500" MinHeight="120">
 		<Grid.RowDefinitions>
@@ -41,10 +42,10 @@ Author: Grega Mohorko
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<TextBlock Name="_TextBlock_Message" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" Text="Message" />
+		<TextBlock Text="{Binding Message,Mode=OneWay}" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" />
 		<Grid Grid.Row="1" Background="White" Margin="0 0 0 10">
-			<Label Name="_Label_Watermark" Content="Watermark ..." FontSize="18" Foreground="Gray" />
-			<TextBox Name="_TextBox" FontSize="18" VerticalContentAlignment="Center" TextWrapping="Wrap" Background="Transparent" />
+			<Label Name="_Label_Watermark" Content="{Binding Watermark,Mode=OneWay}" FontSize="18" Foreground="Gray" />
+			<TextBox Name="_TextBox" Text="{Binding Text,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" FontSize="18" VerticalContentAlignment="Center" TextWrapping="Wrap" Background="Transparent" />
 		</Grid>
 		<Button Content="Cancel" Grid.Row="2" Width="100" Height="32" HorizontalAlignment="Left" Click="Button_Cancel_Click" />
 		<Button Content="OK" Grid.Row="2" Width="150" Height="32" HorizontalAlignment="Right" IsDefault="True" Click="Button_OK_Click" />

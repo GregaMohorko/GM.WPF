@@ -44,9 +44,6 @@ using GM.WPF.Converters;
 
 namespace GM.WPF.Controls.Dialogs
 {
-	/// <summary>
-	/// Interaction logic for InputDialog.xaml
-	/// </summary>
 	public partial class InputDialog : TaskDialog
 	{
 		/// <summary>
@@ -55,31 +52,33 @@ namespace GM.WPF.Controls.Dialogs
 		public InputDialog()
 		{
 			InitializeComponent();
-			
+
 			_TextBox.TextChanged += TextBox_TextChanged;
 		}
-		
-		private static readonly string TextBox_TextChanged_ConverterParameter = $"{StringToVisibilityConverter.PARAM_EMPTY}_{StringToVisibilityConverter.PARAM_INVERT}";
+
+		private const string TEXTBOX_TEXTCHANGED_CONVERTERPARAMETER = StringToVisibilityConverter.PARAM_EMPTY + "_" + StringToVisibilityConverter.PARAM_INVERT;
 
 		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			// this should be done in XAML using Binding, but it doesn't seem to work ...
-			string options = TextBox_TextChanged_ConverterParameter;
+			string options = TEXTBOX_TEXTCHANGED_CONVERTERPARAMETER;
 			_Label_Watermark.Visibility = (Visibility)StringToVisibilityConverter.Convert(_TextBox.Text, ref options);
 		}
 
 		/// <summary>
-		/// Shows the input dialog and waits for the users reponse. If the user cancels the dialog, this method will return null.
+		/// Shows the input dialog and waits for the users response. If the user cancels the dialog, this method will return null.
 		/// </summary>
 		/// <param name="message">The message to show above the input box.</param>
 		/// <param name="watermark">The text to show in the input box.</param>
 		/// <param name="defaultText">The default text that will already be in the input box.</param>
 		public async Task<string> Show(string message = null, string watermark = null, string defaultText = null)
 		{
-			_TextBlock_Message.Text = message;
-			_Label_Watermark.Content = watermark;
-			_TextBox.Text = defaultText;
-			
+			var vm = new InputDialogViewModel<string>();
+			vm.Message = message;
+			vm.Watermark = watermark;
+			vm.Text = defaultText;
+			ViewModel = vm;
+
 			bool wasCancelled = await WaitDialog();
 			Close();
 
@@ -87,7 +86,31 @@ namespace GM.WPF.Controls.Dialogs
 				return null;
 			}
 
-			return _TextBox.Text;
+			return vm.Text;
+		}
+
+		/// <summary>
+		/// Shows the input dialog and waits for the users response. If the user cancels the dialog, this method will return null.
+		/// </summary>
+		/// <param name="message">The message to show above the input box.</param>
+		/// <param name="watermark">The text to show in the input box.</param>
+		/// <param name="defaultValue">The default value that will already be in the input box.</param>
+		public async Task<int?> ShowInt(string message = null, string watermark = null, int? defaultValue = null)
+		{
+			var vm = new InputDialogViewModel<int?>();
+			vm.Message = message;
+			vm.Watermark = watermark;
+			vm.Text = defaultValue;
+			ViewModel = vm;
+
+			bool wasCancelled = await WaitDialog();
+			Close();
+
+			if(wasCancelled) {
+				return null;
+			}
+
+			return vm.Text;
 		}
 
 		private void Button_OK_Click(object sender, RoutedEventArgs e)

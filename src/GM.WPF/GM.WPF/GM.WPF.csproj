@@ -96,6 +96,7 @@
     <Compile Include="Controls\Dialogs\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Dialogs\InputDialogViewModel.cs" />
     <Compile Include="Controls\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
