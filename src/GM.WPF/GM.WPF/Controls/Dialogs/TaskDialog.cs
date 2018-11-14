@@ -60,7 +60,7 @@ namespace GM.WPF.Controls.Dialogs
 		/// <summary>
 		/// Resumes the waiting thread from where the <see cref="WaitDialog"/> was called.
 		/// </summary>
-		/// <param name="wasCancelled">Determines whether the dialog was cancelled. This sets the value of <see cref="WasCancelled"/>.</param>
+		/// <param name="wasCancelled">Determines whether the dialog was cancelled.</param>
 		protected void EndDialog(bool wasCancelled = false)
 		{
 			dialogAwaiter.SetResult(wasCancelled);

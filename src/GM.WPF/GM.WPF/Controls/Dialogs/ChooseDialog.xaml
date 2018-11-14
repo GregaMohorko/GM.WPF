@@ -42,14 +42,14 @@ Author: Grega Mohorko
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<TextBlock Name="_TextBlock_Question" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" Text="Question?" />
-		<WrapPanel Name="_WrapPanel_Buttons" Grid.Row="1" HorizontalAlignment="Right">
+		<WrapPanel Name="_WrapPanel_Buttons" Grid.Row="1" HorizontalAlignment="Stretch">
 			<WrapPanel.Resources>
 				<Style TargetType="Button">
 					<Setter Property="FontWeight" Value="Bold" />
 					<Setter Property="Height" Value="35" />
 					<Setter Property="Padding" Value="50 0" />
 					<Setter Property="Margin" Value="5" />
-					<Setter Property="HorizontalAlignment" Value="Right" />
+					<Setter Property="HorizontalAlignment" Value="Center" />
 				</Style>
 			</WrapPanel.Resources>
 			<Button Content="Answer 1" />

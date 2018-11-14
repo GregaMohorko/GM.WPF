@@ -39,4 +39,4 @@ Author: Grega Mohorko
 	<Grid Name="_Grid">
 		
 	</Grid>
-</UserControl>
+</controls:BaseControl>
