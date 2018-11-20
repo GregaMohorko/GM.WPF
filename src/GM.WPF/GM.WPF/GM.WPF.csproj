@@ -121,6 +121,7 @@
     <Compile Include="Converters\BaseConverter.cs" />
     <Compile Include="Converters\BoolToBoolConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\FunctionToStringConverter.cs" />
     <Compile Include="Converters\IListToIListConverter.cs" />
     <Compile Include="Converters\IntToVisibilityConverter.cs" />
     <Compile Include="Converters\ObjectToBoolConverter.cs" />

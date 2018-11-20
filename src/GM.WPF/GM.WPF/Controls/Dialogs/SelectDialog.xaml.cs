@@ -40,11 +40,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GM.WPF.Converters;
 
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for SelectDialog.xaml
+	/// A dialog with a <see cref="ListView"/> where the user can select items from that list.
 	/// </summary>
 	public partial class SelectDialog : TaskDialog
 	{
@@ -62,9 +63,10 @@ namespace GM.WPF.Controls.Dialogs
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="message">The message text.</param>
 		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
-		public async Task<IEnumerable<T>> Show<T>(string message, IEnumerable<T> items)
+		/// <param name="convertToString">The function that converts every item to a string representation. If null, ToString is used.</param>
+		public async Task<IEnumerable<T>> Show<T>(string message, IEnumerable<T> items, Func<T, string> convertToString = null)
 		{
-			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Multiple);
+			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Multiple, convertToString);
 			if(wasCancelled) {
 				return null;
 			}
@@ -73,14 +75,15 @@ namespace GM.WPF.Controls.Dialogs
 		}
 
 		/// <summary>
-		/// Shows the select dialog and waits for the user to select a single item and confirm. If the user cancels the dialog, this method returns null.
+		/// Shows the select dialog and waits for the user to select a single item and confirm. If the user cancels the dialog, this method returns default value.
 		/// </summary>
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="message">The message text.</param>
 		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
-		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items)
+		/// <param name="convertToString">The function that converts every item to a string representation. If null, ToString is used.</param>
+		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items, Func<T, string> convertToString = null)
 		{
-			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Single);
+			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Single, convertToString);
 			if(wasCancelled) {
 				return default(T);
 			}
@@ -88,13 +91,35 @@ namespace GM.WPF.Controls.Dialogs
 			return (T)_ListView.SelectedItem;
 		}
 
-		private async Task<bool> ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode)
+		private async Task<bool> ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode, Func<T, string> convertToString)
 		{
-			var vm = new SelectDialogViewModel()
+			if(convertToString == null) {
+				convertToString = (item) => item?.ToString();
+			}
+
+			// create the binding for the text
+			var textBinding = new Binding
 			{
-				Message=message,
-				Items=items,
-				SelectionMode=selectionMode
+				Converter = new FunctionToStringConverter<T>(convertToString),
+				Mode = BindingMode.OneWay
+			};
+
+			// create the factory for the data template
+			var tbFactory = new FrameworkElementFactory(typeof(TextBlock));
+			tbFactory.SetValue(TextBlock.TextProperty, textBinding);
+
+			// set the item template of the ListView
+			_ListView.ItemTemplate = new DataTemplate
+			{
+				DataType = typeof(T),
+				VisualTree = tbFactory
+			};
+
+			var vm = new SelectDialogViewModel
+			{
+				Message = message,
+				Items = items,
+				SelectionMode = selectionMode
 			};
 			ViewModel = vm;
 
