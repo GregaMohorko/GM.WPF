@@ -50,9 +50,11 @@ Author: Grega Mohorko
 			<RowDefinition />
 		</Grid.RowDefinitions>
 		<TextBlock Text="{Binding Message,Mode=OneWay}" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" />
-		<ListView Name="_ListView" Grid.Row="1" MinWidth="50" ItemsSource="{Binding Items,Mode=OneWay}" SelectionMode="{Binding SelectionMode,Mode=OneWay}" />
+		<ContentControl Name="_ContentControl" Grid.Row="1" MinWidth="50">
+			<!-- The ListBox/DataGrid will be created in code -->
+		</ContentControl>
 		<StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" Margin="20 0 0 0">
-			<Button Content="OK" IsEnabled="{Binding Mode=OneWay,ElementName=_ListView,Path=SelectedItem,Converter={converters:ObjectToBoolConverter}}" Padding="40 10" Margin="0 0 0 40" Click="Button_OK_Click" />
+			<Button Content="OK" IsEnabled="{Binding SelectedItem,Converter={converters:ObjectToBoolConverter},Mode=OneWay}" Padding="40 10" Margin="0 0 0 40" Click="Button_OK_Click" />
 			<Button Content="Cancel" Padding="10 0" HorizontalAlignment="Left" Click="Button_Cancel_Click" />
 		</StackPanel>
 	</Grid>

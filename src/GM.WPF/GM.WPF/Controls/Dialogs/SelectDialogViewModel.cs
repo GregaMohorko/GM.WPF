@@ -37,10 +37,9 @@ using GM.WPF.MVVM;
 
 namespace GM.WPF.Controls.Dialogs
 {
-	class SelectDialogViewModel:ViewModel
+	class SelectDialogViewModel : ViewModel
 	{
 		public string Message { get; set; }
-		public IEnumerable Items { get; set; }
-		public SelectionMode SelectionMode { get; set; }
+		public object SelectedItem { get; set; }
 	}
 }

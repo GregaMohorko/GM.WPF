@@ -33,6 +33,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -45,7 +46,7 @@ using GM.WPF.Converters;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// A dialog with a <see cref="ListView"/> where the user can select items from that list.
+	/// A dialog with a <see cref="ListBox"/> or <see cref="DataGrid"/> where the user can select items from it.
 	/// </summary>
 	public partial class SelectDialog : TaskDialog
 	{
@@ -59,39 +60,143 @@ namespace GM.WPF.Controls.Dialogs
 
 		/// <summary>
 		/// Shows the select dialog and waits for the user to select possibly multiple items and confirm. If the user cancels the dialog, this method will return null.
+		/// <para>This method will create a <see cref="ListBox"/>.</para>
 		/// </summary>
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="message">The message text.</param>
-		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
+		/// <param name="items">Items to put in the <see cref="ListBox"/> control.</param>
 		/// <param name="convertToString">The function that converts every item to a string representation. If null, ToString is used.</param>
-		public async Task<IEnumerable<T>> Show<T>(string message, IEnumerable<T> items, Func<T, string> convertToString = null)
+		public async Task<List<T>> Show<T>(string message, IEnumerable<T> items, Func<T, string> convertToString = null)
 		{
-			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Multiple, convertToString);
-			if(wasCancelled) {
+			ListBox listBox = await ShowAndWait(message, items, SelectionMode.Multiple, convertToString);
+			if(listBox == null) {
 				return null;
 			}
 
-			return _ListView.SelectedItems.Cast<T>();
+			return listBox.SelectedItems.Cast<T>().ToList();
 		}
 
 		/// <summary>
 		/// Shows the select dialog and waits for the user to select a single item and confirm. If the user cancels the dialog, this method returns default value.
+		/// <para>This method will create a <see cref="ListBox"/>.</para>
 		/// </summary>
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="message">The message text.</param>
-		/// <param name="items">Items to put in the <see cref="ListView"/> control.</param>
+		/// <param name="items">Items to put in the <see cref="ListBox"/> control.</param>
 		/// <param name="convertToString">The function that converts every item to a string representation. If null, ToString is used.</param>
 		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items, Func<T, string> convertToString = null)
 		{
-			bool wasCancelled = await ShowAndWait(message, items, SelectionMode.Single, convertToString);
-			if(wasCancelled) {
+			ListBox listBox = await ShowAndWait(message, items, SelectionMode.Single, convertToString);
+			if(listBox == null) {
 				return default(T);
 			}
 
-			return (T)_ListView.SelectedItem;
+			return (T)listBox.SelectedItem;
 		}
 
-		private async Task<bool> ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode, Func<T, string> convertToString)
+		/// <summary>
+		/// Shows the select dialog and waits for the user to select possibly multiple items and confirm. If the user cancels the dialog, this method will return null.
+		/// <para>This method will create a <see cref="DataGrid"/> with the specified columns.</para>
+		/// </summary>
+		/// <typeparam name="T">The type of items.</typeparam>
+		/// <param name="message">The message text.</param>
+		/// <param name="items">Items to put in the <see cref="DataGrid"/> control.</param>
+		/// <param name="columnHeadersAndBindingPaths">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
+		public async Task<List<T>> Show<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, string>> columnHeadersAndBindingPaths)
+		{
+			// create bindings out of the paths
+			var columnHeadersAndBindings = columnHeadersAndBindingPaths.Select(ct => Tuple.Create(ct.Item1, new Binding
+			{
+				Path = new PropertyPath(ct.Item2),
+				Mode = BindingMode.OneWay
+			}));
+
+			return await Show(message, items, columnHeadersAndBindings);
+		}
+
+		/// <summary>
+		/// Shows the select dialog and waits for the user to select possibly multiple items and confirm. If the user cancels the dialog, this method will return null.
+		/// <para>This method will create a <see cref="DataGrid"/> with the specified columns.</para>
+		/// </summary>
+		/// <typeparam name="T">The type of items.</typeparam>
+		/// <param name="message">The message text.</param>
+		/// <param name="items">Items to put in the <see cref="DataGrid"/> control.</param>
+		/// <param name="columnHeadersAndBindings">A collection of tuples with a column header and the binding for that column.</param>
+		public async Task<List<T>> Show<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, Binding>> columnHeadersAndBindings)
+		{
+			DataGrid dataGrid = await ShowAndWait(message, items, columnHeadersAndBindings, DataGridSelectionMode.Extended);
+			if(dataGrid == null) {
+				return null;
+			}
+
+			return dataGrid.SelectedItems.Cast<T>().ToList();
+		}
+
+		/// <summary>
+		/// Shows the select dialog and waits for the user to select a single item and confirm. If the user cancels the dialog, this method returns default value.
+		/// <para>This method will create a <see cref="DataGrid"/> with the specified columns.</para>
+		/// </summary>
+		/// <typeparam name="T">The type of items.</typeparam>
+		/// <param name="message">The message text.</param>
+		/// <param name="items">Items to put in the <see cref="DataGrid"/> control.</param>
+		/// <param name="columnHeadersAndBindingPaths">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
+		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, string>> columnHeadersAndBindingPaths)
+		{
+			// create bindings out of the paths
+			var columnHeadersAndBindings = columnHeadersAndBindingPaths.Select(ct => Tuple.Create(ct.Item1, new Binding
+			{
+				Path = new PropertyPath(ct.Item2),
+				Mode = BindingMode.OneWay
+			}));
+
+			return await ShowSingle(message, items, columnHeadersAndBindings);
+		}
+
+		/// <summary>
+		/// Shows the select dialog and waits for the user to select a single item and confirm. If the user cancels the dialog, this method returns default value.
+		/// <para>This method will create a <see cref="DataGrid"/> with the specified columns.</para>
+		/// </summary>
+		/// <typeparam name="T">The type of items.</typeparam>
+		/// <param name="message">The message text.</param>
+		/// <param name="items">Items to put in the <see cref="DataGrid"/> control.</param>
+		/// <param name="columnHeadersAndBindings">A collection of tuples with a column header and the binding for that column.</param>
+		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, Binding>> columnHeadersAndBindings)
+		{
+			DataGrid dataGrid = await ShowAndWait(message, items, columnHeadersAndBindings, DataGridSelectionMode.Extended);
+			if(dataGrid == null) {
+				return default(T);
+			}
+
+			return (T)dataGrid.SelectedItem;
+		}
+
+		private async Task<DataGrid> ShowAndWait<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, Binding>> columnHeadersAndBindings, DataGridSelectionMode selectionMode)
+		{
+			var dataGrid = new DataGrid
+			{
+				ItemsSource = items,
+				SelectionMode = selectionMode,
+				AutoGenerateColumns = false,
+				IsReadOnly = true
+			};
+			// create columns
+			foreach(Tuple<string, Binding> columnTuple in columnHeadersAndBindings) {
+				dataGrid.Columns.Add(new DataGridTextColumn
+				{
+					Header = columnTuple.Item1,
+					Binding = columnTuple.Item2
+				});
+			}
+
+			bool wasCancelled = await ShowAndWait(message, dataGrid);
+			if(wasCancelled) {
+				return null;
+			}
+
+			return dataGrid;
+		}
+
+		private async Task<ListBox> ShowAndWait<T>(string message, IEnumerable<T> items, SelectionMode selectionMode, Func<T, string> convertToString)
 		{
 			if(convertToString == null) {
 				convertToString = (item) => item?.ToString();
@@ -108,18 +213,39 @@ namespace GM.WPF.Controls.Dialogs
 			var tbFactory = new FrameworkElementFactory(typeof(TextBlock));
 			tbFactory.SetValue(TextBlock.TextProperty, textBinding);
 
-			// set the item template of the ListView
-			_ListView.ItemTemplate = new DataTemplate
+			var listBox = new ListBox
 			{
-				DataType = typeof(T),
-				VisualTree = tbFactory
+				ItemsSource = items,
+				ItemTemplate = new DataTemplate
+				{
+					DataType = typeof(T),
+					VisualTree = tbFactory
+				},
+				SelectionMode = selectionMode
 			};
+
+			bool wasCancelled = await ShowAndWait(message, listBox);
+			if(wasCancelled) {
+				return null;
+			}
+
+			return listBox;
+		}
+
+		private async Task<bool> ShowAndWait(string message, Selector content)
+		{
+			// set binding for the selected item
+			content.SetBinding(Selector.SelectedItemProperty, new Binding
+			{
+				Path = new PropertyPath(nameof(SelectDialogViewModel.SelectedItem)),
+				Mode = BindingMode.TwoWay
+			});
+
+			_ContentControl.Content = content;
 
 			var vm = new SelectDialogViewModel
 			{
-				Message = message,
-				Items = items,
-				SelectionMode = selectionMode
+				Message = message
 			};
 			ViewModel = vm;
 
