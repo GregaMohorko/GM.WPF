@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2018 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,59 +22,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2018-11-27
 Author: Grega Mohorko
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using GM.Utility;
 
 namespace GM.WPF.Converters
 {
 	/// <summary>
-	/// Converter from <see cref="string"/> to <see cref="Visibility"/>.
-	/// <para>
-	/// Is considered visible, when the string is not null (false = hidden/collapsed).
-	/// </para>
+	/// Converter from <see cref="ICollection"/> to <see cref="bool"/>.
+	/// <para>Is considered true, when the collection is not empty.</para>
 	/// </summary>
-	[ValueConversion(typeof(string), typeof(Visibility))]
-	public class StringToVisibilityConverter : BaseConverter
+	[ValueConversion(typeof(ICollection), typeof(bool))]
+	public class ICollectionToBoolConverter : BaseConverter
 	{
-		/// <summary>
-		/// Causes empty strings to be considered as false.
-		/// </summary>
-		public const string PARAM_EMPTY = StringToBoolConverter.PARAM_EMPTY;
-
 		/// <summary>
 		/// Inverts the value.
 		/// </summary>
 		public const string PARAM_INVERT = BoolToBoolConverter.PARAM_INVERT;
 
 		/// <summary>
-		/// Causes false to represent <see cref="Visibility.Collapsed"/> instead of <see cref="Visibility.Hidden"/>.
+		/// Determines how many items must there be in the collection to be considered as true. Default is 1.
+		/// <para>Usage: atleast(*), where * is replaced with the number of items.</para>
 		/// </summary>
-		public const string PARAM_COLLAPSE = BoolToVisibilityConverter.PARAM_COLLAPSE;
+		public const string PARAM_ATLEAST = "atleast";
 
 		/// <summary>
-		/// Converts the provided value with the specified parameter to <see cref="Visibility"/>.
+		/// Converts the provided value with the specified parameter to <see cref="ICollection"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static Visibility? Convert(object value, ref string options)
+		public static bool? Convert(object value, ref string options)
 		{
-			bool? boolValue = StringToBoolConverter.Convert(value, ref options);
-			if(boolValue == null) {
+			if(!(value is IList collection)) {
 				return null;
 			}
 
-			return BoolToVisibilityConverter.Convert(boolValue.Value, ref options);
+			bool boolValue = collection.Count >= 1;
+
+			if(options != null) {
+				options = options.ToLower();
+
+				boolValue = AtLeast(collection, ref options) ?? boolValue;
+				if(options.Contains(PARAM_INVERT)) {
+					boolValue = !boolValue;
+					options = StringUtility.RemoveFirstOf(options, PARAM_INVERT);
+				}
+			}
+
+			return boolValue;
+		}
+
+		private readonly static Regex regex_atLeast = new Regex($@"{PARAM_ATLEAST}\((\d+)\)", RegexOptions.Compiled);
+		private static bool? AtLeast(ICollection collection, ref string options)
+		{
+			MatchCollection matches = regex_atLeast.Matches(options);
+			if(matches.Count == 0) {
+				return null;
+			}
+			if(matches.Count > 1) {
+				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ATLEAST}' criteria is allowed.");
+			}
+
+			options = StringUtility.RemoveAllOf(options, $"{PARAM_ATLEAST}(");
+
+			string atLeastParameter = matches[0].Groups[1].Value;
+			int atLeastValue = int.Parse(atLeastParameter);
+
+			return collection.Count >= atLeastValue;
 		}
 
 		/// <summary>
@@ -99,7 +125,7 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			// converting back is disabled because the information about the string is lost
+			// converting back is disabled because the information about the collection is lost
 			return DependencyProperty.UnsetValue;
 		}
 	}

@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2018 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2018-11-27
 Author: Grega Mohorko
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -39,37 +39,31 @@ using System.Windows.Data;
 namespace GM.WPF.Converters
 {
 	/// <summary>
-	/// Converter from <see cref="string"/> to <see cref="Visibility"/>.
-	/// <para>
-	/// Is considered visible, when the string is not null (false = hidden/collapsed).
-	/// </para>
+	/// Converter from <see cref="ICollection"/> to <see cref="Visibility"/>.
+	/// <para>Is considered visible, when the collection is not empty.</para>
 	/// </summary>
-	[ValueConversion(typeof(string), typeof(Visibility))]
-	public class StringToVisibilityConverter : BaseConverter
+	[ValueConversion(typeof(ICollection), typeof(Visibility))]
+	public class ICollectionToVisibilityConverter : BaseConverter
 	{
-		/// <summary>
-		/// Causes empty strings to be considered as false.
-		/// </summary>
-		public const string PARAM_EMPTY = StringToBoolConverter.PARAM_EMPTY;
-
 		/// <summary>
 		/// Inverts the value.
 		/// </summary>
-		public const string PARAM_INVERT = BoolToBoolConverter.PARAM_INVERT;
+		public const string PARAM_INVERT = ICollectionToBoolConverter.PARAM_INVERT;
 
 		/// <summary>
-		/// Causes false to represent <see cref="Visibility.Collapsed"/> instead of <see cref="Visibility.Hidden"/>.
+		/// Determines how many items must there be in the collection to be considered as true. Default is 1.
+		/// <para>Usage: atleast(*), where * is replaced with the number of items.</para>
 		/// </summary>
-		public const string PARAM_COLLAPSE = BoolToVisibilityConverter.PARAM_COLLAPSE;
+		public const string PARAM_ATLEAST = ICollectionToBoolConverter.PARAM_ATLEAST;
 
 		/// <summary>
-		/// Converts the provided value with the specified parameter to <see cref="Visibility"/>.
+		/// Converts the provided value with the speficied parameter to <see cref="Visibility"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
 		public static Visibility? Convert(object value, ref string options)
 		{
-			bool? boolValue = StringToBoolConverter.Convert(value, ref options);
+			bool? boolValue = ICollectionToBoolConverter.Convert(value, ref options);
 			if(boolValue == null) {
 				return null;
 			}

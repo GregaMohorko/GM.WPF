@@ -62,7 +62,7 @@ namespace GM.WPF.Converters
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static IList Convert(object value,ref string options)
+		public static IList Convert(object value, ref string options)
 		{
 			var ilistValue = value as IList;
 			if(ilistValue == null) {
@@ -71,7 +71,7 @@ namespace GM.WPF.Converters
 			if(ilistValue.Count == 0) {
 				return ilistValue;
 			}
-			
+
 			if(options == null) {
 				return ilistValue;
 			}
@@ -83,10 +83,10 @@ namespace GM.WPF.Converters
 			return ilistValue;
 		}
 
-		private static IList Ignore(IList list,ref string options)
+		private readonly static Regex regex_ignore = new Regex($@"{PARAM_IGNORE}\((\d+)\)", RegexOptions.Compiled);
+		private static IList Ignore(IList list, ref string options)
 		{
-			var regex = new Regex($@"{PARAM_IGNORE}\((\d+)\)");
-			MatchCollection matches = regex.Matches(options);
+			MatchCollection matches = regex_ignore.Matches(options);
 			if(matches.Count == 0) {
 				return list;
 			}
@@ -113,10 +113,10 @@ namespace GM.WPF.Converters
 			return list;
 		}
 
-		private static IList Rotate(IList list,ref string options)
+		private readonly static Regex regex_rotate = new Regex($@"{PARAM_ROTATE}\((\d+)\)", RegexOptions.Compiled);
+		private static IList Rotate(IList list, ref string options)
 		{
-			var regex = new Regex($@"{PARAM_ROTATE}\((\d+)\)");
-			MatchCollection matches = regex.Matches(options);
+			MatchCollection matches = regex_rotate.Matches(options);
 			if(matches.Count == 0) {
 				return list;
 			}
@@ -124,7 +124,7 @@ namespace GM.WPF.Converters
 				throw new ArgumentException($"The provided parameter '{options}' for the converter is invalid: only one '{PARAM_ROTATE}' criteria is allowed.");
 			}
 
-			options = StringUtility.RemoveAllOf(options, $"{PARAM_ROTATE}(");
+			options = StringUtility.RemoveFirstOf(options, $"{PARAM_ROTATE}(");
 
 			string rotateParameter = matches[0].Groups[1].Value;
 			int rotateValue = int.Parse(rotateParameter);
