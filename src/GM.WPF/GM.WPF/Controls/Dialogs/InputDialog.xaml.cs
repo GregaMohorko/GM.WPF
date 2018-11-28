@@ -44,6 +44,9 @@ using GM.WPF.Converters;
 
 namespace GM.WPF.Controls.Dialogs
 {
+	/// <summary>
+	/// A dialog with an input box.
+	/// </summary>
 	public partial class InputDialog : TaskDialog
 	{
 		/// <summary>
@@ -73,31 +76,19 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="defaultText">The default text that will already be in the input box.</param>
 		public async Task<string> Show(string message = null, string watermark = null, string defaultText = null)
 		{
-			var vm = new InputDialogViewModel<string>();
-			vm.Message = message;
-			vm.Watermark = watermark;
-			vm.Text = defaultText;
-			ViewModel = vm;
-
-			bool wasCancelled = await WaitDialog();
-			Close();
-
-			if(wasCancelled) {
-				return null;
-			}
-
-			return vm.Text;
+			return await Show<string>(message, watermark, defaultText);
 		}
 
 		/// <summary>
-		/// Shows the input dialog and waits for the users response. If the user cancels the dialog, this method will return null.
+		/// Shows the input dialog and waits for the users response. If the user cancels the dialog, this method will return the default value.
 		/// </summary>
+		/// <typeparam name="T">The type of the input.</typeparam>
 		/// <param name="message">The message to show above the input box.</param>
 		/// <param name="watermark">The text to show in the input box.</param>
 		/// <param name="defaultValue">The default value that will already be in the input box.</param>
-		public async Task<int?> ShowInt(string message = null, string watermark = null, int? defaultValue = null)
+		public async Task<T> Show<T>(string message = null, string watermark = null, T defaultValue = default(T))
 		{
-			var vm = new InputDialogViewModel<int?>();
+			var vm = new InputDialogViewModel<T>();
 			vm.Message = message;
 			vm.Watermark = watermark;
 			vm.Text = defaultValue;
@@ -107,7 +98,7 @@ namespace GM.WPF.Controls.Dialogs
 			Close();
 
 			if(wasCancelled) {
-				return null;
+				return default(T);
 			}
 
 			return vm.Text;
