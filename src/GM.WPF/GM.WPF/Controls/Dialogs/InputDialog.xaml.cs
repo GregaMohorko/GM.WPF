@@ -91,7 +91,7 @@ namespace GM.WPF.Controls.Dialogs
 			var vm = new InputDialogViewModel<T>();
 			vm.Message = message;
 			vm.Watermark = watermark;
-			vm.Text = defaultValue;
+			vm.Text = defaultValue?.ToString();
 			ViewModel = vm;
 
 			bool wasCancelled = await WaitDialog();
@@ -101,7 +101,7 @@ namespace GM.WPF.Controls.Dialogs
 				return default(T);
 			}
 
-			return vm.Text;
+			return vm.Value;
 		}
 
 		private void Button_OK_Click(object sender, RoutedEventArgs e)

@@ -28,6 +28,7 @@ Author: Grega Mohorko
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,27 @@ namespace GM.WPF.Controls.Dialogs
 	{
 		public string Message { get; set; }
 		public string Watermark { get; set; }
-		public T Text { get; set; }
+		public T Value { get; private set; }
+		public bool CanSubmit { get; private set; }
+
+		private string _text;
+		public string Text
+		{
+			get => _text;
+			set
+			{
+				_text = value;
+				try {
+					Value = (T)typeConverter.ConvertFromString(_text);
+					CanSubmit = true;
+				} catch {
+					// invalid string
+					CanSubmit = false;
+				}
+			}
+		}
+
+		private readonly TypeConverter typeConverter;
 
 		public InputDialogViewModel()
 		{
@@ -51,6 +72,10 @@ namespace GM.WPF.Controls.Dialogs
 				Watermark = "Watermark ...";
 				return;
 			}
+
+			CanSubmit = typeof(T) == typeof(string);
+
+			typeConverter = TypeDescriptor.GetConverter(typeof(T));
 		}
 	}
 }

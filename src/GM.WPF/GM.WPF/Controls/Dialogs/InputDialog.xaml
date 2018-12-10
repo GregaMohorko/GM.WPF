@@ -48,6 +48,6 @@ Author: Grega Mohorko
 			<TextBox Name="_TextBox" Text="{Binding Text,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" FontSize="18" VerticalContentAlignment="Center" TextWrapping="Wrap" Background="Transparent" />
 		</Grid>
 		<Button Content="Cancel" Grid.Row="2" Width="100" Height="32" HorizontalAlignment="Left" Click="Button_Cancel_Click" />
-		<Button Content="OK" Grid.Row="2" Width="150" Height="32" HorizontalAlignment="Right" IsDefault="True" Click="Button_OK_Click" />
+		<Button Content="OK" IsEnabled="{Binding CanSubmit,Mode=OneWay}" Grid.Row="2" Width="150" Height="32" HorizontalAlignment="Right" IsDefault="True" Click="Button_OK_Click" />
 	</Grid>
 </local:TaskDialog>
