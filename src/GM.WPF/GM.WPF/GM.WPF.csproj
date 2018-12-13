@@ -104,6 +104,7 @@
     </Compile>
     <Compile Include="Controls\Dialogs\SelectDialogViewModel.cs" />
     <Compile Include="Controls\Dialogs\TaskDialog.cs" />
+    <Compile Include="Controls\GMDataGrid.cs" />
     <Compile Include="Controls\GMStackPanel.cs" />
     <Compile Include="Controls\GMWrapPanel.cs" />
     <Compile Include="Controls\ProgressOverlay.xaml.cs">

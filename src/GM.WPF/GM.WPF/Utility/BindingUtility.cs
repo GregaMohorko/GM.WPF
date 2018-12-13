@@ -54,7 +54,7 @@ namespace GM.WPF.Utility
 
 		/// <summary>
 		/// Evaluates the value of this binding on the provided object.
-		/// <para>Note: while evaluating, the source of the binding will be set to the provided object and then set back to what it was. This may cause side effects.</para>
+		/// <para>Supported: Binding and PriorityBinding.</para>
 		/// </summary>
 		/// <param name="bindingBase">The binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
@@ -67,7 +67,6 @@ namespace GM.WPF.Utility
 
 		/// <summary>
 		/// Evaluates the value of this priority binding on the provided object.
-		/// <para>Note: while evaluating, the source of the bindings will be set to the provided object and then set back to what it was. This may cause side effects.</para>
 		/// </summary>
 		/// <param name="priorityBinding">The priority binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
@@ -80,7 +79,6 @@ namespace GM.WPF.Utility
 
 		/// <summary>
 		/// Evaluates the value of this binding on the provided object.
-		/// <para>Note: while evaluating, the source of the binding will be set to the provided object and then set back to what it was. This may cause side effects.</para>
 		/// </summary>
 		/// <param name="binding">The binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
@@ -92,8 +90,37 @@ namespace GM.WPF.Utility
 		}
 
 		/// <summary>
+		/// Sets the value of the property specified by this binding in the provided object to the provided value.
+		/// <para>Supported: Binding only.</para>
+		/// </summary>
+		/// <param name="bindingBase">The binding to use for setting the value.</param>
+		/// <param name="obj">The object to which to set the value.</param>
+		/// <param name="value">The value to set.</param>
+		/// <exception cref="InvalidOperationException">Thrown when the evaluation of the binding is not successful.</exception>
+		public static void SetValueFor(this BindingBase bindingBase, object obj, object value)
+		{
+			if(!TrySetValueFor(bindingBase, obj, value)) {
+				throw new InvalidOperationException($"Setting the provided value to the provided object was not successful using the specified binding.");
+			}
+		}
+
+		/// <summary>
+		/// Sets the value of the property specified by this binding in the provided object to the provided value.
+		/// </summary>
+		/// <param name="binding">The binding to use for setting the value.</param>
+		/// <param name="obj">The object to which to set the value.</param>
+		/// <param name="value">The value to set.</param>
+		/// <exception cref="InvalidOperationException">Thrown when the evaluation of the binding is not successful.</exception>
+		public static void SetValueFor(this Binding binding, object obj, object value)
+		{
+			if(!TrySetValueFor(binding, obj, value)) {
+				throw new InvalidOperationException($"Setting the provided value to the provided object was not successful using the specified binding.");
+			}
+		}
+
+		/// <summary>
 		/// Tries to evaluate the value of this binding on the provided object and returns a tuple with a bool that determines whether the evaluation was successful and the resulting value.
-		/// <para>Note: while evaluating, the source of the binding will be set to the provided object and then set back to what it was. This may cause side effects.</para>
+		/// <para>Supported: Binding and PriorityBinding.</para>
 		/// </summary>
 		/// <param name="bindingBase">The binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
@@ -111,8 +138,23 @@ namespace GM.WPF.Utility
 		}
 
 		/// <summary>
+		/// Tries to set the value of the property specified by this binding in the provided object to the provided value and returns true if it was successful.
+		/// <para>Supported: Binding only.</para>
+		/// </summary>
+		/// <param name="bindingBase">The binding to use for setting the value.</param>
+		/// <param name="obj">The object to which to set the value.</param>
+		/// <param name="value">The value to set.</param>
+		public static bool TrySetValueFor(this BindingBase bindingBase, object obj, object value)
+		{
+			if(bindingBase is Binding b) {
+				return TrySetValueFor(b, obj, value);
+			} else {
+				throw new ArgumentException($"Unsupported binding type: {bindingBase.GetType().ToString()}.", nameof(bindingBase));
+			}
+		}
+
+		/// <summary>
 		/// Tries to evaluate the value of this priority binding on the provided object and returns a tuple with a bool that determines whether the evaluation was successful and the resulting value.
-		/// <para>Note: while evaluating, the source of the child bindings will be set to the provided object and then set back to what it was. This may cause side effects.</para>
 		/// </summary>
 		/// <param name="priorityBinding">The priority binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
@@ -141,7 +183,6 @@ namespace GM.WPF.Utility
 
 		/// <summary>
 		/// Tries to evaluate the value of this binding on the provided object and returns a tuple with a bool that determines whether the evaluation was successful and the resulting value.
-		/// <para>Note: while evaluating, the source of the binding will be set to the provided object and then set back to what it was. This may cause side effects.</para>
 		/// </summary>
 		/// <param name="binding">The binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
@@ -161,7 +202,8 @@ namespace GM.WPF.Utility
 				ValidatesOnDataErrors = binding.ValidatesOnDataErrors,
 				ValidatesOnExceptions = binding.ValidatesOnExceptions,
 				ValidatesOnNotifyDataErrors = binding.ValidatesOnNotifyDataErrors,
-				Source = obj
+				Source = obj,
+				Mode = BindingMode.OneWay
 			};
 
 			var dummyDO = new DummyDO();
@@ -171,12 +213,50 @@ namespace GM.WPF.Utility
 
 			// check if it was successful
 			BindingExpression bindingExpression = BindingOperations.GetBindingExpression(dummyDO, DummyDO.ValueProperty);
-			if(bindingExpression.Status != BindingStatus.Active) {
+			if(bindingExpression?.Status != BindingStatus.Active) {
 				// it was not
-				return Tuple.Create<bool, object>(false, bindingExpression.Status);
+				return Tuple.Create<bool, object>(false, bindingExpression?.Status);
 			}
 
 			return Tuple.Create(true, value);
+		}
+
+		/// <summary>
+		/// Tries to set the value of the property specified by this binding in the provided object to the provided value and returns true if it was successful.
+		/// </summary>
+		/// <param name="binding">The binding to use for setting the value.</param>
+		/// <param name="obj">The object to which to set the value.</param>
+		/// <param name="value">The value to set.</param>
+		public static bool TrySetValueFor(this Binding binding, object obj, object value)
+		{
+			var tmpBinding = new Binding
+			{
+				Path = binding.Path,
+				Converter = binding.Converter,
+				ConverterParameter = binding.ConverterParameter,
+				ConverterCulture = binding.ConverterCulture,
+				FallbackValue = binding.FallbackValue,
+				StringFormat = binding.StringFormat,
+				TargetNullValue = binding.TargetNullValue,
+				ValidatesOnDataErrors = binding.ValidatesOnDataErrors,
+				ValidatesOnExceptions = binding.ValidatesOnExceptions,
+				ValidatesOnNotifyDataErrors = binding.ValidatesOnNotifyDataErrors,
+				Source = obj,
+				Mode = BindingMode.OneWayToSource
+			};
+
+			var dummyDO = new DummyDO();
+			BindingOperations.SetBinding(dummyDO, DummyDO.ValueProperty, tmpBinding);
+
+			dummyDO.Value = value;
+
+			// check if it was successful
+			BindingExpression bindingExpression = BindingOperations.GetBindingExpression(dummyDO, DummyDO.ValueProperty);
+			if(bindingExpression?.Status != BindingStatus.Active) {
+				// it was not
+				return false;
+			}
+			return true;
 		}
 	}
 }
