@@ -11,8 +11,14 @@
     <iconUrl>https://mohorko.info/favicon.ico</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-	<releaseNotes>Fixed a bug in the DependencyVMProperty when the name of the view models property differs from the controls.</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>WPF MVVM controls utility extensions dialogs converters behaviors windows</tags>
+	<releaseNotes>Added: PanelBehavior.Spacing, GMDataGrid, collection converters, BindingUtility, TreeViewUtility.
+Improved dialogs:
+	- InputDialog: Added support for any type of input
+	- SelectDialog:
+		- support for custom convertion of items to text
+		- support for DataGrid with custom columns
+Fixed TimePicker not working in DataGrid.</releaseNotes>
   </metadata>
 </package>

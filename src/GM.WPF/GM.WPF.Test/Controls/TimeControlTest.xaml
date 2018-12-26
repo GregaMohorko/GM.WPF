@@ -1,0 +1,57 @@
+﻿<!--
+MIT License
+
+Copyright (c) 2018 Grega Mohorko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Project: GM.WPF.Test
+Created: 2018-12-26
+Author: GregaMohorko
+-->
+<controls:BaseControl x:Class="GM.WPF.Test.Controls.TimeControlTest"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:local="clr-namespace:GM.WPF.Test.Controls"
+		xmlns:controls="clr-namespace:GM.WPF.Controls;assembly=GM.WPF"
+		mc:Ignorable="d"
+		d:DesignHeight="450"
+		d:DesignWidth="800"
+		>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<controls:TimeControl Name="_TimeControl_Top" TimeChanged="Top_TimeChanged" />
+		<controls:TimeControl Name="_TimeControl_Bottom" Time="{Binding ElementName=_TimeControl_Top,Path=Time,Mode=TwoWay}" TimeChanged="Bottom_TimeChanged" Grid.Row="2" Grid.Column="2" />
+		<TextBox Name="_TextBox_Event_Top" Grid.Column="2" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+		<TextBox Name="_TextBox_Event_Bottom" Grid.Row="2" IsReadOnly="True" HorizontalContentAlignment="Right" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+		<GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+		<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+	</Grid>
+</controls:BaseControl>

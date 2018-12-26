@@ -48,9 +48,6 @@ using GM.WPF.Windows;
 
 namespace GM.WPF.Test
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
 	public partial class MainWindow : BaseWindow, IDisposable
 	{
 		public MainWindow()
@@ -192,71 +189,5 @@ namespace GM.WPF.Test
 		#endregion // Dialogs
 
 		#endregion // MainMenu
-
-		#region TimeControl
-		private void TimeControl_Top_TimeChanged(object sender, TimeSpan e)
-		{
-			TimeControl_TimeChanged(e, _TimeControl_Event_TextBox_Top);
-		}
-
-		private void TimeControl_Bottom_TimeChanged(object sender, TimeSpan e)
-		{
-			TimeControl_TimeChanged(e, _TimeControl_Event_TextBox_Bottom);
-		}
-
-		private void TimeControl_TimeChanged(TimeSpan newValue, TextBox associatedTextBox)
-		{
-			string text = $"TimeChanged event fired. Current time value: {newValue}";
-			if(!string.IsNullOrEmpty(associatedTextBox.Text)) {
-				text = Environment.NewLine + text;
-			}
-
-			associatedTextBox.AppendText(text);
-			associatedTextBox.ScrollToEnd();
-		}
-		#endregion // TimeControl
-
-		#region TimePicker
-		private void TimePicker_Left_SelectedTimeChanged(object sender, TimeSpan e)
-		{
-			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeChanged), (TimePicker)sender, _TimePicker_Event_TextBox_Left);
-		}
-
-		private void TimePicker_Right_SelectedTimeChanged(object sender, TimeSpan e)
-		{
-			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeChanged), (TimePicker)sender, _TimePicker_Event_TextBox_Right);
-		}
-
-		private void TimePicker_Left_SelectedTimeSelected(object sender, TimeSpan e)
-		{
-			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeSelected), (TimePicker)sender, _TimePicker_Event_TextBox_Left);
-		}
-
-		private void TimePicker_Right_SelectedTimeSelected(object sender, TimeSpan e)
-		{
-			TimePicker_EventOccured(nameof(TimePicker.SelectedTimeSelected), (TimePicker)sender, _TimePicker_Event_TextBox_Right);
-		}
-
-		private void TimePicker_Left_PopupOpened(object sender, EventArgs e)
-		{
-			TimePicker_EventOccured(nameof(TimePicker.PopupOpened), (TimePicker)sender, _TimePicker_Event_TextBox_Left);
-		}
-
-		private void TimePicker_Right_PopupOpened(object sender, EventArgs e)
-		{
-			TimePicker_EventOccured(nameof(TimePicker.PopupOpened), (TimePicker)sender, _TimePicker_Event_TextBox_Right);
-		}
-
-		private void TimePicker_EventOccured(string eventName, TimePicker timePicker, TextBox associatedTextBox)
-		{
-			string text = $"{eventName}: {timePicker.SelectedTime}";
-			if(!string.IsNullOrEmpty(associatedTextBox.Text)) {
-				text = Environment.NewLine + text;
-			}
-
-			associatedTextBox.AppendText(text);
-			associatedTextBox.ScrollToEnd();
-		}
-		#endregion // TimePicker
 	}
 }

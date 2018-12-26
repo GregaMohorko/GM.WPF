@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
+﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2018 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +22,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF.Test
-Created: 2017-11-26
+Created: 2018-12-26
 Author: GregaMohorko
--->
-<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
-  <PropertyChanged />
-</Weavers>
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GM.WPF.MVVM;
+
+namespace GM.WPF.Test.Controls
+{
+	class ProgressOverlayTestViewModel:ViewModel
+	{
+		public string Message { get; set; }
+
+		private double? _value;
+		public double? Value
+		{
+			get => _value;
+			set
+			{
+				_value = value;
+				if(value != null) {
+					IsIndeterminate = false;
+				}
+			}
+		}
+
+		private bool _isIndeterminate;
+		public bool IsIndeterminate
+		{
+			get => _isIndeterminate;
+			set
+			{
+				_isIndeterminate = value;
+				if(value) {
+					Value = null;
+				} else if(Value == null) {
+					Value = 0;
+				}
+			}
+		}
+
+		public ProgressOverlayTestViewModel()
+		{
+			if(IsInDesignMode) {
+				Message = "Loading ...";
+				return;
+			}
+		}
+	}
+}

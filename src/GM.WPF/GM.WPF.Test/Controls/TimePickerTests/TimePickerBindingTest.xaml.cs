@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2018 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +22,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF.Test
-Created: 2017-11-26
-Author: Grega Mohorko
+Created: 2018-12-26
+Author: GregaMohorko
 */
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GM.WPF.MVVM;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using GM.Utility;
+using GM.WPF.Controls;
 
-namespace GM.WPF.Test
+namespace GM.WPF.Test.Controls.TimePickerTests
 {
-	class MainWindowViewModel : ViewModel
-	{
-		public bool IsDialogProgressShown { get; set; }
+    public partial class TimePickerBindingTest : BaseControl
+    {
+        public TimePickerBindingTest()
+        {
+            InitializeComponent();
+
+			var vm = new TimePickerBindingTestViewModel();
+			vm.PropertyChanged += Vm_PropertyChanged;
+			ViewModel = vm;
+        }
+
+		private void Vm_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			var vm = (TimePickerBindingTestViewModel)ViewModel;
+
+			_TextBox.Text += $"ViewModel property changed: {e.PropertyName}={vm.GetPropertyValue(e.PropertyName)}"+Environment.NewLine;
+			_TextBox.ScrollToEnd();
+		}
 	}
 }

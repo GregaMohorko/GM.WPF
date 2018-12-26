@@ -35,6 +35,7 @@ Author: Grega Mohorko
 		xmlns:controls="clr-namespace:GM.WPF.Controls;assembly=GM.WPF"
 		xmlns:dialogs="clr-namespace:GM.WPF.Controls.Dialogs;assembly=GM.WPF"
 		xmlns:converters="clr-namespace:GM.WPF.Converters;assembly=GM.WPF"
+		xmlns:controlsTests="clr-namespace:GM.WPF.Test.Controls"
         mc:Ignorable="d"
         Title="GM.WPF.Test"
 		Height="700"
@@ -69,75 +70,8 @@ Author: Grega Mohorko
 				</MenuItem>
 			</Menu>
 			<TabControl>
-				<TabItem Header="ProgressOverlay">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" MinWidth="150" />
-							<ColumnDefinition />
-						</Grid.ColumnDefinitions>
-						<StackPanel Background="LightGray">
-							<Label FontWeight="Bold">Message:</Label>
-							<TextBox Text="{Binding ProgressOverlay_Message,UpdateSourceTrigger=PropertyChanged,Mode=OneWayToSource}" Margin="5 0" />
-							<StackPanel Orientation="Horizontal">
-								<Label FontWeight="Bold">Progress value:</Label>
-								<Label Content="{Binding ProgressOverlay_Value,Mode=OneWay}" />
-							</StackPanel>
-							<Slider Value="{Binding ProgressOverlay_Value,Mode=TwoWay}" Maximum="100" Margin="10 0" TickFrequency="1" IsSnapToTickEnabled="True" />
-							<CheckBox IsChecked="{Binding ProgressOverlay_IsIndeterminate,Mode=TwoWay}" Content="Is indeterminate" Margin="10 10" />
-						</StackPanel>
-						<Grid Grid.Column="1">
-							<StackPanel>
-								<TextBlock>Some random content ...</TextBlock>
-								<TextBlock>Some random content ...</TextBlock>
-								<TextBlock>Some random content ...</TextBlock>
-								<TextBlock>Some random content ...</TextBlock>
-								<TextBlock>Some random content ...</TextBlock>
-								<TextBlock>Some random content ...</TextBlock>
-							</StackPanel>
-							<controls:ProgressOverlay Message="{Binding ProgressOverlay_Message,Mode=OneWay}" ProgressValue="{Binding ProgressOverlay_Value,Mode=OneWay}" />
-						</Grid>
-					</Grid>
-				</TabItem>
-				<TabItem Header="TimeControl">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition />
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition />
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition />
-							<RowDefinition Height="Auto" />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						<controls:TimeControl Name="_TimeControl_Top" TimeChanged="TimeControl_Top_TimeChanged" />
-						<controls:TimeControl Name="_TimeControl_Bottom" Time="{Binding ElementName=_TimeControl_Top,Path=Time,Mode=TwoWay}" TimeChanged="TimeControl_Bottom_TimeChanged" Grid.Row="2" Grid.Column="2" />
-						<TextBox Name="_TimeControl_Event_TextBox_Top" Grid.Column="2" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-						<TextBox Name="_TimeControl_Event_TextBox_Bottom" Grid.Row="2" IsReadOnly="True" HorizontalContentAlignment="Right" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-						<GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-						<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-					</Grid>
-				</TabItem>
-				<TabItem Header="TimePicker">
-					<Grid Margin="20">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition />
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition />
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition />
-							<RowDefinition Height="Auto" />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						<controls:TimePicker Name="_TimePicker_Left" SelectedTimeChanged="TimePicker_Left_SelectedTimeChanged" SelectedTimeSelected="TimePicker_Left_SelectedTimeSelected" PopupOpened="TimePicker_Left_PopupOpened" HorizontalAlignment="Center" VerticalAlignment="Center" />
-						<controls:TimePicker Name="_TimePicker_Right" SelectedTime="{Binding ElementName=_TimePicker_Left,Path=SelectedTime,Mode=TwoWay}" SelectedTimeChanged="TimePicker_Right_SelectedTimeChanged" SelectedTimeSelected="TimePicker_Right_SelectedTimeSelected" PopupOpened="TimePicker_Right_PopupOpened" Grid.Column="2" Width="100" Height="30" />
-						<TextBox Name="_TimePicker_Event_TextBox_Left" Grid.Row="2" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-						<TextBox Name="_TimePicker_Event_TextBox_Right" Grid.Column="2" Grid.Row="2" IsReadOnly="True" HorizontalContentAlignment="Right" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-						<GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-						<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-						
-					</Grid>
+				<TabItem Header="Controls">
+					<controlsTests:ControlsTest />
 				</TabItem>
 			</TabControl>
 		</DockPanel>

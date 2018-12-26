@@ -37,9 +37,6 @@ using System.Windows;
 
 namespace GM.WPF.Test
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
 	public partial class App : Application
 	{
 		private MainWindow mainWindow;

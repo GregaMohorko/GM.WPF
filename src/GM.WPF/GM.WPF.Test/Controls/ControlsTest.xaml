@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
+﻿<!--
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2018 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +22,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF.Test
-Created: 2017-11-26
+Created: 2018-12-26
 Author: GregaMohorko
 -->
-<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
-  <PropertyChanged />
-</Weavers>
+<controls:BaseControl x:Class="GM.WPF.Test.Controls.ControlsTest"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:local="clr-namespace:GM.WPF.Test.Controls"
+		xmlns:controls="clr-namespace:GM.WPF.Controls;assembly=GM.WPF"
+		mc:Ignorable="d"
+		d:DesignHeight="450"
+		d:DesignWidth="800"
+		>
+	<TabControl>
+		<TabItem Header="ProgressOverlay">
+			<local:ProgressOverlayTest />
+		</TabItem>
+		<TabItem Header="TimeControl">
+			<local:TimeControlTest />
+		</TabItem>
+		<TabItem Header="TimePicker" IsSelected="True">
+			<local:TimePickerTest />
+		</TabItem>
+	</TabControl>
+</controls:BaseControl>
