@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 MIT License
 
@@ -26,6 +26,6 @@ Project: GM.WPF
 Created: 2017-12-7
 Author: GregaMohorko
 -->
-<Weavers>
-	<PropertyChanged />
+<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
+  <PropertyChanged />
 </Weavers>

@@ -102,8 +102,6 @@ namespace GM.WPF.Controls
 			vm.PropertyChanged += ViewModel_PropertyChanged;
 
 			ViewModel = vm;
-
-			SelectedTime = vm.SelectedTime;
 		}
 
 		/// <summary>

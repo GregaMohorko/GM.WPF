@@ -36,6 +36,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GM.Utility;
+using GM.Windows.Utility;
+using GM.WPF.Utility;
 
 namespace GM.WPF.Controls
 {
@@ -173,7 +175,7 @@ namespace GM.WPF.Controls
 			IList<DataGridCellInfo> selectedCells = SelectedCells;
 
 			// parse the clipboard data [row][column]
-			List<string[]> clipboardData = clipboardData = ClipboardUtility.ParseClipboardData();
+			List<string[]> clipboardData = ClipboardUtility.ParseClipboardData();
 
 			// inspect selected cells ...
 			bool shouldPasteDuplicates;

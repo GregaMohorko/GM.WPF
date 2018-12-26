@@ -33,7 +33,6 @@ using System.Text;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight.CommandWpf;
 using GM.WPF.MVVM;
-using PropertyChanged;
 
 namespace GM.WPF.Controls
 {
@@ -41,27 +40,13 @@ namespace GM.WPF.Controls
 	{
 		public RelayCommand Command_OpenPopup { get; private set; }
 
-		//public TimeSpan SelectedTime { get; set; }
-		private TimeSpan _selectedTime;
-		public TimeSpan SelectedTime
-		{
-			get => _selectedTime;
-			set
-			{
-				if(_selectedTime == value) {
-					return;
-				}
-				_selectedTime = value;
-			}
-		}
+		public TimeSpan SelectedTime { get; set; }
 		public bool IsPopupOpen { get; set; }
 
 		public string ButtonContent => SelectedTime.ToString("hh':'mm");
 
 		public TimePickerViewModel()
 		{
-			SelectedTime = new TimeSpan(17, 0, 0);
-
 			if(IsInDesignMode) {
 				return;
 			}

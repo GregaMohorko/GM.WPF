@@ -85,8 +85,6 @@ namespace GM.WPF.Controls
 			var vm = new TimeControlViewModel();
 			vm.PropertyChanged += ViewModel_PropertyChanged;
 			ViewModel = vm;
-
-			Time = vm.Time;
 		}
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

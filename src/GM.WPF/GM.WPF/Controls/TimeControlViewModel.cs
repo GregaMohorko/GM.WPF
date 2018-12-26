@@ -84,8 +84,6 @@ namespace GM.WPF.Controls
 
 		public TimeControlViewModel()
 		{
-			Time = new TimeSpan(17, 0, 0);
-
 			if(IsInDesignMode) {
 				return;
 			}
