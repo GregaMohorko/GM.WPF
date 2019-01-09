@@ -43,54 +43,26 @@ namespace GM.WPF.Controls
 {
 	/// <summary>
 	/// A <see cref="DataGrid"/> with:
-	/// <para>- ability to paste comma separated values data (even directly from excel)</para>
+	/// <para>- ability to copy/paste comma separated values data (even directly from/to excel)</para>
+	/// <para>- ability to delete cell values (only works when <see cref="DataGrid.CanUserDeleteRows"/> is false)</para>
 	/// </summary>
 	public class GMDataGrid : DataGrid
 	{
 		static GMDataGrid()
 		{
 			var pasteCommandBinding = new CommandBinding(ApplicationCommands.Paste, new ExecutedRoutedEventHandler(OnExecutedPasteInternal), new CanExecuteRoutedEventHandler(OnCanExecutePasteInternal));
-			var deleteCommandBinding = new CommandBinding(ApplicationCommands.Delete, new ExecutedRoutedEventHandler(OnExecutedDeleteInternal), new CanExecuteRoutedEventHandler(OnCanExecuteDeleteInternal));
 			CommandManager.RegisterClassCommandBinding(typeof(GMDataGrid), pasteCommandBinding);
-			CommandManager.RegisterClassCommandBinding(typeof(GMDataGrid), deleteCommandBinding);
-		}
-
-		private static void OnExecutedPasteInternal(object sender, ExecutedRoutedEventArgs e)
-		{
-			((GMDataGrid)sender).OnExecutePaste(sender, e);
 		}
 
 		private static void OnCanExecutePasteInternal(object sender, CanExecuteRoutedEventArgs e)
 		{
-			((GMDataGrid)sender).OnCanExecutePaste(sender, e);
+			((GMDataGrid)sender).OnCanExecutePaste(e);
 		}
 
-		private static void OnExecutedDeleteInternal(object sender, ExecutedRoutedEventArgs e)
+		private static void OnExecutedPasteInternal(object sender, ExecutedRoutedEventArgs e)
 		{
-			((GMDataGrid)sender).OnExecuteDelete(sender, e);
+			((GMDataGrid)sender).OnExecutedPaste(e);
 		}
-
-		private static void OnCanExecuteDeleteInternal(object sender, CanExecuteRoutedEventArgs e)
-		{
-			((GMDataGrid)sender).OnCanExecuteDelete(sender, e);
-		}
-
-		/// <summary>
-		/// Occurs when pasting.
-		/// </summary>
-		public event ExecutedRoutedEventHandler ExecutePasteEvent;
-		/// <summary>
-		/// Occurs when determining whether paste event can be executed.
-		/// </summary>
-		public event CanExecuteRoutedEventHandler CanExecutePasteEvent;
-		/// <summary>
-		/// Occurs when deleting.
-		/// </summary>
-		public event ExecutedRoutedEventHandler ExecuteDeleteEvent;
-		/// <summary>
-		/// Occurs when determining whether delete event can be executed.
-		/// </summary>
-		public event CanExecuteRoutedEventHandler CanExecuteDeleteEvent;
 
 		/// <summary>
 		/// DependencyProperty for CanUserAddRows.
@@ -107,71 +79,113 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
-		/// This virtual method is called when ApplicationCommands.Paste command query its state.
+		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="ApplicationCommands.Paste"/> command.
 		/// </summary>
-		/// <param name="sender">The target.</param>
-		/// <param name="e">Arguments.</param>
-		protected virtual void OnCanExecutePaste(object sender, CanExecuteRoutedEventArgs e)
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnCanExecutePaste(CanExecuteRoutedEventArgs e)
 		{
-			if(CanExecutePasteEvent != null) {
-				CanExecutePasteEvent(sender, e);
-				if(e.Handled) {
-					return;
-				}
-			}
-
 			e.CanExecute = SelectedCells.Count > 0;
 			e.Handled = true;
 		}
 
 		/// <summary>
-		/// This virtual method is called when ApplicationCommands.Delete command is executed.
+		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="DataGrid.DeleteCommand"/> command.
 		/// </summary>
-		/// <param name="sender">The target.</param>
-		/// <param name="e">Arguments.</param>
-		private void OnExecuteDelete(object sender, ExecutedRoutedEventArgs e)
+		/// <param name="e">The data for the event.</param>
+		protected override void OnCanExecuteDelete(CanExecuteRoutedEventArgs e)
 		{
-			if(ExecuteDeleteEvent != null) {
-				ExecuteDeleteEvent(sender, e);
-				if(e.Handled) {
-					return;
-				}
-			}
-
-			IList<DataGridCellInfo> selectedCells = SelectedCells;
-			foreach(DataGridCellInfo cell in selectedCells) {
-				DataGridColumn column = cell.Column;
-				if(column.IsReadOnly) {
-					continue;
-				}
-				object item = cell.Item;
-				object cellContent = null;
-
-				BeginEditCommand.Execute(null, this);
-				// using column.OnPastingCellClipboardContent did not paste on all cells sometimes ... which is weird!
-				// that's why I'm first trying to set it manually using binding
-				bool bindingSuccessful = column.ClipboardContentBinding.TrySetValueFor(item, cellContent);
-				if(!bindingSuccessful) {
-					column.OnPastingCellClipboardContent(item, cellContent);
-				}
-				CommitEditCommand.Execute(null, this);
+			if(CanUserDeleteRows == false) {
+				e.CanExecute = true;
+				e.Handled = true;
+				return;
+			} else {
+				base.OnCanExecuteDelete(e);
 			}
 		}
 
 		/// <summary>
-		/// This virtual method is called when ApplicationCommands.Paste command is executed.
+		/// Provides handling for the <see cref="CommandBinding.Executed"/> event associated with the <see cref="ApplicationCommands.Copy"/> command.
 		/// </summary>
-		/// <param name="sender">The target.</param>
-		/// <param name="e">Arguments.</param>
-		protected virtual void OnExecutePaste(object sender, ExecutedRoutedEventArgs e)
+		/// <param name="e">The data for the event.</param>
+		/// <exception cref="NotSupportedException"><see cref="DataGrid.ClipboardCopyMode"/> is set to <see cref="DataGridClipboardCopyMode.None"/>.</exception>
+		protected override void OnExecutedCopy(ExecutedRoutedEventArgs e)
 		{
-			if(ExecutePasteEvent != null) {
-				ExecutePasteEvent(sender, e);
-				if(e.Handled) {
-					return;
-				}
+			DataGridClipboardCopyMode clipboardCopyMode = ClipboardCopyMode;
+
+			if(clipboardCopyMode != DataGridClipboardCopyMode.None) {
+				ExecuteCopy(e, clipboardCopyMode);
+			} else {
+				base.OnExecutedCopy(e);
+			}
+		}
+
+		/// <summary>
+		/// Provides handling for the <see cref="CommandBinding.Executed"/> event associated with the <see cref="ApplicationCommands.Paste"/> command.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnExecutedPaste(ExecutedRoutedEventArgs e)
+		{
+			ExecutePaste(e);
+		}
+
+		/// <summary>
+		/// Provides handling for the <see cref="CommandBinding.Executed"/> event associated with the <see cref="DataGrid.DeleteCommand"/> command.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected override void OnExecutedDelete(ExecutedRoutedEventArgs e)
+		{
+			if(CanUserDeleteRows == false) {
+				ExecuteDelete(e);
+			} else {
+				base.OnExecutedDelete(e);
+			}
+		}
+
+		/// <summary>
+		/// This method is called when ApplicationCommands.Copy command is executed.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		private void ExecuteCopy(ExecutedRoutedEventArgs e, DataGridClipboardCopyMode clipboardCopyMode)
+		{
+			// copy all selected cells as a tab-delimited text ONLY (without style, formatting, etc.)
+
+			IList<DataGridCellInfo> selectedCells = SelectedCells;
+
+			var selectedCellsByItem = selectedCells.GroupBy(c => c.Item);
+
+			var tsvLines = new List<string>();
+
+			if(clipboardCopyMode == DataGridClipboardCopyMode.IncludeHeader) {
+				// include the column headers in the 1st line
+				var columns = selectedCells.Select(c => c.Column).Distinct().ToList();
+				var columnHeaders = columns.Select(c => c.Header?.ToString());
+				tsvLines.Add(string.Join("\t", columnHeaders));
 			}
 
+			foreach(var itemAndCells in selectedCellsByItem) {
+				object item = itemAndCells.Key;
+				var tsvLineParts = new List<string>();
+				foreach(DataGridCellInfo cell in itemAndCells) {
+					object value = cell.Column.ClipboardContentBinding.GetValueFor(item);
+					string text = value?.ToString();
+					tsvLineParts.Add($"\"{text}\"");
+				}
+				string tsvLine = string.Join("\t", tsvLineParts);
+				tsvLines.Add(tsvLine);
+			}
+
+			string tsvText = string.Join(Environment.NewLine, tsvLines);
+			Clipboard.SetText(tsvText, TextDataFormat.Text);
+
+			e.Handled = true;
+		}
+
+		/// <summary>
+		/// This method is called when ApplicationCommands.Paste command is executed.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		private void ExecutePaste(ExecutedRoutedEventArgs e)
+		{
 			IList<DataGridCellInfo> selectedCells = SelectedCells;
 
 			// parse the clipboard data [row][column]
@@ -313,23 +327,35 @@ namespace GM.WPF.Controls
 					CommitEditCommand.Execute(null, this);
 				}
 			}
+
+			e.Handled = true;
 		}
 
 		/// <summary>
-		/// This virtual method is called when ApplicationCommands.Delete command query its state.
+		/// This method is called when ApplicationCommands.Delete command is executed.
 		/// </summary>
-		/// <param name="sender">The target.</param>
-		/// <param name="e">Arguments.</param>
-		private void OnCanExecuteDelete(object sender, CanExecuteRoutedEventArgs e)
+		/// <param name="e">The data for the event.</param>
+		private void ExecuteDelete(ExecutedRoutedEventArgs e)
 		{
-			if(CanExecuteDeleteEvent != null) {
-				CanExecuteDeleteEvent(sender, e);
-				if(e.Handled) {
-					return;
+			IList<DataGridCellInfo> selectedCells = SelectedCells;
+			foreach(DataGridCellInfo cell in selectedCells) {
+				DataGridColumn column = cell.Column;
+				if(column.IsReadOnly) {
+					continue;
 				}
+				object item = cell.Item;
+				object cellContent = null;
+
+				BeginEditCommand.Execute(null, this);
+				// using column.OnPastingCellClipboardContent did not paste on all cells sometimes ... which is weird!
+				// that's why I'm first trying to set it manually using binding
+				bool bindingSuccessful = column.ClipboardContentBinding.TrySetValueFor(item, cellContent);
+				if(!bindingSuccessful) {
+					column.OnPastingCellClipboardContent(item, cellContent);
+				}
+				CommitEditCommand.Execute(null, this);
 			}
 
-			e.CanExecute = CurrentItem != null;
 			e.Handled = true;
 		}
 	}
