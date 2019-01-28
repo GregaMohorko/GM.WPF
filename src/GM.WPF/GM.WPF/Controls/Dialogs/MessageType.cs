@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
+﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +21,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Project: GM.WPF.Test
-Created: 2017-11-26
-Author: Grega Mohorko
--->
-<packages>
-  <package id="CommonServiceLocator" version="2.0.4" targetFramework="net461" />
-  <package id="Fody" version="3.3.4" targetFramework="net461" developmentDependency="true" />
-  <package id="GM.Utility" version="1.2.8" targetFramework="net461" />
-  <package id="MvvmLightLibs" version="5.4.1.1" targetFramework="net461" />
-  <package id="PropertyChanged.Fody" version="2.6.0" targetFramework="net461" developmentDependency="true" />
-</packages>
+Project: GM.WPF
+Created: 2019-1-28
+Author: GregaMohorko
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GM.WPF.Controls.Dialogs
+{
+	/// <summary>
+	/// The type of message for <see cref="MessageDialog"/>. Determines the color of the background.
+	/// </summary>
+	public enum MessageType
+	{
+		/// <summary>
+		/// Normal message type. The background will be <see cref="MessageDialog.NormalBackground"/>.
+		/// </summary>
+		NORMAL = 0,
+		/// <summary>
+		/// Message type that represents a warning. The background will be <see cref="MessageDialog.WarningBackground"/>.
+		/// </summary>
+		WARNING = 1,
+		/// <summary>
+		/// Message type that represents an error. The background will be <see cref="MessageDialog.ErrorBackground"/>.
+		/// </summary>
+		ERROR = 2
+	}
+}

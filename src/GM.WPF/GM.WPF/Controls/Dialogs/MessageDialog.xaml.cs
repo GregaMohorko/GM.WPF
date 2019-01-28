@@ -49,25 +49,6 @@ namespace GM.WPF.Controls.Dialogs
 	public partial class MessageDialog : TaskDialog
 	{
 		/// <summary>
-		/// The type of message. Determines the color of the background.
-		/// </summary>
-		public enum MessageType
-		{
-			/// <summary>
-			/// Normal message type. The background will be <see cref="NormalBackground"/>.
-			/// </summary>
-			NORMAL = 0,
-			/// <summary>
-			/// Message type that represents a warning. The background will be <see cref="WarningBackground"/>.
-			/// </summary>
-			WARNING = 1,
-			/// <summary>
-			/// Message type that represents an error. The background will be <see cref="ErrorBackground"/>.
-			/// </summary>
-			ERROR=2
-		}
-
-		/// <summary>
 		/// Background for messages of type <see cref="MessageType.NORMAL"/>.
 		/// </summary>
 		public static Brush NormalBackground = DefaultBackground;

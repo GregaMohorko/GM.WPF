@@ -53,8 +53,8 @@
     <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.4.1.0, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.4.1.1\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
     </Reference>
-    <Reference Include="GM.Utility, Version=1.2.7.0, Culture=neutral, PublicKeyToken=a1ae152199607549, processorArchitecture=MSIL">
-      <HintPath>..\packages\GM.Utility.1.2.7\lib\netstandard2.0\GM.Utility.dll</HintPath>
+    <Reference Include="GM.Utility, Version=1.2.8.0, Culture=neutral, PublicKeyToken=a1ae152199607549, processorArchitecture=MSIL">
+      <HintPath>..\packages\GM.Utility.1.2.8\lib\netstandard2.0\GM.Utility.dll</HintPath>
     </Reference>
     <Reference Include="GM.Windows.Utility, Version=1.0.4.0, Culture=neutral, PublicKeyToken=a1ae152199607549, processorArchitecture=MSIL">
       <HintPath>..\packages\GM.Windows.Utility.1.0.4\lib\net461\GM.Windows.Utility.dll</HintPath>
@@ -99,6 +99,7 @@
     <Compile Include="Controls\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Dialogs\MessageType.cs" />
     <Compile Include="Controls\Dialogs\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
