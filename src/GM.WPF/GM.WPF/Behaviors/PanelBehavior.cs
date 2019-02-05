@@ -47,7 +47,17 @@ namespace GM.WPF.Behaviors
 		/// <summary>
 		/// The inner margin between elements in this panel. Note that this will only set the margins when the panel is loaded. It will not do anything when you add/remove children.
 		/// </summary>
-		public static readonly DependencyProperty SpacingProperty = DependencyProperty.RegisterAttached("Spacing", typeof(Thickness), typeof(Panel), new UIPropertyMetadata(OnSpacingChanged));
+		public static readonly DependencyProperty SpacingProperty;
+
+		private static readonly bool spacingRegistered;
+		static PanelBehavior()
+		{
+			// this prevents the "Property already registered" error in design
+			if(!spacingRegistered) {
+				spacingRegistered = true;
+				SpacingProperty = DependencyProperty.RegisterAttached("Spacing", typeof(Thickness), typeof(Panel), new UIPropertyMetadata(OnSpacingChanged));
+			}
+		}
 
 		/// <summary>
 		/// Gets the current effective value of <see cref="SpacingProperty"/> for the specified target.

@@ -38,7 +38,6 @@ using System.Windows;
 using System.Windows.Controls;
 using GM.Utility;
 using GM.WPF.MVVM;
-using GM.WPF.Utility;
 
 namespace GM.WPF.Controls
 {
@@ -48,7 +47,7 @@ namespace GM.WPF.Controls
 	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
 	/// <para>For registering dependency properties with view models, use <see cref="DependencyVMProperty(string, Type, Type, string, bool)"/>.</para>
 	/// </summary>
-	public class BaseControl:UserControl
+	public class BaseControl : UserControl
 	{
 		/// <summary>
 		/// Gets a value indicating whether the control is in design mode (running under Blend or Visual Studio).
@@ -97,6 +96,88 @@ namespace GM.WPF.Controls
 			}
 		}
 
+		#region DEPENDENCY PROPERTIES
+
+		#region DEPENDENCY PROPERTIES - DEPENDENCYNOTIFYPROPERTY
+		/// <summary>
+		/// Creates a dependency property that, when updated, will call the specified callback method.
+		/// <para>The <paramref name="propertyChangedCallback"/> must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</para>
+		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="propertyChangedCallback">The name of the method to call when this property changes. The method must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</param>
+		protected static DependencyProperty DependencyNotifyProperty<TOwner>(string name, string propertyChangedCallback)
+		{
+			return DependencyNotifyProperty(name, typeof(TOwner), propertyChangedCallback);
+		}
+
+		/// <summary>
+		/// Creates a dependency property that, when updated, will call the specified callback method.
+		/// <para>The <paramref name="propertyChangedCallback"/> must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</para>
+		/// </summary>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		/// <param name="propertyChangedCallback">The name of the method to call when this property changes. The method must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</param>
+		protected static DependencyProperty DependencyNotifyProperty(string name, Type ownerType, string propertyChangedCallback)
+		{
+			return DependencyNotifyProperty(name, ownerType, null, propertyChangedCallback);
+		}
+
+		/// <summary>
+		/// Creates a dependency property that, when updated, will call the specified callback method.
+		/// <para>The <paramref name="propertyChangedCallback"/> must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</para>
+		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="defaultValue">The default value of this property.</param>
+		/// <param name="propertyChangedCallback">The name of the method to call when this property changes. The method must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</param>
+		protected static DependencyProperty DependencyNotifyProperty<TOwner>(string name, object defaultValue, string propertyChangedCallback)
+		{
+			return DependencyNotifyProperty(name, typeof(TOwner), defaultValue, propertyChangedCallback);
+		}
+
+		/// <summary>
+		/// Creates a dependency property that, when updated, will call the specified callback method.
+		/// <para>The <paramref name="propertyChangedCallback"/> must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</para>
+		/// </summary>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		/// <param name="defaultValue">The default value of this property.</param>
+		/// <param name="propertyChangedCallback">The name of the method to call when this property changes. The method must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</param>
+		protected static DependencyProperty DependencyNotifyProperty(string name, Type ownerType, object defaultValue, string propertyChangedCallback)
+		{
+			if(!ownerType.IsSubclassOf(typeof(BaseControl))) {
+				throw new ArgumentException($"The owner type must be a child of {nameof(BaseControl)}. {ownerType.Name} is not.", nameof(ownerType));
+			}
+
+			MethodInfo callbackMethod = ownerType.GetMethod(propertyChangedCallback, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			{
+				if(callbackMethod == null) {
+					throw new ArgumentException($"The callback method named '{propertyChangedCallback}' does not exist in type '{ownerType.Name}'.", nameof(propertyChangedCallback));
+				}
+				if(callbackMethod.ReturnType != typeof(void)) {
+					throw new ArgumentException("The callback method must be void.", nameof(propertyChangedCallback));
+				}
+				var parameters = callbackMethod.GetParameters();
+				if(parameters.Length != 1) {
+					throw new ArgumentException("The callback method must have exactly one parameter.", nameof(propertyChangedCallback));
+				}
+				if(parameters[0].ParameterType != typeof(DependencyPropertyChangedEventArgs)) {
+					throw new ArgumentException($"The parameter of the callback method must be of type {nameof(DependencyPropertyChangedEventArgs)}.", nameof(propertyChangedCallback));
+				}
+			}
+
+			void staticCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+			{
+				callbackMethod.Invoke(d, new object[] { e });
+			}
+
+			Type propertyType = ownerType.GetPropertyTypeReal(name);
+			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(defaultValue, staticCallback));
+		}
+		#endregion DEPENDENCY PROPERTIES - DEPENDENCYNOTIFYPROPERTY
+
+		#region DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTY
 		/// <summary>
 		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
 		/// </summary>
@@ -196,14 +277,14 @@ namespace GM.WPF.Controls
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName = null, bool nullifyWhenParentTabItemIsNotSelected=false)
+		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName = null, bool nullifyWhenParentTabItemIsNotSelected = false)
 		{
 			if(viewModelPropertyName == null) {
 				viewModelPropertyName = name;
 			}
 
 			if(!ownerType.IsSubclassOf(typeof(BaseControl))) {
-				throw new ArgumentException("The owner type must be a child of BaseControl.", nameof(ownerType));
+				throw new ArgumentException($"The owner type must be a child of {nameof(BaseControl)}. {ownerType.Name} is not.", nameof(ownerType));
 			}
 			if(!viewModelType.IsSubclassOf(typeof(ViewModel))) {
 				throw new ArgumentException("The view model type must be a child of ViewModel.", nameof(viewModelType));
@@ -211,14 +292,14 @@ namespace GM.WPF.Controls
 			if(!viewModelType.HasProperty(viewModelPropertyName, true)) {
 				throw new ArgumentException("A property with the specified view model property name must exist in the specified view model type.", nameof(viewModelPropertyName));
 			}
-			
+
 			Type propertyType = ownerType.GetPropertyTypeReal(name);
 
 			object typeDefaultValue = propertyType.GetDefault();
 
-			TabItem tabItem=null;
+			TabItem tabItem = null;
 			TabControl tabControl;
-			object actualValue= typeDefaultValue;
+			object actualValue = typeDefaultValue;
 			void propertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
 				var baseControl = (BaseControl)d;
@@ -292,5 +373,8 @@ namespace GM.WPF.Controls
 			}
 			return null;
 		}
+		#endregion DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTY
+
+		#endregion DEPENDENCY PROPERTIES
 	}
 }
