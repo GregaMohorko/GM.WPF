@@ -92,6 +92,10 @@ namespace GM.WPF.Controls.Dialogs
 			vm.Message = message;
 			vm.Watermark = watermark;
 			vm.Text = defaultValue?.ToString();
+			if(vm.Text == null && typeof(T) == typeof(string)) {
+				// this is to distinguish between clicking 'cancel' and clicking 'ok' with an empty input
+				vm.Text = "";
+			}
 			ViewModel = vm;
 
 			bool wasCancelled = await WaitDialog();
