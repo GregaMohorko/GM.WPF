@@ -49,7 +49,7 @@ namespace GM.WPF.Utility
 		/// <param name="textBlock">The text block to measure.</param>
 		public static Size MeasureText(this TextBlock textBlock)
 		{
-			return MeasureText(textBlock.Text, textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch, textBlock.FontSize);
+			return MeasureText(textBlock.Text, textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch, textBlock.FontSize, textBlock);
 		}
 
 		/// <summary>
@@ -61,9 +61,17 @@ namespace GM.WPF.Utility
 		/// <param name="fontWeight">The font weight.</param>
 		/// <param name="fontStretch">The font stretch.</param>
 		/// <param name="fontSize">The font size.</param>
-		public static Size MeasureText(string text, FontFamily fontFamily, FontStyle fontStyle, FontWeight fontWeight, FontStretch fontStretch, double fontSize)
+		/// <param name="visual">The visual target object where this text will be drawn. Used for getting the DPI information. If not provided, it will use the main window of the current application.</param>
+		public static Size MeasureText(string text, FontFamily fontFamily, FontStyle fontStyle, FontWeight fontWeight, FontStretch fontStretch, double fontSize, Visual visual = null)
 		{
-			FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface(fontFamily, fontStyle, fontWeight, fontStretch), fontSize, Brushes.Black);
+			if(visual == null) {
+				visual = Application.Current.MainWindow;
+			}
+			if(visual == null) {
+				throw new ArgumentNullException(nameof(visual));
+			}
+			DpiScale dpiScale = VisualTreeHelper.GetDpi(visual);
+			var formattedText = new FormattedText(text, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface(fontFamily, fontStyle, fontWeight, fontStretch), fontSize, Brushes.Black, dpiScale.PixelsPerDip);
 
 			return new Size(formattedText.Width, formattedText.Height);
 		}

@@ -13,12 +13,21 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 - [GM.Windows.Utility](https://github.com/GregaMohorko/GM.Windows.Utility)
 - [GM.Windows.Tools](https://github.com/GregaMohorko/GM.Windows.Tools)
 
+## List of utility classes
+- [Binding](src/GM.WPF/GM.WPF/Utility/BindingUtility.cs)
+- [DependencyObject](src/GM.WPF/GM.WPF/Utility/DependencyObjectUtility.cs)
+- [FrameworkElement](src/GM.WPF/GM.WPF/Utility/FrameworkElementUtility.cs)
+- [Size](src/GM.WPF/GM.WPF/Utility/SizeUtility.cs)
+- [TextBlock](src/GM.WPF/GM.WPF/Utility/TextBlockUtility.cs)
+- [TreeView](src/GM.WPF/GM.WPF/Utility/TreeViewUtility.cs)
+- [Visual](src/GM.WPF/GM.WPF/Utility/VisualUtility.cs)
+
 ## Requirements
-.NET Framework 4.6.1
+.NET Framework 4.7.1
 
 ## Author and License
 Grega Mohorko ([www.mohorko.info](https://www.mohorko.info))
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 [MIT License](./LICENSE)
