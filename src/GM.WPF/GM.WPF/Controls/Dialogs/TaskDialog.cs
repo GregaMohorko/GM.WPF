@@ -52,7 +52,6 @@ namespace GM.WPF.Controls.Dialogs
 		protected Task<bool> WaitDialog()
 		{
 			Show();
-			this.MoveFocusNext();
 			dialogAwaiter = new TaskCompletionSource<bool>();
 			return dialogAwaiter.Task;
 		}

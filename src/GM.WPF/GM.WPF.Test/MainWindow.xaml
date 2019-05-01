@@ -32,9 +32,7 @@ Author: Grega Mohorko
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GM.WPF.Test"
 		xmlns:windows="clr-namespace:GM.WPF.Windows;assembly=GM.WPF"
-		xmlns:controls="clr-namespace:GM.WPF.Controls;assembly=GM.WPF"
 		xmlns:dialogs="clr-namespace:GM.WPF.Controls.Dialogs;assembly=GM.WPF"
-		xmlns:converters="clr-namespace:GM.WPF.Converters;assembly=GM.WPF"
 		xmlns:controlsTests="clr-namespace:GM.WPF.Test.Controls"
         mc:Ignorable="d"
         Title="GM.WPF.Test"
@@ -66,6 +64,10 @@ Author: Grega Mohorko
 					<MenuItem Header="_Select">
 						<MenuItem Header="_Multiple" Click="MenuItem_Dialogs_Select_Multiple_Click" />
 						<MenuItem Header="_Single" Click="MenuItem_Dialogs_Select_Single_Click" />
+					</MenuItem>
+					<MenuItem Header="S_earch">
+						<MenuItem Header="_Multiple (default settings)" Click="MenuItem_Dialogs_Search_Multiple_Click" />
+						<MenuItem Header="_Single (default settings)" Click="MenuItem_Dialogs_Search_Single_Click" />
 					</MenuItem>
 				</MenuItem>
 			</Menu>

@@ -79,12 +79,24 @@ namespace GM.WPF.Controls.Dialogs
 		}
 
 		/// <summary>
-		/// Shows this dialog and attempts to focus it.
+		/// Shows this dialog and attempts to focus the first focusable child.
 		/// </summary>
 		public void Show()
 		{
 			Visibility = Visibility.Visible;
-			Focus();
+
+			if(Content is FrameworkElement fwContent) {
+				if(!fwContent.IsLoaded) {
+					void Dialog_Loaded(object sender, RoutedEventArgs e)
+					{
+						fwContent.Loaded -= Dialog_Loaded;
+						fwContent.FocusFirstFocusableChild();
+					}
+					fwContent.Loaded += Dialog_Loaded;
+				} else {
+					fwContent.FocusFirstFocusableChild();
+				}
+			}
 		}
 
 		/// <summary>
@@ -144,7 +156,7 @@ namespace GM.WPF.Controls.Dialogs
 				BorderThickness = new Thickness();
 			}
 			Brush foreground = this.IsSet(ForegroundProperty) ? Foreground : DefaultForeground;
-			IEnumerable<Visual> allLabelsAndTextBoxes = ((DependencyObject)Content).GetVisualChildCollection<Label,TextBlock>();
+			IEnumerable<Visual> allLabelsAndTextBoxes = ((Visual)Content).GetVisualChildCollection<Label,TextBlock>();
 			foreach(Visual labelOrTextBlock in allLabelsAndTextBoxes) {
 				if(labelOrTextBlock is Label label) {
 					if(!label.IsSet(ForegroundProperty)) {

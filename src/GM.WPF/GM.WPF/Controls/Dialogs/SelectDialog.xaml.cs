@@ -102,7 +102,7 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="message">The message text.</param>
 		/// <param name="items">Items to put in the <see cref="DataGrid"/> control.</param>
 		/// <param name="columnHeadersAndBindingPaths">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
-		public async Task<List<T>> Show<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, string>> columnHeadersAndBindingPaths)
+		public Task<List<T>> Show<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, string>> columnHeadersAndBindingPaths)
 		{
 			// create bindings out of the paths
 			var columnHeadersAndBindings = columnHeadersAndBindingPaths.Select(ct => Tuple.Create(ct.Item1, new Binding
@@ -111,7 +111,7 @@ namespace GM.WPF.Controls.Dialogs
 				Mode = BindingMode.OneWay
 			}));
 
-			return await Show(message, items, columnHeadersAndBindings);
+			return Show(message, items, columnHeadersAndBindings);
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="message">The message text.</param>
 		/// <param name="items">Items to put in the <see cref="DataGrid"/> control.</param>
 		/// <param name="columnHeadersAndBindingPaths">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
-		public async Task<T> ShowSingle<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, string>> columnHeadersAndBindingPaths)
+		public Task<T> ShowSingle<T>(string message, IEnumerable<T> items, IEnumerable<Tuple<string, string>> columnHeadersAndBindingPaths)
 		{
 			// create bindings out of the paths
 			var columnHeadersAndBindings = columnHeadersAndBindingPaths.Select(ct => Tuple.Create(ct.Item1, new Binding
@@ -149,7 +149,7 @@ namespace GM.WPF.Controls.Dialogs
 				Mode = BindingMode.OneWay
 			}));
 
-			return await ShowSingle(message, items, columnHeadersAndBindings);
+			return ShowSingle(message, items, columnHeadersAndBindings);
 		}
 
 		/// <summary>

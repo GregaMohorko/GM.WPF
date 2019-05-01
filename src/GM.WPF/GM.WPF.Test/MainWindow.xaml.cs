@@ -97,12 +97,12 @@ namespace GM.WPF.Test
 
 		private async void MenuItem_Dialogs_Message_Warning_Click(object sender, RoutedEventArgs e)
 		{
-			await _MessageDialog.Show("This is a warning message created using the manual reusable dialog.", MessageDialog.MessageType.WARNING);
+			await _MessageDialog.Show("This is a warning message created using the manual reusable dialog.", MessageType.WARNING);
 		}
 
 		private async void MenuItem_Dialogs_Message_Error_Click(object sender, RoutedEventArgs e)
 		{
-			await _MessageDialog.Show("This is an error message.", MessageDialog.MessageType.ERROR);
+			await _MessageDialog.Show("This is an error message.", MessageType.ERROR);
 		}
 
 		private void MenuItem_Dialogs_Input_Empty_Click(object sender, RoutedEventArgs e)
@@ -172,7 +172,7 @@ namespace GM.WPF.Test
 				return;
 			}
 
-			MessageBox.Show($"You selected {selectedItems.Count} items.{Environment.NewLine}Selected items:{Environment.NewLine}{string.Join(", ", selectedItems)}");
+			MessageBox.Show($"You selected {selectedItems.Count} items.{Environment.NewLine}Selected items:{Environment.NewLine}{string.Join(Environment.NewLine, selectedItems)}");
 		}
 
 		private async void MenuItem_Dialogs_Select_Single_Click(object sender, RoutedEventArgs e)
@@ -185,6 +185,44 @@ namespace GM.WPF.Test
 			}
 
 			MessageBox.Show($"You selected '{selectedItem}'.");
+		}
+
+		private async void MenuItem_Dialogs_Search_Multiple_Click(object sender, RoutedEventArgs e)
+		{
+			List<string> selectedItems = await _DialogPanel.Create<SearchDialog>().Show("Search and select multiple items (default settings):", SearchDialogLoadingFunction);
+			if(selectedItems == null) {
+				MessageBox.Show("Cancelled.");
+				return;
+			}
+
+			MessageBox.Show($"You selected {selectedItems.Count} items.{Environment.NewLine}Selected items:{Environment.NewLine}{string.Join(Environment.NewLine, selectedItems)}");
+		}
+
+		private async void MenuItem_Dialogs_Search_Single_Click(object sender, RoutedEventArgs e)
+		{
+			string selectedItem = await _DialogPanel.Create<SearchDialog>().ShowSingle("Search and select a single item (default settings):", SearchDialogLoadingFunction);
+			if(selectedItem == null) {
+				MessageBox.Show("Cancelled.");
+				return;
+			}
+
+			MessageBox.Show($"You selected '{selectedItem}'.");
+		}
+
+		private Random rand = new Random();
+
+		private async Task<List<string>> SearchDialogLoadingFunction(string searchText)
+		{
+			// simulate one second of loading
+			await Task.Delay(1000);
+
+			// generate some random items
+			int count = rand.Next(2, 30);
+			var items = new List<string>(count);
+			for(int i = count - 1; i >= 0; --i) {
+				items.Add($"{rand.Next(100)}-{searchText}");
+			}
+			return items;
 		}
 		#endregion // Dialogs
 
