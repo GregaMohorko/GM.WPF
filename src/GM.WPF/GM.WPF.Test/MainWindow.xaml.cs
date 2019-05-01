@@ -73,7 +73,7 @@ namespace GM.WPF.Test
 			switch(e.PropertyName) {
 				case nameof(MainWindowViewModel.IsDialogProgressShown):
 					if(vm.IsDialogProgressShown) {
-						Random r = new Random();
+						var r = new Random();
 						_ProgressDialog.Show("Title content.", "Message content.", r.NextDouble() * 130);
 					} else {
 						_ProgressDialog.Hide();

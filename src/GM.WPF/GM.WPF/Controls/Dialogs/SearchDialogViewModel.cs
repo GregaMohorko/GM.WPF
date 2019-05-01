@@ -102,6 +102,8 @@ namespace GM.WPF.Controls.Dialogs
 				return;
 			}
 
+			OverlayMessage = loadingMessage;
+
 			// timeout?
 			if(msTimeout > 0) {
 				await Task.Delay(msTimeout);
@@ -112,7 +114,6 @@ namespace GM.WPF.Controls.Dialogs
 			}
 
 			// do the search
-			OverlayMessage = loadingMessage;
 			List<T> items = await search(mySearchText);
 			if(myCounter != lastSearchCounter) {
 				// search text has changed in the meantime
