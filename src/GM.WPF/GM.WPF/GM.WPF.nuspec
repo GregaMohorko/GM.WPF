@@ -13,7 +13,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>WPF MVVM controls utility extensions dialogs converters behaviors windows</tags>
-	<releaseNotes>GMDataGrid: Ability to copy cell contents without formatting.
-BaseControl: Added support for automatically nullifying VM dependency properties if inside TabItem and TabItem is not selected.</releaseNotes>
+	<releaseNotes>Moved to .NET 4.7.1.
+Added a SearchDialog.
+InputDialog: distinguishing between canceling and entering empty input.
+BaseControl: Added DependencyNotifyProperty.</releaseNotes>
   </metadata>
 </package>

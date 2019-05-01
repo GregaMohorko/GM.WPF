@@ -93,8 +93,7 @@ namespace GM.WPF.Controls.Dialogs
 
 			SetBackground(background);
 			_TextBlock.Text = message;
-
-			Show();
+			
 			await WaitDialog();
 			Close();
 		}

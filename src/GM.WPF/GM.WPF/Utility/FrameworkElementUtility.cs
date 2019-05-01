@@ -33,6 +33,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace GM.WPF.Utility
 {
@@ -42,75 +43,86 @@ namespace GM.WPF.Utility
 	public static class FrameworkElementUtility
 	{
 		/// <summary>
+		/// Tries to find the first focusable child (depth-first) and set focus to it.
+		/// </summary>
+		/// <param name="element">The element whose first focusable child to focus.</param>
+		public static bool FocusFirstFocusableChild(this FrameworkElement element)
+		{
+			bool predicate(Visual v) => (v is UIElement uie) && uie.Focusable;
+			var firstFocusable = element.GetVisualChildCollection(predicate, VisualUtility.TreeTraverseStrategy.DepthFirst).FirstOrDefault() as UIElement;
+			return firstFocusable?.Focus() ?? false;
+		}
+
+		/// <summary>
 		/// Moves the keyboard focus to another focusable element downwards from the currently focused element.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusDown(this FrameworkElement element)
+		public static bool MoveFocusDown(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Down));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Down));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to the first focusable element in tab order.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusFirst(this FrameworkElement element)
+		public static bool MoveFocusFirst(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to the last focusable element in tab order.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusLast(this FrameworkElement element)
+		public static bool MoveFocusLast(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Last));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Last));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to another focusable element to the left of currently focused element.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusLeft(this FrameworkElement element)
+		public static bool MoveFocusLeft(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Left));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Left));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to the next focusable element in tab order.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusNext(this FrameworkElement element)
+		public static bool MoveFocusNext(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to the previous focusable element in tab order.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusPrevious(this FrameworkElement element)
+		public static bool MoveFocusPrevious(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to another focusable element to the right of currently focused element.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusRight(this FrameworkElement element)
+		public static bool MoveFocusRight(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Right));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Right));
 		}
 
 		/// <summary>
 		/// Moves the keyboard focus to another focusable element upwards from the currently focused element.
 		/// </summary>
 		/// <param name="element">The element from which to move focus.</param>
-		public static void MoveFocusUp(this FrameworkElement element)
+		public static bool MoveFocusUp(this FrameworkElement element)
 		{
-			element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up));
+			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up));
 		}
 	}
 }

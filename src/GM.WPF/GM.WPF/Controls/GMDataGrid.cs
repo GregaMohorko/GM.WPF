@@ -145,6 +145,7 @@ namespace GM.WPF.Controls
 		/// This method is called when ApplicationCommands.Copy command is executed.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
+		/// <param name="clipboardCopyMode">Copy mode.</param>
 		private void ExecuteCopy(ExecutedRoutedEventArgs e, DataGridClipboardCopyMode clipboardCopyMode)
 		{
 			// copy all selected cells as a tab-delimited text ONLY (without style, formatting, etc.)

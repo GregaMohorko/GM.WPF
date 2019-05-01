@@ -27,6 +27,7 @@ Author: Grega Mohorko
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,7 +38,7 @@ using System.Windows.Media;
 namespace GM.WPF.Utility
 {
 	/// <summary>
-	/// Utilities for <see cref="DependencyObject"/>.
+	/// Utilities for <see cref="Visual"/>.
 	/// </summary>
 	public static class VisualUtility
 	{
@@ -46,9 +47,10 @@ namespace GM.WPF.Utility
 		/// </summary>
 		/// <typeparam name="T">The type of visuals to search for.</typeparam>
 		/// <param name="parent">The parent visual whose children to look through.</param>
-		public static IEnumerable<T> GetVisualChildCollection<T>(this DependencyObject parent) where T : Visual
+		/// <param name="treeTraverseStrategy">The strategy to use.</param>
+		public static IEnumerable<T> GetVisualChildCollection<T>(this Visual parent, TreeTraverseStrategy treeTraverseStrategy = TreeTraverseStrategy.BreadthFirst) where T : Visual
 		{
-			return GetVisualChildCollection(parent, new List<Type>() { typeof(T) }).Cast<T>();
+			return GetVisualChildCollection(parent, new List<Type>() { typeof(T) }, treeTraverseStrategy).Cast<T>();
 		}
 
 		/// <summary>
@@ -57,9 +59,10 @@ namespace GM.WPF.Utility
 		/// <typeparam name="T1">The first type of visuals to search for.</typeparam>
 		/// <typeparam name="T2">The second type of visuals to search for.</typeparam>
 		/// <param name="parent">The parent visual whose children to look through.</param>
-		public static IEnumerable<Visual> GetVisualChildCollection<T1,T2>(this DependencyObject parent) where T1:Visual where T2:Visual
+		/// <param name="treeTraverseStrategy">The strategy to use.</param>
+		public static IEnumerable<Visual> GetVisualChildCollection<T1,T2>(this Visual parent, TreeTraverseStrategy treeTraverseStrategy = TreeTraverseStrategy.BreadthFirst) where T1:Visual where T2:Visual
 		{
-			return GetVisualChildCollection(parent, new List<Type>() { typeof(T1), typeof(T2) });
+			return GetVisualChildCollection(parent, new List<Type>() { typeof(T1), typeof(T2) }, treeTraverseStrategy);
 		}
 
 		/// <summary>
@@ -67,33 +70,93 @@ namespace GM.WPF.Utility
 		/// </summary>
 		/// <param name="parent">The parent visual whose children to look through.</param>
 		/// <param name="typesOfChildren">The types of visuals to search for. All the types should be child types of <see cref="Visual"/>.</param>
-		public static IEnumerable<Visual> GetVisualChildCollection(this DependencyObject parent, IEnumerable<Type> typesOfChildren)
+		/// <param name="treeTraverseStrategy">The strategy to use.</param>
+		public static IEnumerable<Visual> GetVisualChildCollection(this Visual parent, IEnumerable<Type> typesOfChildren, TreeTraverseStrategy treeTraverseStrategy = TreeTraverseStrategy.BreadthFirst)
 		{
-			var currentVisuals = new List<DependencyObject>
+			return GetVisualChildCollection(parent, (Visual v) =>
 			{
-				parent
-			};
+				Type childType = v.GetType();
+				return typesOfChildren.Any(type => type.IsAssignableFrom(childType));
+			}, treeTraverseStrategy);
+		}
 
-			while(currentVisuals.Count > 0) {
-				var newVisuals = new List<DependencyObject>();
+		/// <summary>
+		/// Returns all the child visual objects within this parent that satisfies a condition.
+		/// </summary>
+		/// <param name="parent">The parent visual whose children to look through.</param>
+		/// <param name="predicate">A function to test each visual for a condition.</param>
+		/// <param name="treeTraverseStrategy">The strategy to use.</param>
+		public static IEnumerable<Visual> GetVisualChildCollection(this Visual parent, Func<Visual,bool> predicate, TreeTraverseStrategy treeTraverseStrategy=TreeTraverseStrategy.BreadthFirst)
+		{
+			ICollection visuals;
+			switch(treeTraverseStrategy) {
+				case TreeTraverseStrategy.BreadthFirst:
+					visuals = new Queue<Visual>();
+					((Queue<Visual>)visuals).Enqueue(parent);
+					break;
+				case TreeTraverseStrategy.DepthFirst:
+					visuals = new Stack<Visual>();
+					((Stack<Visual>)visuals).Push(parent);
+					break;
+				default:
+					throw new NotImplementedException($"Uknown TreeTraverseStrategy: '{treeTraverseStrategy}'.");
+			}
 
-				foreach(DependencyObject visual in currentVisuals) {
-					int count = VisualTreeHelper.GetChildrenCount(visual);
+			bool firstTime = true;
 
-					for(int i = 0; i < count; ++i) {
-						DependencyObject child = VisualTreeHelper.GetChild(visual, i);
-						Type childType = child.GetType();
-						if(typesOfChildren.Any(type => type.IsAssignableFrom(childType))) {
-							yield return (Visual)child;
-						}
-						if(child != null) {
-							newVisuals.Add(child);
-						}
-					}
+			while(visuals.Count > 0) {
+				Visual visual;
+				switch(treeTraverseStrategy) {
+					case TreeTraverseStrategy.BreadthFirst:
+						visual = ((Queue<Visual>)visuals).Dequeue();
+						break;
+					case TreeTraverseStrategy.DepthFirst:
+						visual = ((Stack<Visual>)visuals).Pop();
+						break;
+					default:
+						throw new NotImplementedException($"Uknown TreeTraverseStrategy: '{treeTraverseStrategy}'.");
 				}
 
-				currentVisuals = newVisuals;
+				if(firstTime) {
+					// parent should not be tested because it is not a child
+					firstTime = false;
+				} else if(predicate(visual)) {
+					yield return visual;
+				}
+				
+				int childrenCount = VisualTreeHelper.GetChildrenCount(visual);
+				for(int i = childrenCount-1; i >= 0; --i) {
+					DependencyObject child = VisualTreeHelper.GetChild(visual, i);
+					if(!(child is Visual childVisual)) {
+						continue;
+					}
+					switch(treeTraverseStrategy) {
+						case TreeTraverseStrategy.BreadthFirst:
+							((Queue<Visual>)visuals).Enqueue(childVisual);
+							break;
+						case TreeTraverseStrategy.DepthFirst:
+							((Stack<Visual>)visuals).Push(childVisual);
+							break;
+						default:
+							throw new NotImplementedException($"Uknown TreeTraverseStrategy: '{treeTraverseStrategy}'.");
+					}
+				}
 			}
+		}
+
+		/// <summary>
+		/// A strategy for traversing/searching tree/graph data structures.
+		/// </summary>
+		public enum TreeTraverseStrategy
+		{
+			/// <summary>
+			/// It starts at the tree root and explores all of the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.
+			/// </summary>
+			BreadthFirst,
+			/// <summary>
+			/// The algorithm starts at the root node and explores as far as possible along each branch before backtracking.
+			/// </summary>
+			DepthFirst
 		}
 	}
 }
