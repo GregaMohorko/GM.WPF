@@ -29,6 +29,7 @@ Author: Grega Mohorko
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,7 +45,9 @@ namespace GM.WPF.MVVM
 	/// </summary>
 	public abstract class ViewModel : ViewModelBase
 	{
-		// is empty for now
-		// additional functionalities can be added at a later time if needed or desired
+		/// <summary>
+		/// Gets a value that indicates whether a debugger is attached to the process.
+		/// </summary>
+		public bool IsDebuggerAttached => Debugger.IsAttached;
 	}
 }
