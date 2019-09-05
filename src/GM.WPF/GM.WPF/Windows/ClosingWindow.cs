@@ -22,70 +22,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2019-09-05
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using GM.WPF.Controls;
-using GM.WPF.MVVM;
-using GM.WPF.Utility;
 
 namespace GM.WPF.Windows
 {
 	/// <summary>
-	/// The base class for windows. Will always dispose the view model (if disposable) when closed.
-	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
-	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
+	/// A window that invokes the <see cref="CanClose"/> before closing to make sure that the window can close.
 	/// </summary>
-	public class BaseWindow : Window
+	public abstract class ClosingWindow : BaseWindow, IClosingControl
 	{
 		/// <summary>
-		/// Gets or sets the view model. If setting, the current view model is first disposed.
+		/// If false, the cancelling process will be cancelled because apparently some action is still required from the user.
 		/// </summary>
-		protected ViewModel ViewModel
-		{
-			get => DataContext as ViewModel;
-			set
-			{
-				DisposeViewModel();
-				DataContext = value;
-			}
-		}
+		public abstract Task<bool> CanClose();
 
-		private void DisposeViewModel()
-		{
-			if(ViewModel is IDisposable) {
-				((IDisposable)ViewModel).Dispose();
-			}
-		}
+		private bool shouldClose;
 
 		/// <summary>
-		/// Disposes the view model (if disposable) and raises the <see cref="Window.Closed"/> event.
+		/// Invokes the <see cref="CanClose"/> property and only invokes the <see cref="Window.OnClosing(CancelEventArgs)"/> if it returns true.
 		/// </summary>
-		/// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-		protected override void OnClosed(EventArgs e)
+		/// <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
+		protected override void OnClosing(CancelEventArgs e)
 		{
-			// dispose inner controls
-			var controls = this.GetVisualChildCollection<BaseControl>();
-			foreach(BaseControl control in controls) {
-				control.DisposeBaseControl();
+			if(!shouldClose) {
+				e.Cancel = true;
+
+				Application.Current.Dispatcher.InvokeAsync(async delegate
+				{
+					shouldClose = await CanClose();
+					if(shouldClose) {
+						Close();
+					}
+				});
+
+				return;
 			}
 
-			// dispose the window, if disposable
-			if(this is IDisposable) {
-				((IDisposable)this).Dispose();
-			}
-
-			// dispose the viewmodel of this window
-			DisposeViewModel();
-
-			base.OnClosed(e);
+			base.OnClosing(e);
 		}
 	}
 }
