@@ -39,7 +39,7 @@ namespace GM.WPF.Behaviors
 	/// <summary>
 	/// A behavior for all controls that derive from <see cref="Panel"/>.
 	/// </summary>
-	public class PanelBehavior
+	public static class PanelBehavior
 	{
 		#region Spacing
 		// idea for implementation taken from: http://blogs.microsoft.co.il/eladkatz/2011/05/29/what-is-the-easiest-way-to-set-spacing-between-items-in-stackpanel/
@@ -55,7 +55,9 @@ namespace GM.WPF.Behaviors
 			// this prevents the "Property already registered" error in design
 			if(!spacingRegistered) {
 				spacingRegistered = true;
-				SpacingProperty = DependencyProperty.RegisterAttached("Spacing", typeof(Thickness), typeof(Panel), new UIPropertyMetadata(OnSpacingChanged));
+				if(SpacingProperty == null) {
+					SpacingProperty = DependencyProperty.RegisterAttached("Spacing", typeof(Thickness), typeof(Panel), new UIPropertyMetadata(OnSpacingChanged));
+				}
 			}
 		}
 

@@ -34,6 +34,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using GM.WPF.Utility;
 
 namespace GM.WPF.Behaviors
@@ -41,11 +42,11 @@ namespace GM.WPF.Behaviors
 	/// <summary>
 	/// A behavior for <see cref="DataGrid"/>.
 	/// </summary>
-	public class DataGridBehavior
+	public static class DataGridBehavior
 	{
 		#region DisplayRowNumber
 		// implementation from: http://stackoverflow.com/questions/4663771/wpf-4-datagrid-getting-the-row-number-into-the-rowheader/4663799#4663799
-		
+
 		/// <summary>
 		/// Determines whether or not to display the row numbers.
 		/// </summary>
@@ -78,19 +79,17 @@ namespace GM.WPF.Behaviors
 				return;
 			}
 
-			EventHandler<DataGridRowEventArgs> loadedRowHandler = null;
-			loadedRowHandler = (object sender, DataGridRowEventArgs ea) =>
+			void loadedRowHandler(object sender, DataGridRowEventArgs ea)
 			{
 				if(!GetDisplayRowNumber(dataGrid)) {
 					dataGrid.LoadingRow -= loadedRowHandler;
 					return;
 				}
 				ea.Row.Header = ea.Row.GetIndex() + 1;
-			};
+			}
 			dataGrid.LoadingRow += loadedRowHandler;
 
-			ItemsChangedEventHandler itemsChangedHandler = null;
-			itemsChangedHandler = (object sender, ItemsChangedEventArgs ea) =>
+			void itemsChangedHandler(object sender, ItemsChangedEventArgs ea)
 			{
 				if(!GetDisplayRowNumber(dataGrid)) {
 					dataGrid.ItemContainerGenerator.ItemsChanged -= itemsChangedHandler;
@@ -99,9 +98,116 @@ namespace GM.WPF.Behaviors
 				foreach(DataGridRow row in dataGrid.GetVisualChildCollection<DataGridRow>()) {
 					row.Header = row.GetIndex() + 1;
 				}
-			};
+			}
 			dataGrid.ItemContainerGenerator.ItemsChanged += itemsChangedHandler;
 		}
 		#endregion // DisplayRowNumber
+
+		#region MouseWheelProperties
+		// implementation from: https://stackoverflow.com/questions/1585462/bubbling-scroll-events-from-a-listview-to-its-parent
+		/// <summary>
+		/// Determines whether or not the vertical scroll is ignored.
+		/// </summary>
+		public static readonly DependencyProperty IgnoreScrollProperty = DependencyProperty.RegisterAttached("IgnoreScroll", typeof(bool), typeof(DataGridBehavior), new FrameworkPropertyMetadata(false, OnIgnoreScrollChanged));
+		// implementation from: https://stackoverflow.com/questions/3727439/how-to-enable-horizontal-scrolling-with-mouse
+		/// <summary>
+		/// Determines whether or not it should scroll horizontally on mouse wheel event if a shift is being pressed.
+		/// </summary>
+		public static readonly DependencyProperty ShiftWheelScrollsHorizontallyProperty = DependencyProperty.RegisterAttached("ShiftWheelScrollsHorizontally", typeof(bool), typeof(DataGridBehavior), new FrameworkPropertyMetadata(false, OnShiftWheelScrollsHorizontallyChanged));
+
+		/// <summary>
+		/// Gets the current effective value of <see cref="IgnoreScrollProperty"/> for the specified target.
+		/// </summary>
+		/// <param name="target">The target.</param>
+		public static bool GetIgnoreScroll(DependencyObject target)
+		{
+			return (bool)target.GetValue(IgnoreScrollProperty);
+		}
+
+		/// <summary>
+		/// Sets the local value of <see cref="IgnoreScrollProperty"/> for the specified target.
+		/// </summary>
+		/// <param name="target">The target.</param>
+		/// <param name="value">The value.</param>
+		public static void SetIgnoreScroll(DependencyObject target, bool value)
+		{
+			target.SetValue(IgnoreScrollProperty, value);
+		}
+
+		/// <summary>
+		/// Gets the current effective value of <see cref="ShiftWheelScrollsHorizontallyProperty"/> for the specified target.
+		/// </summary>
+		/// <param name="target">The target.</param>
+		public static bool GetShiftWheelScrollsHorizontally(DependencyObject target)
+		{
+			return (bool)target.GetValue(ShiftWheelScrollsHorizontallyProperty);
+		}
+
+		/// <summary>
+		/// Sets the local value of <see cref="ShiftWheelScrollsHorizontallyProperty"/> for the specified target.
+		/// </summary>
+		/// <param name="target">The target.</param>
+		/// <param name="value">The value.</param>
+		public static void SetShiftWheelScrollsHorizontally(DependencyObject target, bool value)
+		{
+			target.SetValue(ShiftWheelScrollsHorizontallyProperty, value);
+		}
+
+		private static void OnIgnoreScrollChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
+		{
+			OnMouseWheelPropertyChanged(target);
+		}
+
+		private static void OnShiftWheelScrollsHorizontallyChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
+		{
+			OnMouseWheelPropertyChanged(target);
+		}
+
+		private static void OnMouseWheelPropertyChanged(DependencyObject target)
+		{
+			var dataGrid = (DataGrid)target;
+			bool ignoreScroll = GetIgnoreScroll(target);
+			bool shiftWheelScrollsHorizontally = GetShiftWheelScrollsHorizontally(target);
+
+			if(ignoreScroll || shiftWheelScrollsHorizontally) {
+				dataGrid.PreviewMouseWheel += PreviewMouseWheel;
+			} else {
+				dataGrid.PreviewMouseWheel -= PreviewMouseWheel;
+			}
+		}
+
+		private static void PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			if(!(sender is DataGrid dataGrid)) {
+				return;
+			}
+
+			bool shiftWheelScrollsHorizontally = GetShiftWheelScrollsHorizontally(dataGrid);
+			if(shiftWheelScrollsHorizontally) {
+				if(Keyboard.Modifiers == ModifierKeys.Shift) {
+					var childScrollViewer = VisualUtility.GetVisualChildCollection<ScrollViewer>(dataGrid).FirstOrDefault();
+					// scroll by 6 lines
+					for(int i = 6; i > 0; --i) {
+						if(e.Delta < 0) {
+							childScrollViewer?.LineRight();
+						} else {
+							childScrollViewer?.LineLeft();
+						}
+					}
+					e.Handled = true;
+					return;
+				}
+			}
+
+			bool ignoreScroll = GetIgnoreScroll(dataGrid);
+			if(ignoreScroll) {
+				var e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+				e2.RoutedEvent = UIElement.MouseWheelEvent;
+				dataGrid.RaiseEvent(e2);
+				e.Handled = true;
+				return;
+			}
+		}
+		#endregion // MouseWheelProperties
 	}
 }
