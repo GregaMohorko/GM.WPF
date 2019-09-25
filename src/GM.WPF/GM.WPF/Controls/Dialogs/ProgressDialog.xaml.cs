@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,17 +44,27 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ProgressDialog.xaml
+	/// A dialog with a title, message and a progress bar.
+	/// <para>Use the <see cref="Updater"/> to update the progress in a background thread.</para>
 	/// </summary>
 	public partial class ProgressDialog : Dialog
 	{
+		private readonly Lazy<ProgressUpdater> updater;
+
 		/// <summary>
 		/// Initializes a new instance of <see cref="ProgressDialog"/>.
 		/// </summary>
 		public ProgressDialog()
 		{
 			InitializeComponent();
+
+			updater = new Lazy<ProgressUpdater>(() => new ProgressUpdater(SetTitle, SetMessage, SetProgress));
 		}
+
+		/// <summary>
+		/// Gets the <see cref="ProgressUpdater"/> that can be used for updating the values of this progress dialog.
+		/// </summary>
+		public ProgressUpdater Updater => updater.Value;
 
 		/// <summary>
 		/// Shows this progress bar and sets the information accordingly.
@@ -62,7 +72,7 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="titleContent">The title content.</param>
 		/// <param name="messageContent">The message content.</param>
 		/// <param name="progress">The progress value.</param>
-		public void Show(object titleContent,object messageContent=null,double? progress=null)
+		public void Show(object titleContent, object messageContent = null, double? progress = null)
 		{
 			SetTitle(titleContent);
 			SetMessage(messageContent);
@@ -89,17 +99,26 @@ namespace GM.WPF.Controls.Dialogs
 		}
 
 		/// <summary>
-		/// Sets the progress to the specified value. If null, it is put in indeterminate mode.
+		/// Sets the progress to the specified value. If null, below 0 or above 100, it is put in indeterminate mode.
 		/// </summary>
-		/// <param name="progress">The new progress value.</param>
-		public void SetProgress(double? progress=null)
+		/// <param name="progress">The new progress value. Should either be null or in the [0-100] range.</param>
+		public void SetProgress(double? progress = null)
 		{
-			if(progress == null || progress<0 || progress>100) {
-				_ProgressBar.IsIndeterminate=true;
+			if(progress == null || progress < 0 || progress > 100) {
+				_ProgressBar.IsIndeterminate = true;
 			} else {
 				_ProgressBar.IsIndeterminate = false;
 				_ProgressBar.Value = progress.Value;
 			}
+		}
+
+		/// <summary>
+		/// Sets the progress to the specified value. If null, below 0 or above 1, it is put in indeterminate mode.
+		/// </summary>
+		/// <param name="progress">The new progress value. Should either be null or in the [0-1] range.</param>
+		public void SetProgress2(double? progress = null)
+		{
+			SetProgress(progress * 100);
 		}
 	}
 }

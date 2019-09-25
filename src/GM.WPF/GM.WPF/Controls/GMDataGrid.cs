@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -350,8 +350,8 @@ namespace GM.WPF.Controls
 				BeginEditCommand.Execute(null, this);
 				// using column.OnPastingCellClipboardContent did not paste on all cells sometimes ... which is weird!
 				// that's why I'm first trying to set it manually using binding
-				bool bindingSuccessful = column.ClipboardContentBinding.TrySetValueFor(item, cellContent);
-				if(!bindingSuccessful) {
+				bool? bindingSuccessful = column.ClipboardContentBinding?.TrySetValueFor(item, cellContent);
+				if(bindingSuccessful != true) {
 					column.OnPastingCellClipboardContent(item, cellContent);
 				}
 				CommitEditCommand.Execute(null, this);

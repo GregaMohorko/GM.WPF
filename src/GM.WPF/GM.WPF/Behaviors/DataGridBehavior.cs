@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -189,9 +189,9 @@ namespace GM.WPF.Behaviors
 					// scroll by 6 lines
 					for(int i = 6; i > 0; --i) {
 						if(e.Delta < 0) {
-							childScrollViewer?.LineRight();
-						} else {
 							childScrollViewer?.LineLeft();
+						} else {
+							childScrollViewer?.LineRight();
 						}
 					}
 					e.Handled = true;
