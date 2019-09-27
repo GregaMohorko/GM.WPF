@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for MessageDialog.xaml
+	/// A dialog with a message and an OK button.
 	/// </summary>
 	public partial class MessageDialog : TaskDialog
 	{
@@ -52,6 +52,10 @@ namespace GM.WPF.Controls.Dialogs
 		/// Background for messages of type <see cref="MessageType.NORMAL"/>.
 		/// </summary>
 		public static Brush NormalBackground = DefaultBackground;
+		/// <summary>
+		/// Backgroudn for messages of type <see cref="MessageType.SUCCESS"/>.
+		/// </summary>
+		public static Brush SuccessBackground = Brushes.Green;
 		/// <summary>
 		/// Background for messages of type <see cref="MessageType.WARNING"/>.
 		/// </summary>
@@ -74,12 +78,15 @@ namespace GM.WPF.Controls.Dialogs
 		/// </summary>
 		/// <param name="message">The message to show.</param>
 		/// <param name="type">The type of the message.</param>
-		public async Task Show(string message,MessageType type=MessageType.NORMAL)
+		public async Task Show(string message, MessageType type = MessageType.NORMAL)
 		{
 			Brush background;
 			switch(type) {
 				case MessageType.NORMAL:
 					background = NormalBackground;
+					break;
+				case MessageType.SUCCESS:
+					background = SuccessBackground;
 					break;
 				case MessageType.WARNING:
 					background = WarningBackground;
@@ -93,12 +100,12 @@ namespace GM.WPF.Controls.Dialogs
 
 			SetBackground(background);
 			_TextBlock.Text = message;
-			
-			await WaitDialog();
+
+			_ = await WaitDialog();
 			Close();
 		}
 
-		private void Button_OK_Click(object sender,RoutedEventArgs e)
+		private void Button_OK_Click(object sender, RoutedEventArgs e)
 		{
 			EndDialog();
 		}

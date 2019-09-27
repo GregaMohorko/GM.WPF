@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,9 @@ Author: Grega Mohorko
 		x:ClassModifier="internal"
 		d:DesignHeight="300"
 		d:DesignWidth="300"
-		x:Name="_Self"
 		>
 	<Grid Background="#A0000000">
-		<Border Name="_Border" Margin="20" MinWidth="20" MinHeight="20" VerticalAlignment="Center" HorizontalAlignment="Center" Background="{x:Static local:Dialog.DefaultBackground}" BorderBrush="{x:Static local:Dialog.DefaultBorderBrush}" BorderThickness="{x:Static local:Dialog.DefaultBorderThickness}">
+		<Border Name="_Border" Margin="20" MinWidth="20" MinHeight="20" VerticalAlignment="{x:Static local:Dialog.DefaultVerticalAlignment}" HorizontalAlignment="{x:Static local:Dialog.DefaultHorizontalAlignment}" Background="{x:Static local:Dialog.DefaultBackground}" BorderBrush="{x:Static local:Dialog.DefaultBorderBrush}" BorderThickness="{x:Static local:Dialog.DefaultBorderThickness}">
 			<ContentPresenter Name="_ContentPresenter" />
 		</Border>
 	</Grid>

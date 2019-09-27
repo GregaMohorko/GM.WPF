@@ -42,14 +42,18 @@ namespace GM.WPF.Controls.Dialogs
 		/// <summary>
 		/// Normal message type. The background will be <see cref="MessageDialog.NormalBackground"/>.
 		/// </summary>
-		NORMAL = 0,
+		NORMAL,
+		/// <summary>
+		/// Message type that represents a success. The background will be <see cref="MessageDialog.SuccessBackground"/>.
+		/// </summary>
+		SUCCESS,
 		/// <summary>
 		/// Message type that represents a warning. The background will be <see cref="MessageDialog.WarningBackground"/>.
 		/// </summary>
-		WARNING = 1,
+		WARNING,
 		/// <summary>
 		/// Message type that represents an error. The background will be <see cref="MessageDialog.ErrorBackground"/>.
 		/// </summary>
-		ERROR = 2
+		ERROR
 	}
 }

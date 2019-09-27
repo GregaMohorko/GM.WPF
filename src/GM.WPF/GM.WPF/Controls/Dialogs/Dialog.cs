@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ namespace GM.WPF.Controls.Dialogs
 	/// <summary>
 	/// The base class for dialogs.
 	/// </summary>
-	public class Dialog:BaseControl
+	public class Dialog : BaseControl
 	{
 		/// <summary>
 		/// Default dialog background.
@@ -60,6 +60,14 @@ namespace GM.WPF.Controls.Dialogs
 		/// Default dialog border thickness.
 		/// </summary>
 		public static Thickness DefaultBorderThickness = new Thickness(1);
+		/// <summary>
+		/// Default dialog horizontal alignment.
+		/// </summary>
+		public static HorizontalAlignment DefaultHorizontalAlignment = HorizontalAlignment.Center;
+		/// <summary>
+		/// Default dialog vertical alignment.
+		/// </summary>
+		public static VerticalAlignment DefaultVerticalAlignment = VerticalAlignment.Center;
 
 		/// <summary>
 		/// The reference to the <see cref="DialogPanel"/> where this dialog was possibly created.
@@ -90,11 +98,11 @@ namespace GM.WPF.Controls.Dialogs
 					void Dialog_Loaded(object sender, RoutedEventArgs e)
 					{
 						fwContent.Loaded -= Dialog_Loaded;
-						fwContent.FocusFirstFocusableChild();
+						_ = fwContent.FocusFirstFocusableChild();
 					}
 					fwContent.Loaded += Dialog_Loaded;
 				} else {
-					fwContent.FocusFirstFocusableChild();
+					_ = fwContent.FocusFirstFocusableChild();
 				}
 			}
 		}
@@ -138,7 +146,7 @@ namespace GM.WPF.Controls.Dialogs
 		{
 			var contentWrapper = new DialogContentWrapper();
 			contentWrapper._ContentPresenter.Content = Content;
-			
+
 			// if any of the default values were manually set, pass them on
 			if(!this.IsSet(ForegroundProperty)) {
 				Foreground = DefaultForeground;
@@ -153,18 +161,26 @@ namespace GM.WPF.Controls.Dialogs
 			}
 			if(this.IsSet(BorderThicknessProperty)) {
 				contentWrapper._Border.BorderThickness = BorderThickness;
-				BorderThickness = new Thickness();
+				BorderThickness = default;
 			}
-			Brush foreground = this.IsSet(ForegroundProperty) ? Foreground : DefaultForeground;
-			IEnumerable<Visual> allLabelsAndTextBoxes = ((Visual)Content).GetVisualChildCollection<Label,TextBlock>();
+			if(this.IsSet(HorizontalAlignmentProperty)) {
+				contentWrapper._Border.HorizontalAlignment = HorizontalAlignment;
+				HorizontalAlignment = HorizontalAlignment.Stretch;
+			}
+			if(this.IsSet(VerticalAlignmentProperty)) {
+				contentWrapper._Border.VerticalAlignment = VerticalAlignment;
+				VerticalAlignment = VerticalAlignment.Stretch;
+			}
+			// set foreground to all child controls with text
+			IEnumerable<Visual> allLabelsAndTextBoxes = ((Visual)Content).GetVisualChildCollection<Label, TextBlock>();
 			foreach(Visual labelOrTextBlock in allLabelsAndTextBoxes) {
 				if(labelOrTextBlock is Label label) {
 					if(!label.IsSet(ForegroundProperty)) {
-						label.Foreground = foreground;
+						label.Foreground = Foreground;
 					}
 				} else if(labelOrTextBlock is TextBlock textBlock) {
 					if(!textBlock.IsSet(TextBlock.ForegroundProperty)) {
-						textBlock.Foreground = foreground;
+						textBlock.Foreground = Foreground;
 					}
 				}
 			}
