@@ -45,6 +45,7 @@ namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
 	/// A dialog with a search box where the user can search for certain items. <see cref="DataGrid"/> is used for presenting items.
+	/// <para>Everything is done on the UI thread.</para>
 	/// </summary>
 	public partial class SearchDialog : TaskDialog
 	{
@@ -65,15 +66,14 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="columnHeader">The header of the only column in the <see cref="DataGrid"/> that displays the items.</param>
 		/// <param name="loadingMessage">The text to show to the user while load is in process.</param>
 		/// <param name="watermark">The text to show in the search box.</param>
-		/// <param name="msTimeout">The amount of milliseconds to wait before loading is executed after the user inputs a new character into the search box.</param>
-		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute.</param>
+		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute. Can be zero.</param>
 		/// <param name="defaultSearchText">Default search text to set when this dialog shows.</param>
-		public Task<List<T>> Show<T>(string title, Func<string, Task<List<T>>> search, string columnHeader = "Items", string loadingMessage = "Loading ...", string watermark = "Search text ...", int msTimeout = 300, int minSearchTextLength = 4, string defaultSearchText = null)
+		public Task<List<T>> Show<T>(string title, Func<string, Task<List<T>>> search, string columnHeader = "Items", string loadingMessage = "Loading ...", string watermark = "Search text ...", int minSearchTextLength = 4, string defaultSearchText = null)
 		{
 			// create the binding out of the column header
-			var columnHeadersAndBindings = new List<Tuple<string, Binding>> { Tuple.Create(columnHeader, new Binding { Mode=BindingMode.OneWay }) };
+			var columns = new List<(string Header, Binding)> { (columnHeader, new Binding { Mode = BindingMode.OneWay }) };
 
-			return Show(title, search, columnHeadersAndBindings, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			return Show(title, search, columns, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 		}
 
 		/// <summary>
@@ -82,22 +82,21 @@ namespace GM.WPF.Controls.Dialogs
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="title">The title text.</param>
 		/// <param name="search">The method that gets the search text and returns the results asynchronously.</param>
-		/// <param name="columnHeadersAndBindingPaths">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
+		/// <param name="columns">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
 		/// <param name="loadingMessage">The text to show to the user while load is in process.</param>
 		/// <param name="watermark">The text to show in the search box.</param>
-		/// <param name="msTimeout">The amount of milliseconds to wait before loading is executed after the user inputs a new character into the search box.</param>
-		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute.</param>
+		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute. Can be zero.</param>
 		/// <param name="defaultSearchText">Default search text to set when this dialog shows.</param>
-		public Task<List<T>> Show<T>(string title, Func<string, Task<List<T>>> search, ICollection<Tuple<string, string>> columnHeadersAndBindingPaths, string loadingMessage = "Loading ...", string watermark = "Search text ...", int msTimeout = 300, int minSearchTextLength = 4, string defaultSearchText = null)
+		public Task<List<T>> Show<T>(string title, Func<string, Task<List<T>>> search, ICollection<(string Header, string Path)> columns, string loadingMessage = "Loading ...", string watermark = "Search text ...", int minSearchTextLength = 4, string defaultSearchText = null)
 		{
 			// create bindings out of the paths
-			var columnHeadersAndBindings = columnHeadersAndBindingPaths.Select(ct => Tuple.Create(ct.Item1, new Binding
+			var columnsWithBindings = columns.Select(ct => (ct.Header, new Binding
 			{
-				Path = new PropertyPath(ct.Item2),
+				Path = new PropertyPath(ct.Path),
 				Mode = BindingMode.OneWay
 			})).ToList();
 
-			return Show(title, search, columnHeadersAndBindings, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			return Show(title, search, columnsWithBindings, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 		}
 
 		/// <summary>
@@ -106,15 +105,14 @@ namespace GM.WPF.Controls.Dialogs
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="title">The title text.</param>
 		/// <param name="search">The method that gets the search text and returns the results asynchronously.</param>
-		/// <param name="columnHeadersAndBindings">A collection of tuples with a column header and the binding for that column.</param>
+		/// <param name="columns">A collection of tuples with a column header and the binding for that column.</param>
 		/// <param name="loadingMessage">The text to show to the user while load is in process.</param>
 		/// <param name="watermark">The text to show in the search box.</param>
-		/// <param name="msTimeout">The amount of milliseconds to wait before loading is executed after the user inputs a new character into the search box.</param>
-		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute.</param>
+		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute. Can be zero.</param>
 		/// <param name="defaultSearchText">Default search text to set when this dialog shows.</param>
-		public async Task<List<T>> Show<T>(string title, Func<string, Task<List<T>>> search, ICollection<Tuple<string, Binding>> columnHeadersAndBindings, string loadingMessage = "Loading ...", string watermark = "Search text ...", int msTimeout = 300, int minSearchTextLength = 4, string defaultSearchText = null)
+		public async Task<List<T>> Show<T>(string title, Func<string, Task<List<T>>> search, ICollection<(string Header, Binding)> columns, string loadingMessage = "Loading ...", string watermark = "Search text ...", int minSearchTextLength = 4, string defaultSearchText = null)
 		{
-			bool wasCancelled = await ShowAndWait(title, search, columnHeadersAndBindings, DataGridSelectionMode.Extended, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			bool wasCancelled = await ShowAndWait(title, search, columns, DataGridSelectionMode.Extended, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 			if(wasCancelled) {
 				return null;
 			}
@@ -131,15 +129,14 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="columnHeader">The header of the only column in the <see cref="DataGrid"/> that displays the items.</param>
 		/// <param name="loadingMessage">The text to show to the user while load is in process.</param>
 		/// <param name="watermark">The text to show in the search box.</param>
-		/// <param name="msTimeout">The amount of milliseconds to wait before loading is executed after the user inputs a new character into the search box.</param>
-		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute.</param>
+		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute. Can be zero.</param>
 		/// <param name="defaultSearchText">Default search text to set when this dialog shows.</param>
-		public Task<T> ShowSingle<T>(string title, Func<string, Task<List<T>>> search, string columnHeader = "Items", string loadingMessage = "Loading ...", string watermark = "Search text ...", int msTimeout = 300, int minSearchTextLength = 4, string defaultSearchText = null)
+		public Task<T> ShowSingle<T>(string title, Func<string, Task<List<T>>> search, string columnHeader = "Items", string loadingMessage = "Loading ...", string watermark = "Search text ...", int minSearchTextLength = 4, string defaultSearchText = null)
 		{
 			// create the binding out of the column header
-			var columnHeadersAndBindings = new List<Tuple<string, Binding>> { Tuple.Create(columnHeader, new Binding { Mode = BindingMode.OneWay }) };
+			var columns = new List<(string Header, Binding)> { (columnHeader, new Binding { Mode = BindingMode.OneWay }) };
 
-			return ShowSingle(title, search, columnHeadersAndBindings, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			return ShowSingle(title, search, columns, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 		}
 
 		/// <summary>
@@ -148,22 +145,21 @@ namespace GM.WPF.Controls.Dialogs
 		/// <typeparam name="T">The type of items.</typeparam>
 		/// <param name="title">The title text.</param>
 		/// <param name="search">The method that gets the search text and returns the results asynchronously.</param>
-		/// <param name="columnHeadersAndBindingPaths">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
+		/// <param name="columns">A collection of tuples with a column header and a path for the binding (the name of the property in the item) for that column.</param>
 		/// <param name="loadingMessage">The text to show to the user while load is in process.</param>
 		/// <param name="watermark">The text to show in the search box.</param>
-		/// <param name="msTimeout">The amount of milliseconds to wait before loading is executed after the user inputs a new character into the search box.</param>
-		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute.</param>
+		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute. Can be zero.</param>
 		/// <param name="defaultSearchText">Default search text to set when this dialog shows.</param>
-		public Task<T> ShowSingle<T>(string title, Func<string, Task<List<T>>> search, ICollection<Tuple<string, string>> columnHeadersAndBindingPaths, string loadingMessage = "Loading ...", string watermark = "Search text ...", int msTimeout = 300, int minSearchTextLength = 4, string defaultSearchText = null)
+		public Task<T> ShowSingle<T>(string title, Func<string, Task<List<T>>> search, ICollection<(string Header, string Path)> columns, string loadingMessage = "Loading ...", string watermark = "Search text ...", int minSearchTextLength = 4, string defaultSearchText = null)
 		{
 			// create bindings out of the paths
-			var columnHeadersAndBindings = columnHeadersAndBindingPaths.Select(ct => Tuple.Create(ct.Item1, new Binding
+			var columnsWithBindings = columns.Select(ct => (ct.Header, new Binding
 			{
-				Path = new PropertyPath(ct.Item2),
+				Path = new PropertyPath(ct.Path),
 				Mode = BindingMode.OneWay
 			})).ToList();
 
-			return ShowSingle(title, search, columnHeadersAndBindings, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			return ShowSingle(title, search, columnsWithBindings, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 		}
 
 		/// <summary>
@@ -175,33 +171,32 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="columnHeadersAndBindings">A collection of tuples with a column header and the binding for that column.</param>
 		/// <param name="loadingMessage">The text to show to the user while load is in process.</param>
 		/// <param name="watermark">The text to show in the search box.</param>
-		/// <param name="msTimeout">The amount of milliseconds to wait before loading is executed after the user inputs a new character into the search box.</param>
-		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute.</param>
+		/// <param name="minSearchTextLength">The minimum length of the search text for which the loading will execute. Can be zero.</param>
 		/// <param name="defaultSearchText">Default search text to set when this dialog shows.</param>
-		public async Task<T> ShowSingle<T>(string title, Func<string, Task<List<T>>> search, ICollection<Tuple<string, Binding>> columnHeadersAndBindings, string loadingMessage = "Loading ...", string watermark = "Search text ...", int msTimeout = 300, int minSearchTextLength = 4, string defaultSearchText = null)
+		public async Task<T> ShowSingle<T>(string title, Func<string, Task<List<T>>> search, ICollection<(string Header, Binding)> columnHeadersAndBindings, string loadingMessage = "Loading ...", string watermark = "Search text ...", int minSearchTextLength = 4, string defaultSearchText = null)
 		{
-			bool wasCancelled = await ShowAndWait(title, search, columnHeadersAndBindings, DataGridSelectionMode.Single, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			bool wasCancelled = await ShowAndWait(title, search, columnHeadersAndBindings, DataGridSelectionMode.Single, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 			if(wasCancelled) {
-				return default(T);
+				return default;
 			}
 			return (T)_DataGrid.SelectedItem;
 		}
 
-		private async Task<bool> ShowAndWait<T>(string title, Func<string, Task<List<T>>> search, ICollection<Tuple<string, Binding>> columnHeadersAndBindings, DataGridSelectionMode selectionMode, string loadingMessage, string watermark, int msTimeout, int minSearchTextLength, string defaultSearchText)
+		private async Task<bool> ShowAndWait<T>(string title, Func<string, Task<List<T>>> search, ICollection<(string Header, Binding)> columnHeadersAndBindings, DataGridSelectionMode selectionMode, string loadingMessage, string watermark, int minSearchTextLength, string defaultSearchText)
 		{
 			_DataGrid.SelectionMode = selectionMode;
 
 			// create columns
 			_DataGrid.Columns.Clear();
-			foreach(Tuple<string, Binding> columnTuple in columnHeadersAndBindings) {
+			foreach((string header, Binding binding) in columnHeadersAndBindings) {
 				_DataGrid.Columns.Add(new DataGridTextColumn
 				{
-					Header = columnTuple.Item1,
-					Binding = columnTuple.Item2
+					Header = header,
+					Binding = binding
 				});
 			}
 
-			var vm = new SearchDialogViewModel<T>(title, search, loadingMessage, watermark, msTimeout, minSearchTextLength, defaultSearchText);
+			var vm = new SearchDialogViewModel<T>(title, search, loadingMessage, watermark, minSearchTextLength, defaultSearchText);
 			vm.Submit += delegate
 			{
 				EndDialog();

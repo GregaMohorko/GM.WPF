@@ -33,8 +33,10 @@ Author: GregaMohorko
 		xmlns:local="clr-namespace:GM.WPF.Controls.Dialogs"
 		xmlns:controls="clr-namespace:GM.WPF.Controls"
 		mc:Ignorable="d"
+		MinHeight="300"
 		MinWidth="400"
 		FontSize="18"
+		VerticalAlignment="Top"
 		d:DataContext="{d:DesignInstance Type=local:SearchDialogViewModel,IsDesignTimeCreatable=True}"
 		>
 	<Grid Margin="20">
@@ -55,13 +57,13 @@ Author: GregaMohorko
 				<TextBox Text="{Binding SearchText,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" FontSize="18" VerticalContentAlignment="Center" TextWrapping="Wrap" Background="Transparent" Margin="0" Padding="2 4 5 5" Focusable="True" />
 			</Grid>
 			<Grid>
-				<DataGrid Name="_DataGrid" ItemsSource="{Binding Items,Mode=OneWay}" SelectedItem="{Binding Selected,Mode=TwoWay}" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" IsReadOnly="True" MinWidth="200" Focusable="True" />
+				<DataGrid Name="_DataGrid" ItemsSource="{Binding Items,Mode=OneWay}" SelectedItem="{Binding Selected,Mode=TwoWay}" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" IsReadOnly="True" MinWidth="200" Focusable="True" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
 				<controls:ProgressOverlay Message="{Binding OverlayMessage,Mode=OneWay}" Focusable="False" />
 			</Grid>
 		</DockPanel>
 		<StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" Margin="20 0 0 0">
 			<Button Content="OK" Command="{Binding Command_Ok,Mode=OneTime}" Padding="40 10" Margin="0 0 0 40" Focusable="True" />
-			<Button Content="Prekini" Padding="10 0" HorizontalAlignment="Left" Click="Button_Cancel_Click" Focusable="True" />
+			<Button Content="Cancel" Padding="10 0" HorizontalAlignment="Left" Click="Button_Cancel_Click" Focusable="True" />
 		</StackPanel>
 	</Grid>
 </local:TaskDialog>

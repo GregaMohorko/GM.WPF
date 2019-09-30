@@ -28,6 +28,7 @@ Author: GregaMohorko
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,9 +38,9 @@ using GM.WPF.MVVM;
 namespace GM.WPF.Controls.Dialogs
 {
 	[Obsolete("Design only.", true)]
-	class SearchDialogViewModel:SearchDialogViewModel<string> { }
+	class SearchDialogViewModel : SearchDialogViewModel<string> { }
 
-	class SearchDialogViewModel<T>:ViewModel
+	class SearchDialogViewModel<T> : ViewModel
 	{
 		public event EventHandler Submit;
 
@@ -52,12 +53,10 @@ namespace GM.WPF.Controls.Dialogs
 		public string OverlayMessage { get; set; }
 		public List<T> Items { get; private set; }
 
-		private int lastSearchCounter;
-
 		private readonly string watermark;
 		private readonly Func<string, Task<List<T>>> search;
+		private readonly AsyncRequestLoader loader;
 		private readonly string loadingMessage;
-		private readonly int msTimeout;
 		private readonly int minSearchTextLength;
 
 		[Obsolete("Design only.", true)]
@@ -68,22 +67,35 @@ namespace GM.WPF.Controls.Dialogs
 			OverlayMessage = "";
 		}
 
-		public SearchDialogViewModel(string title, Func<string, Task<List<T>>> search, string loadingMessage, string watermark, int msTimeout, int minSearchTextLength, string defaultSearchText)
+		public SearchDialogViewModel(string title, Func<string, Task<List<T>>> search, string loadingMessage, string watermark, int minSearchTextLength, string defaultSearchText)
 		{
 			Title = title;
 			this.search = search;
 			this.loadingMessage = loadingMessage;
 			this.watermark = watermark;
-			this.msTimeout = msTimeout;
 			this.minSearchTextLength = minSearchTextLength;
 
 			Command_Ok = new RelayCommand(Ok, () => Selected != null);
 
+			loader = new AsyncRequestLoader();
+			loader.PropertyChanged += Loader_PropertyChanged;
+
 			SearchWatermark = watermark;
-			SearchText = defaultSearchText;
+			SearchText = defaultSearchText ?? string.Empty;
 		}
 
+		private void Loader_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			switch(e.PropertyName) {
+				case nameof(AsyncRequestLoader.IsLoading):
+					OverlayMessage = loader.IsLoading ? loadingMessage : null;
+					break;
+			}
+		}
+
+#pragma warning disable IDE0051 // Remove unused private members
 		private async void OnSearchTextChanged()
+#pragma warning restore IDE0051 // Remove unused private members
 		{
 			// take care of the watermark
 			if(string.IsNullOrEmpty(SearchText)) {
@@ -92,35 +104,15 @@ namespace GM.WPF.Controls.Dialogs
 				SearchWatermark = null;
 			}
 
-			int myCounter = ++lastSearchCounter;
-			string mySearchText = SearchText;
-
-			// search text length?
-			if(SearchText.Length < minSearchTextLength) {
-				Items = null;
-				OverlayMessage = null;
-				return;
-			}
-
-			OverlayMessage = loadingMessage;
-
-			// timeout?
-			if(msTimeout > 0) {
-				await Task.Delay(msTimeout);
-				if(myCounter != lastSearchCounter) {
-					// search text has changed in the meantime
-					return;
+			await loader.InvokeWhenIfLast(async delegate
+			{
+				// search text length?
+				if(SearchText.Length < minSearchTextLength) {
+					Items = null;
+				} else {
+					Items = await search(SearchText);
 				}
-			}
-
-			// do the search
-			List<T> items = await search(mySearchText);
-			if(myCounter != lastSearchCounter) {
-				// search text has changed in the meantime
-				return;
-			}
-			Items = items;
-			OverlayMessage = null;
+			});
 		}
 
 		private void Ok()
