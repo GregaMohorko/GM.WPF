@@ -163,6 +163,8 @@
     <Compile Include="Utility\SizeUtility.cs" />
     <Compile Include="Windows\BaseWindow.cs" />
     <Compile Include="Windows\ClosingWindow.cs" />
+    <Compile Include="Windows\SplashWindow.cs" />
+    <Compile Include="Windows\SplashWindowViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
