@@ -22,53 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2019-09-05
+Created: 2019-10-08
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
-namespace GM.WPF.Windows
+namespace GM.WPF.Windows.Model.SettingsWindow
 {
 	/// <summary>
-	/// A window that invokes the <see cref="CanClose"/> before closing to make sure that the window can close.
+	/// Represents a control with a collection of <see cref="ISettingsUI"/> controls.
 	/// </summary>
-	public abstract class ClosingWindow : BaseWindow, IClosingControl
+	public interface ISettingsUIPanel
 	{
 		/// <summary>
-		/// If false, the cancelling process will be cancelled because apparently some action is still required from the user.
+		/// A collection of child settings.
 		/// </summary>
-		public abstract Task<bool> CanClose();
-
-		private bool shouldClose;
-
-		/// <summary>
-		/// Invokes the <see cref="CanClose"/> property and only invokes the <see cref="Window.OnClosing(CancelEventArgs)"/> if it returns true.
-		/// </summary>
-		/// <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
-		protected override void OnClosing(CancelEventArgs e)
-		{
-			if(!shouldClose) {
-				e.Cancel = true;
-
-				_ = Application.Current.Dispatcher.InvokeAsync(async delegate
-				{
-					shouldClose = await CanClose();
-					if(shouldClose) {
-						Close();
-					}
-				});
-
-				return;
-			}
-
-			base.OnClosing(e);
-		}
+		ObservableCollection<ISettingsUI> Children { get; }
 	}
 }

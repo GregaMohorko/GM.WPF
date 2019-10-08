@@ -32,30 +32,13 @@ Author: GregaMohorko
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:local="clr-namespace:GM.WPF.Controls"
 		mc:Ignorable="d"
-		d:DesignHeight="1600"
-		d:DesignWidth="800"
+		d:DesignHeight="1100"
+		d:DesignWidth="1000"
 		d:DataContext="{d:DesignInstance Type=local:StartPageViewModel,IsDesignTimeCreatable=True}"
 		>
 	<Grid>
-		<Grid.Resources>
-			<Style x:Key="CD_Side" TargetType="ColumnDefinition">
-				<Setter Property="Width" Value="2*" />
-				<Setter Property="MinWidth" Value="36" />
-			</Style>
-		</Grid.Resources>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="160" />
-			<RowDefinition Height="50" />
-			<RowDefinition />
-		</Grid.RowDefinitions>
-		<Grid>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Style="{StaticResource CD_Side}" />
-				<ColumnDefinition />
-				<ColumnDefinition Style="{StaticResource CD_Side}" />
-			</Grid.ColumnDefinitions>
-			<TextBlock Grid.Column="1" Text="Start" VerticalAlignment="Center" FontSize="58" />
-			<StackPanel Grid.ColumnSpan="3" Margin="0 0 36 0" HorizontalAlignment="Right" Orientation="Horizontal">
+		<Grid Height="160" VerticalAlignment="Top">
+			<StackPanel Margin="0 0 36 0" HorizontalAlignment="Right" Orientation="Horizontal">
 				<StackPanel VerticalAlignment="Center" Margin="0 0 5 2">
 					<StackPanel.Resources>
 						<Style TargetType="TextBlock">
@@ -70,13 +53,14 @@ Author: GregaMohorko
 				</Canvas>
 			</StackPanel>
 		</Grid>
-		<Grid Grid.Row="2">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Style="{StaticResource CD_Side}" />
-				<ColumnDefinition />
-				<ColumnDefinition Style="{StaticResource CD_Side}" />
-			</Grid.ColumnDefinitions>
-			<ScrollViewer Grid.Column="1" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+		<Grid HorizontalAlignment="Center">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="160" />
+				<RowDefinition Height="50" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<TextBlock Text="Start" VerticalAlignment="Center" FontSize="58" />
+			<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 				<Grid Name="_Grid_Columns">
 					<Grid.Resources>
 						<Style x:Key="CD_Content" TargetType="ColumnDefinition">
@@ -121,6 +105,8 @@ Author: GregaMohorko
 					</Grid.Resources>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Style="{StaticResource CD_Content}" />
+						<ColumnDefinition Style="{StaticResource CD_Inbetween}" />
+						<ColumnDefinition Style="{StaticResource CD_Content}" />
 					</Grid.ColumnDefinitions>
 					<StackPanel>
 						<StackPanel>
@@ -148,6 +134,104 @@ Author: GregaMohorko
 														<VisualBrush.Visual>
 															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
 																<Path Width="38" Height="38" Canvas.Left="19" Canvas.Top="19" Stretch="Fill" Fill="#FF000000" Data="F1 M 38,19C 42.9706,19 47,23.0294 47,28C 47,30.5642 45.9276,32.878 38,49C 30.0724,32.878 29,30.5642 29,28C 29,23.0294 33.0294,19 38,19 Z M 38,24C 35.7909,24 34,25.7909 34,28C 34,30.2092 35.7909,32 38,32C 40.2091,32 42,30.2092 42,28C 42,25.7909 40.2091,24 38,24 Z M 19,57L 24,42L 31.5,42L 33.5,46L 27.6641,46L 25.3324,53L 50.6676,53L 48.3359,46L 42.5,46L 44.5,42L 52,42L 57,57L 19,57 Z " />
+															</Canvas>
+														</VisualBrush.Visual>
+													</VisualBrush>
+												</Rectangle.Fill>
+											</Rectangle>
+										</Grid>
+									</DockPanel>
+								</Button>
+								<Button Style="{StaticResource Tile_2x1}">
+									<DockPanel>
+										<TextBlock Text="Button" Style="{StaticResource Tile_title}" />
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition />
+												<ColumnDefinition Width="3*" />
+												<ColumnDefinition />
+											</Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition />
+												<RowDefinition Height="3*" />
+												<RowDefinition />
+											</Grid.RowDefinitions>
+											<Rectangle Grid.Column="1" Grid.Row="1">
+												<Rectangle.Fill>
+													<VisualBrush Stretch="Uniform">
+														<VisualBrush.Visual>
+															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+																<Path Width="38" Height="38" Canvas.Left="19" Canvas.Top="19" Stretch="Fill" Fill="#FF000000" Data="F1 M 38,19C 42.9706,19 47,23.0294 47,28C 47,30.5642 45.9276,32.878 38,49C 30.0724,32.878 29,30.5642 29,28C 29,23.0294 33.0294,19 38,19 Z M 38,24C 35.7909,24 34,25.7909 34,28C 34,30.2092 35.7909,32 38,32C 40.2091,32 42,30.2092 42,28C 42,25.7909 40.2091,24 38,24 Z M 19,57L 24,42L 31.5,42L 33.5,46L 27.6641,46L 25.3324,53L 50.6676,53L 48.3359,46L 42.5,46L 44.5,42L 52,42L 57,57L 19,57 Z " />
+															</Canvas>
+														</VisualBrush.Visual>
+													</VisualBrush>
+												</Rectangle.Fill>
+											</Rectangle>
+										</Grid>
+									</DockPanel>
+								</Button>
+							</WrapPanel>
+						</StackPanel>
+						<StackPanel Style="{StaticResource Row_NotFirst}">
+							<TextBlock Text="Second row" Style="{StaticResource Row_Title}" />
+							<WrapPanel>
+								<Button Style="{StaticResource Tile_2x2}">
+									<DockPanel>
+										<TextBlock Text="Button" Style="{StaticResource Tile_title}" />
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition />
+												<ColumnDefinition Width="3*" />
+												<ColumnDefinition />
+											</Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition />
+												<RowDefinition Height="3*" />
+												<RowDefinition />
+											</Grid.RowDefinitions>
+											<Rectangle Grid.Column="1" Grid.Row="1">
+												<Rectangle.Fill>
+													<VisualBrush Stretch="Uniform">
+														<VisualBrush.Visual>
+															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+																<Path Width="38" Height="38" Canvas.Left="19" Canvas.Top="19" Stretch="Fill" Fill="#FF000000" Data="F1 M 38,19C 42.9706,19 47,23.0294 47,28C 47,30.5642 45.9276,32.878 38,49C 30.0724,32.878 29,30.5642 29,28C 29,23.0294 33.0294,19 38,19 Z M 38,24C 35.7909,24 34,25.7909 34,28C 34,30.2092 35.7909,32 38,32C 40.2091,32 42,30.2092 42,28C 42,25.7909 40.2091,24 38,24 Z M 19,57L 24,42L 31.5,42L 33.5,46L 27.6641,46L 25.3324,53L 50.6676,53L 48.3359,46L 42.5,46L 44.5,42L 52,42L 57,57L 19,57 Z " />
+															</Canvas>
+														</VisualBrush.Visual>
+													</VisualBrush>
+												</Rectangle.Fill>
+											</Rectangle>
+										</Grid>
+									</DockPanel>
+								</Button>
+							</WrapPanel>
+						</StackPanel>
+					</StackPanel>
+					<StackPanel Grid.Column="2">
+						<StackPanel>
+							<TextBlock Text="First row" Style="{StaticResource Row_Title}" />
+							<WrapPanel>
+								<Button Style="{StaticResource Tile_1x1}" />
+								<Button Style="{StaticResource Tile_1x1}" />
+								<Button Style="{StaticResource Tile_1x1}">
+									<DockPanel>
+										<TextBlock Text="Button" Style="{StaticResource Tile_title}" />
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition />
+												<ColumnDefinition Width="3*" />
+												<ColumnDefinition />
+											</Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition />
+												<RowDefinition Height="3*" />
+												<RowDefinition />
+											</Grid.RowDefinitions>
+											<Rectangle Grid.Column="1" Grid.Row="1">
+												<Rectangle.Fill>
+													<VisualBrush Stretch="Uniform">
+														<VisualBrush.Visual>
+															<Canvas>
+																<Path Fill="#FF000000" Data="F1 M 38,19C 42.9706,19 47,23.0294 47,28C 47,30.5642 45.9276,32.878 38,49C 30.0724,32.878 29,30.5642 29,28C 29,23.0294 33.0294,19 38,19 Z M 38,24C 35.7909,24 34,25.7909 34,28C 34,30.2092 35.7909,32 38,32C 40.2091,32 42,30.2092 42,28C 42,25.7909 40.2091,24 38,24 Z M 19,57L 24,42L 31.5,42L 33.5,46L 27.6641,46L 25.3324,53L 50.6676,53L 48.3359,46L 42.5,46L 44.5,42L 52,42L 57,57L 19,57 Z " />
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>

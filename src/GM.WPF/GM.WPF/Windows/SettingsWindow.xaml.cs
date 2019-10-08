@@ -22,53 +22,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2019-09-05
+Created: 2019-10-08
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using GM.WPF.Controls.Dialogs;
+using GM.WPF.Windows.Model.SettingsWindow;
 
 namespace GM.WPF.Windows
 {
 	/// <summary>
-	/// A window that invokes the <see cref="CanClose"/> before closing to make sure that the window can close.
+	/// A window with configurable settings.
 	/// </summary>
-	public abstract class ClosingWindow : BaseWindow, IClosingControl
+	public partial class SettingsWindow : ClosingWindow
 	{
 		/// <summary>
-		/// If false, the cancelling process will be cancelled because apparently some action is still required from the user.
+		/// Creates a new instance of <see cref="SettingsWindow"/>.
 		/// </summary>
-		public abstract Task<bool> CanClose();
+		/// <param name="settings">The settings.</param>
+		public SettingsWindow(Settings settings)
+		{
+			InitializeComponent();
 
-		private bool shouldClose;
+			var vm = new SettingsWindowViewModel(settings);
+			ViewModel = vm;
+		}
 
 		/// <summary>
-		/// Invokes the <see cref="CanClose"/> property and only invokes the <see cref="Window.OnClosing(CancelEventArgs)"/> if it returns true.
+		/// If there are any changes, asks the user if he wants to save them.
 		/// </summary>
-		/// <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
-		protected override void OnClosing(CancelEventArgs e)
+		public override async Task<bool> CanClose()
 		{
-			if(!shouldClose) {
-				e.Cancel = true;
-
-				_ = Application.Current.Dispatcher.InvokeAsync(async delegate
-				{
-					shouldClose = await CanClose();
-					if(shouldClose) {
-						Close();
-					}
-				});
-
-				return;
+			var vm = (SettingsWindowViewModel)ViewModel;
+			if(!vm.Settings.IsDirty) {
+				return true;
 			}
-
-			base.OnClosing(e);
+			int? answer = await _DialogPanel.Create<ChooseDialog>().Show($"Do you want to save the changes?", "Yes", "No");
+			switch(answer) {
+				case null:
+					return false;
+				case 1:
+					return true;
+				case 0:
+					vm.Save();
+					return true;
+				default:
+					throw new NotImplementedException();
+			}
 		}
 	}
 }

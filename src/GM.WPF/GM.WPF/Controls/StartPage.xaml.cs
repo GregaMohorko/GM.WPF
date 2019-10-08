@@ -119,8 +119,9 @@ namespace GM.WPF.Controls
 			ClearTiles();
 
 			// add each column
-			foreach(StartPageColumn column in Columns) {
-				if(_Grid_Columns.Children.Count > 1) {
+			for(int i = 0; i < Columns.Count; ++i) {
+				StartPageColumn column = Columns.ElementAt(i);
+				if(i > 0) {
 					// add the column in between
 					_Grid_Columns.ColumnDefinitions.Add(new ColumnDefinition { Style = (Style)_Grid_Columns.Resources["CD_Inbetween"] });
 				}
@@ -128,7 +129,8 @@ namespace GM.WPF.Controls
 				_Grid_Columns.ColumnDefinitions.Add(new ColumnDefinition { Style = (Style)_Grid_Columns.Resources["CD_Content"] });
 
 				var columnStackPanel = new StackPanel();
-				_Grid_Columns.Children.Add(columnStackPanel);
+				Grid.SetColumn(columnStackPanel, i * 2);
+				_ = _Grid_Columns.Children.Add(columnStackPanel);
 
 				// add each row to this column
 				foreach(StartPageRow row in column.Rows) {
@@ -136,7 +138,7 @@ namespace GM.WPF.Controls
 					if(columnStackPanel.Children.Count > 1) {
 						rowStackPanel.Style = (Style)_Grid_Columns.Resources["Row_NotFirst"];
 					}
-					columnStackPanel.Children.Add(rowStackPanel);
+					_ = columnStackPanel.Children.Add(rowStackPanel);
 
 					// row title
 					var rowTitle = new TextBlock
@@ -144,15 +146,15 @@ namespace GM.WPF.Controls
 						Text = row.Title,
 						Style = (Style)_Grid_Columns.Resources["Row_Title"]
 					};
-					rowStackPanel.Children.Add(rowTitle);
+					_ = rowStackPanel.Children.Add(rowTitle);
 
 					var tilesWrapPanel = new WrapPanel();
-					rowStackPanel.Children.Add(tilesWrapPanel);
+					_ = rowStackPanel.Children.Add(tilesWrapPanel);
 
 					// add each tile
 					foreach(StartPageTile tile in row.Tiles) {
 						var tileButton = new Button();
-						tilesWrapPanel.Children.Add(tileButton);
+						_ = tilesWrapPanel.Children.Add(tileButton);
 
 						// set the command
 						tileButton.Command = tile.Command;
@@ -182,7 +184,7 @@ namespace GM.WPF.Controls
 								Text = tile.Title,
 								Style = (Style)_Grid_Columns.Resources["Tile_title"]
 							};
-							tileDockPanel.Children.Add(tileTitle);
+							_ = tileDockPanel.Children.Add(tileTitle);
 						}
 
 						// tile description
@@ -192,7 +194,7 @@ namespace GM.WPF.Controls
 
 						// tile icon
 						var tileIconGrid = new Grid();
-						tileDockPanel.Children.Add(tileIconGrid);
+						_ = tileDockPanel.Children.Add(tileIconGrid);
 						if(tile.Icon != null) {
 							tileIconGrid.ColumnDefinitions.Add(new ColumnDefinition());
 							tileIconGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(3, GridUnitType.Star) });
@@ -201,7 +203,7 @@ namespace GM.WPF.Controls
 							tileIconGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
 							tileIconGrid.RowDefinitions.Add(new RowDefinition());
 							var tileIconRectangle = new Rectangle();
-							tileIconGrid.Children.Add(tileIconRectangle);
+							_ = tileIconGrid.Children.Add(tileIconRectangle);
 							Grid.SetColumn(tileIconRectangle, 1);
 							Grid.SetRow(tileIconRectangle, 1);
 							tileIconRectangle.Fill = new VisualBrush

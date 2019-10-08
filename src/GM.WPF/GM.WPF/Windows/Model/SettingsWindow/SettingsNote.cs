@@ -22,53 +22,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2019-09-05
+Created: 2019-10-08
 Author: Grega Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
+using GalaSoft.MvvmLight;
 
-namespace GM.WPF.Windows
+namespace GM.WPF.Windows.Model.SettingsWindow
 {
 	/// <summary>
-	/// A window that invokes the <see cref="CanClose"/> before closing to make sure that the window can close.
+	/// A simple text note with an optional title and a text.
 	/// </summary>
-	public abstract class ClosingWindow : BaseWindow, IClosingControl
+	public class SettingsNote : ObservableObject, ISettingsUI
 	{
 		/// <summary>
-		/// If false, the cancelling process will be cancelled because apparently some action is still required from the user.
+		/// The name of this setting. Will be displayed as a title.
 		/// </summary>
-		public abstract Task<bool> CanClose();
+		public string Name { get; private set; }
+		/// <summary>
+		/// The text to display.
+		/// </summary>
+		public string Text { get; private set; }
+		/// <summary>
+		/// Always false.
+		/// </summary>
+		public bool IsDirty => false;
+		/// <summary>
+		/// Always true.
+		/// </summary>
+		public bool IsReadOnly => true;
 
-		private bool shouldClose;
+		internal SettingsNote(string title, string text)
+		{
+			Name = title;
+			Text = text;
+		}
 
 		/// <summary>
-		/// Invokes the <see cref="CanClose"/> property and only invokes the <see cref="Window.OnClosing(CancelEventArgs)"/> if it returns true.
+		/// Does nothing.
 		/// </summary>
-		/// <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
-		protected override void OnClosing(CancelEventArgs e)
+		public void Apply()
 		{
-			if(!shouldClose) {
-				e.Cancel = true;
-
-				_ = Application.Current.Dispatcher.InvokeAsync(async delegate
-				{
-					shouldClose = await CanClose();
-					if(shouldClose) {
-						Close();
-					}
-				});
-
-				return;
-			}
-
-			base.OnClosing(e);
+			// do nothing ...
 		}
 	}
 }
