@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -126,11 +126,14 @@ namespace GM.WPF.Utility
 		/// <param name="obj">The object from which to get the value.</param>
 		public static Tuple<bool, object> TryGetValueFor(this BindingBase bindingBase, object obj)
 		{
+			if(bindingBase == null) {
+				throw new ArgumentNullException(nameof(bindingBase));
+			}
 			if(bindingBase is Binding b) {
 				return TryGetValueFor(b, obj);
 			} else if(bindingBase is PriorityBinding pb) {
 				return TryGetValueFor(pb, obj);
-			} else if(bindingBase is MultiBinding mb) {
+			} else if(bindingBase is MultiBinding) {
 				throw new ArgumentException("MultiBinding is not supported.", nameof(bindingBase));
 			} else {
 				throw new ArgumentException($"Unsupported binding type: {bindingBase.GetType().ToString()}.", nameof(bindingBase));
@@ -146,6 +149,9 @@ namespace GM.WPF.Utility
 		/// <param name="value">The value to set.</param>
 		public static bool TrySetValueFor(this BindingBase bindingBase, object obj, object value)
 		{
+			if(bindingBase == null) {
+				throw new ArgumentNullException(nameof(bindingBase));
+			}
 			if(bindingBase is Binding b) {
 				return TrySetValueFor(b, obj, value);
 			} else {
@@ -160,6 +166,9 @@ namespace GM.WPF.Utility
 		/// <param name="obj">The object from which to get the value.</param>
 		public static Tuple<bool, object> TryGetValueFor(this PriorityBinding priorityBinding, object obj)
 		{
+			if(priorityBinding == null) {
+				throw new ArgumentNullException(nameof(priorityBinding));
+			}
 			// loop through with reflection
 			foreach(BindingBase pbChild in priorityBinding.Bindings) {
 				Tuple<bool, object> result = TryGetValueFor(pbChild, obj);
@@ -188,6 +197,10 @@ namespace GM.WPF.Utility
 		/// <param name="obj">The object from which to get the value.</param>
 		public static Tuple<bool, object> TryGetValueFor(this Binding binding, object obj)
 		{
+			if(binding == null) {
+				throw new ArgumentNullException(nameof(binding));
+			}
+
 			// idea from: https://stackoverflow.com/a/3886477/6277755
 
 			var tmpBinding = new Binding
@@ -207,7 +220,7 @@ namespace GM.WPF.Utility
 			};
 
 			var dummyDO = new DummyDO();
-			BindingOperations.SetBinding(dummyDO, DummyDO.ValueProperty, tmpBinding);
+			_ = BindingOperations.SetBinding(dummyDO, DummyDO.ValueProperty, tmpBinding);
 
 			object value = dummyDO.Value;
 
@@ -229,6 +242,10 @@ namespace GM.WPF.Utility
 		/// <param name="value">The value to set.</param>
 		public static bool TrySetValueFor(this Binding binding, object obj, object value)
 		{
+			if(binding == null) {
+				throw new ArgumentNullException(nameof(binding));
+			}
+
 			var tmpBinding = new Binding
 			{
 				Path = binding.Path,
@@ -246,7 +263,7 @@ namespace GM.WPF.Utility
 			};
 
 			var dummyDO = new DummyDO();
-			BindingOperations.SetBinding(dummyDO, DummyDO.ValueProperty, tmpBinding);
+			_ = BindingOperations.SetBinding(dummyDO, DummyDO.ValueProperty, tmpBinding);
 
 			dummyDO.Value = value;
 

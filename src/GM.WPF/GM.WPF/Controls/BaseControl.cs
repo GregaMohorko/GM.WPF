@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -72,8 +72,9 @@ namespace GM.WPF.Controls
 
 		/// <summary>
 		/// Disposes this control, if disposable. And the <see cref="ViewModel"/>, if disposable.
+		/// <para>This is called automatically if inside <see cref="Windows.BaseWindow"/> and the window closes.</para>
 		/// </summary>
-		internal void DisposeBaseControl()
+		public void DisposeBaseControl()
 		{
 			// dispose this control
 			if(this is IDisposable thisDisposable) {
@@ -169,7 +170,7 @@ namespace GM.WPF.Controls
 
 			void staticCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
-				callbackMethod.Invoke(d, new object[] { e });
+				_ = callbackMethod.Invoke(d, new object[] { e });
 			}
 
 			Type propertyType = ownerType.GetPropertyTypeReal(name);
