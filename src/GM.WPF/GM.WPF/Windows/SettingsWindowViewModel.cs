@@ -56,8 +56,12 @@ namespace GM.WPF.Windows
 			SelectedTab = Settings.Tabs.First();
 			var group = new SettingsGroupBox("A group of settings");
 			SelectedTab.Children.Add(group);
-			group.Children.Add(new StringSettingControl("Name of setting", null, null, null));
-			group.Children.Add(new StringSettingControl("Read-only", null, null, null, true));
+			group.Children.Add(new StringSettingControl("Name of string setting", null, null, null));
+			group.Children.Add(new StringSettingControl("Read-only string setting", null, null, null, true));
+			var group2 = new SettingsGroupBox("Second group");
+			SelectedTab.Children.Add(group2);
+			group2.Children.Add(new DirectoryPathSettingControl("Directory path setting", null, null, null));
+			group2.Children.Add(new DirectoryPathSettingControl("Read-only directory path setting", null, null, null, true));
 		}
 
 		public SettingsWindowViewModel(Settings settings)

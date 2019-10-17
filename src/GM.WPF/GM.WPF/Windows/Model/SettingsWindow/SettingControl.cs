@@ -31,16 +31,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace GM.WPF.Windows.Model.SettingsWindow
 {
 	/// <summary>
-	/// A string setting control.
+	/// A basic string setting control with a TextBox.
 	/// </summary>
 	public class StringSettingControl : SettingControl<string>
 	{
 		internal StringSettingControl(string name, string propertyPath, Action<string, string> applyMethod, string originalValue, bool isReadOnly = false) : base(name, propertyPath, applyMethod, originalValue, isReadOnly) { }
+	}
+
+	/// <summary>
+	/// A string setting control with a TextBox and a "Browse..." button.
+	/// </summary>
+	public class DirectoryPathSettingControl : SettingControl<string>
+	{
+		/// <summary>
+		/// The command for the Browse... button.
+		/// </summary>
+		public RelayCommand Command_Browse { get; private set; }
+
+		internal DirectoryPathSettingControl(string name, string propertyPath, Action<string, string> applyMethod, string originalValue, bool isReadOnly = false) : base(name, propertyPath, applyMethod, originalValue, isReadOnly)
+		{
+			Command_Browse = new RelayCommand(Browse);
+		}
+
+		private void Browse()
+		{
+			string selected;
+			using(var save = new FolderBrowserDialog()) {
+				save.Description = $"Select the new directory for {Name}:";
+				save.SelectedPath = Value;
+				if(save.ShowDialog() != DialogResult.OK) {
+					return;
+				}
+				selected = save.SelectedPath;
+			}
+			Value = selected;
+		}
 	}
 
 	/// <summary>

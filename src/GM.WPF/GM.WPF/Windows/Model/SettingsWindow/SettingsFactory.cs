@@ -70,17 +70,37 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 			return Create<T>(name, propertyPath, true);
 		}
 
+		/// <summary>
+		/// Creates a new <see cref="DirectoryPathSettingControl"/> control. Must be string.
+		/// </summary>
+		/// <param name="name">The name of the control.</param>
+		/// <param name="propertyPath">The path to the property, used in the methods provided when creating this factory.</param>
+		/// <param name="isReadOnly">Determines whether or not this setting is read-only.</param>
+		public DirectoryPathSettingControl CreateDirectoryPath(string name, string propertyPath, bool isReadOnly = false)
+		{
+			CheckReadOnly(isReadOnly);
+
+			string originalValue = (string)valueGetter(propertyPath);
+			return new DirectoryPathSettingControl(name, propertyPath, CastApplyMethod<string>(), originalValue, isReadOnly);
+		}
+
 		private ISettingsUI Create<T>(string name, string propertyPath, bool isReadOnly)
 		{
-			if(applyMethod == null && !isReadOnly) {
-				throw new InvalidOperationException("A read-only factory can only create read-only settings.");
-			}
+			CheckReadOnly(isReadOnly);
+
 			T originalValue = (T)valueGetter(propertyPath);
 			if(typeof(T) == typeof(string)) {
 				return new StringSettingControl(name, propertyPath, CastApplyMethod<string>(), originalValue as string, isReadOnly);
 			}
 
 			throw new ArgumentOutOfRangeException(nameof(T), $"The type '{typeof(T)}' is not supported as a setting.");
+		}
+
+		private void CheckReadOnly(bool isReadOnly)
+		{
+			if(applyMethod == null && !isReadOnly) {
+				throw new InvalidOperationException("A read-only factory can only create read-only settings.");
+			}
 		}
 
 		private Action<string, T> CastApplyMethod<T>()

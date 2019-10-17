@@ -37,6 +37,7 @@ namespace GM.WPF
 {
 	/// <summary>
 	/// This class can be used for updating progress from a background thread.
+	/// <para>Contains some useful static methods to be used while updating the progress.</para>
 	/// </summary>
 	public class ProgressUpdater
 	{
@@ -192,6 +193,127 @@ namespace GM.WPF
 		public void SetProgress2(double? progress)
 		{
 			SetProgress(progress * 100);
+		}
+
+		/// <summary>
+		/// Updates the progress to the specified loop state.
+		/// <para>Check <see cref="GetProgress(int, int)"/> for details.</para>
+		/// </summary>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		/// <param name="totalIterations">The total count of iterations.</param>
+		public void SetProgress(int loopCounter, int totalIterations)
+		{
+			double progress = GetProgress(loopCounter, totalIterations);
+			SetProgress2(progress);
+		}
+
+		/// <summary>
+		/// Updates the progress to the specified loop state. The progress is being calculated inside the [start, end] range.
+		/// <para>Check <see cref="GetProgress(double, double, int, int)"/> for details.</para>
+		/// </summary>
+		/// <param name="start">The start of the progress range.</param>
+		/// <param name="end">The end of the progress range.</param>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		/// <param name="totalIterations">The total count of iterations.</param>
+		public void SetProgress(double start, double end, int loopCounter, int totalIterations)
+		{
+			double progress = GetProgress(start, end, loopCounter, totalIterations);
+			SetProgress2(progress);
+		}
+
+		// fields for loop
+		private int? reasonableStep;
+		private int totalIterations;
+		private int lastUpdateAt;
+		/// <summary>
+		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetProgress(int)"/> or <see cref="SetProgress(double, double, int)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
+		/// <para>This is usefull for very long loops where updating for each iteration is pointless and would take too much of CPU time in total.</para>
+		/// </summary>
+		/// <param name="iterationCount">The number of total iterations (loop count).</param>
+		public void StartNewLoop(int iterationCount)
+		{
+			reasonableStep = GetStepForProgressUpdate(iterationCount);
+			totalIterations = iterationCount;
+			lastUpdateAt = -1;
+		}
+
+		/// <summary>
+		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state.
+		/// <para>Check <see cref="GetProgress(int, int)"/> for details.</para>
+		/// </summary>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		public void SetProgress(int loopCounter)
+		{
+			SetProgress(0, 1, loopCounter, totalIterations);
+		}
+
+		/// <summary>
+		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. The progress is being calculated inside the [start, end] range.
+		/// <para>Check <see cref="GetProgress(double, double, int, int)"/> for details.</para>
+		/// </summary>
+		/// <param name="start">The start of the progress range.</param>
+		/// <param name="end">The end of the progress range.</param>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		public void SetProgress(double start, double end, int loopCounter)
+		{
+			if(reasonableStep == null) {
+				throw new InvalidOperationException("You must first call StartNewLoop before using this method.");
+			}
+			if(lastUpdateAt != -1 && loopCounter < lastUpdateAt + reasonableStep.Value) {
+				return;
+			}
+			lastUpdateAt = loopCounter;
+			SetProgress(start, end, loopCounter, totalIterations);
+		}
+
+		/// <summary>
+		/// Returns the progress for the specified loop state. The progress is being calculated inside the [start, end] range.
+		/// <para>This is useful when you have multiple loops and different loops have different ranges. For instance, you can have a two loops where the first has more iterations so you would give it a range between [0, 0.7] and then the second between [0.7, 1]. This way the progress will go smoothly from 0 to 1 even if there are actually two loops being iterated.</para>
+		/// <para>This returns start + (end - start) * ((loopCounter + 1) / (double)totalIterations).</para>
+		/// </summary>
+		/// <param name="start">The start of the progress range.</param>
+		/// <param name="end">The end of the progress range.</param>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		/// <param name="totalIterations">The total count of iterations.</param>
+		public static double GetProgress(double start, double end, int loopCounter, int totalIterations)
+		{
+			if(start < 0 || start >= 1) {
+				throw new ArgumentOutOfRangeException(nameof(start), "Start must be non-negative and less than 1.");
+			}
+			if(end <= start || end > 1) {
+				throw new ArgumentOutOfRangeException(nameof(end), "End must be more than start and not bigger than 1.");
+			}
+			double progress = GetProgress(loopCounter, totalIterations);
+			double range = end - start;
+			return start + range * progress;
+		}
+
+		/// <summary>
+		/// Returns the progress for the specified loop state.
+		/// <para>This returns (loopCounter + 1) / (double)totalIterations.</para>
+		/// </summary>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		/// <param name="totalIterations">The total count of iterations.</param>
+		public static double GetProgress(int loopCounter, int totalIterations)
+		{
+			if(loopCounter < 0 || loopCounter >= totalIterations) {
+				throw new ArgumentOutOfRangeException(nameof(loopCounter), "The loop counter must be non-negative and less than the total iteration count.");
+			}
+			return (loopCounter + 1) / (double)totalIterations;
+		}
+
+		/// <summary>
+		/// Returns a reasonable step at which the progress is best updated (so that the progress moves by not less than 1 percent).
+		/// <para>This is usefull for very long loops where updating for each iteration is pointless and would take too much of CPU time in total.</para>
+		/// <para>For instance, if you have 100000 items to process, a reasonable step to update the progress is 100000/100 = 1000. So the progress is updated once every 1000 items.</para>
+		/// </summary>
+		/// <param name="iterationCount">The number of total iterations (loop count).</param>
+		public static int GetStepForProgressUpdate(int iterationCount)
+		{
+			if(iterationCount < 200) {
+				return 1;
+			}
+			return iterationCount / 100;
 		}
 	}
 }

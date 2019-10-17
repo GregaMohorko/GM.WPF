@@ -68,6 +68,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.4.1.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -163,6 +164,18 @@
     <Compile Include="Utility\SizeUtility.cs" />
     <Compile Include="Windows\BaseWindow.cs" />
     <Compile Include="Windows\ClosingWindow.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\ISettingsUI.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\ISettingsUIPanel.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\SettingControl.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\Settings.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\SettingsFactory.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\SettingsGroupBox.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\SettingsNote.cs" />
+    <Compile Include="Windows\Model\SettingsWindow\SettingsTab.cs" />
+    <Compile Include="Windows\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SettingsWindowViewModel.cs" />
     <Compile Include="Windows\SplashWindow.cs" />
     <Compile Include="Windows\SplashWindowViewModel.cs" />
   </ItemGroup>
@@ -218,6 +231,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\TimePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

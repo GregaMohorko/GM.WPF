@@ -176,8 +176,7 @@ namespace GM.WPF.Controls
 			}
 
 			string tsvText = string.Join(Environment.NewLine, tsvLines);
-			Clipboard.SetText(tsvText, TextDataFormat.Text);
-
+			ClipboardUtility.SetText(tsvText);
 			e.Handled = true;
 		}
 

@@ -33,14 +33,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace GM.WPF.Windows
 {
 	/// <summary>
 	/// A base class for a splash screen.
-	/// <para>Is not resizable, not shown in taskbar and is topmost.</para>
 	/// <para>Can be moved by dragging it.</para>
+	/// <para>Is not resizable.</para>
 	/// </summary>
 	public abstract class SplashWindow : BaseWindow, IDisposable
 	{
@@ -49,6 +50,15 @@ namespace GM.WPF.Windows
 		/// <para>Is automatically cancelled when this window is manually closed.</para>
 		/// </summary>
 		public CancellationTokenSource CancellationTokenSource { get; private set; }
+
+		/// <summary>
+		/// Gets or sets the view model. If setting, the current view model is first disposed.
+		/// </summary>
+		public new SplashWindowViewModel ViewModel
+		{
+			get => (SplashWindowViewModel)base.ViewModel;
+			set => base.ViewModel = value;
+		}
 
 		private bool isDisposed;
 
@@ -60,8 +70,13 @@ namespace GM.WPF.Windows
 			WindowStyle = WindowStyle.None;
 			ResizeMode = ResizeMode.NoResize;
 			WindowStartupLocation = WindowStartupLocation.CenterScreen;
-			ShowInTaskbar = false;
-			Topmost = true;
+			ShowInTaskbar = true;
+			Topmost = false;
+			_ = SetBinding(TitleProperty, new Binding
+			{
+				Path = new PropertyPath(nameof(SplashWindowViewModel.Title)),
+				Mode = BindingMode.OneWay
+			});
 
 			CancellationTokenSource = new CancellationTokenSource();
 			MouseDown += Window_MouseDown;
@@ -85,8 +100,7 @@ namespace GM.WPF.Windows
 		/// <param name="work">The action that represents the task.</param>
 		public void AddTask(string description, Action work)
 		{
-			var vm = (SplashWindowViewModel)ViewModel;
-			vm.AddTask(description, work);
+			ViewModel.AddTask(description, work);
 		}
 
 		/// <summary>
@@ -105,9 +119,7 @@ namespace GM.WPF.Windows
 				_ = taskCompletionSource.TrySetCanceled();
 			});
 
-			var vm = (SplashWindowViewModel)ViewModel;
-
-			Task completedTask = await Task.WhenAny(vm.ExecuteTasks(CancellationTokenSource.Token), taskCompletionSource.Task);
+			Task completedTask = await Task.WhenAny(ViewModel.ExecuteTasks(CancellationTokenSource.Token), taskCompletionSource.Task);
 
 			try {
 				// the task is finished and the await will return immediately (the point of this is to throw exception if it occured)

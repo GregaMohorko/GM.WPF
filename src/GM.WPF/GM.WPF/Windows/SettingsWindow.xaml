@@ -82,6 +82,17 @@ Author: Grega Mohorko
 									</ItemsControl>
 								</GroupBox>
 							</DataTemplate>
+							<DataTemplate DataType="{x:Type settingsWindow:DirectoryPathSettingControl}">
+								<StackPanel Margin="5 5 5 0">
+									<TextBlock>
+										<Run Text="{Binding Name,Mode=OneTime}" />:
+									</TextBlock>
+									<DockPanel>
+										<Button DockPanel.Dock="Right" Content="Browse..." Command="{Binding Command_Browse, Mode=OneTime}" IsEnabled="{Binding IsReadOnly, Mode=OneTime, Converter={converters:BoolToBoolConverter}, ConverterParameter=Invert}" Margin="5 0 0 0" />
+										<TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsReadOnly, Mode=OneTime}" VerticalContentAlignment="Center" />
+									</DockPanel>
+								</StackPanel>
+							</DataTemplate>
 							<DataTemplate DataType="{x:Type settingsWindow:StringSettingControl}">
 								<StackPanel Margin="5 5 5 0">
 									<TextBlock>

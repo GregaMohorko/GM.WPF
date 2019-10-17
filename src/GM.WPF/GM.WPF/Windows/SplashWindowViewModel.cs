@@ -42,6 +42,10 @@ namespace GM.WPF.Windows
 	public class SplashWindowViewModel : ViewModel
 	{
 		/// <summary>
+		/// The title of the window.
+		/// </summary>
+		public string Title { get; set; }
+		/// <summary>
 		/// The description of the task currently processing.
 		/// </summary>
 		public string CurrentTaskDescription { get; private set; }
@@ -59,9 +63,16 @@ namespace GM.WPF.Windows
 		/// <summary>
 		/// Creates a new instance of <see cref="SplashWindowViewModel"/>.
 		/// </summary>
-		public SplashWindowViewModel()
+		public SplashWindowViewModel() : this(null) { }
+
+		/// <summary>
+		/// Creates a new instance of <see cref="SplashWindowViewModel"/>.
+		/// </summary>
+		/// <param name="appName">The name of the application. Will only be used for the window title.</param>
+		public SplashWindowViewModel(string appName)
 		{
 			if(IsInDesignMode) {
+				Title = "Opening - My Application";
 				CurrentTaskDescription = "Connecting with the database";
 				CurrentTaskIndex = 3;
 				TotalTasks = 42;
@@ -69,6 +80,11 @@ namespace GM.WPF.Windows
 			}
 
 			tasks = new List<(string Description, Action Work)>();
+
+			Title = "Opening";
+			if(appName != null) {
+				Title += $" - {appName}";
+			}
 		}
 
 		internal void AddTask(string description, Action work)
