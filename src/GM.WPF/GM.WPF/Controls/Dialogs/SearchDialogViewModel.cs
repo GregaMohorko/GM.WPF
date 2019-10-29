@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight.CommandWpf;
 using GM.WPF.MVVM;
@@ -54,7 +55,7 @@ namespace GM.WPF.Controls.Dialogs
 		public List<T> Items { get; private set; }
 
 		private readonly string watermark;
-		private readonly Func<string, Task<List<T>>> search;
+		private readonly Func<string, CancellationToken, Task<List<T>>> search;
 		private readonly AsyncRequestLoader loader;
 		private readonly string loadingMessage;
 		private readonly int minSearchTextLength;
@@ -67,7 +68,7 @@ namespace GM.WPF.Controls.Dialogs
 			OverlayMessage = "";
 		}
 
-		public SearchDialogViewModel(string title, Func<string, Task<List<T>>> search, string loadingMessage, string watermark, int minSearchTextLength, string defaultSearchText)
+		public SearchDialogViewModel(string title, Func<string, CancellationToken, Task<List<T>>> search, string loadingMessage, string watermark, int minSearchTextLength, string defaultSearchText)
 		{
 			Title = title;
 			this.search = search;
@@ -104,13 +105,13 @@ namespace GM.WPF.Controls.Dialogs
 				SearchWatermark = null;
 			}
 
-			await loader.InvokeWhenIfLast(async delegate
+			await loader.InvokeWhenIfLast(async (CancellationToken ct) =>
 			{
 				// search text length?
 				if(SearchText.Length < minSearchTextLength) {
 					Items = null;
 				} else {
-					Items = await search(SearchText);
+					Items = await search(SearchText, ct);
 				}
 			});
 		}

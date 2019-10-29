@@ -267,13 +267,6 @@ namespace GM.WPF.Controls
 			int startIndexOfDisplayColumn = (SelectionUnit != DataGridSelectionUnit.FullRow) ? leftTopmostColumn : 0;
 			int clipboardRow = 0;
 			for(int gridRow = topmostRow; ; ++gridRow, ++clipboardRow) {
-				if(gridRow >= Items.Count) {
-					// hmm, what to do here?
-					// how is that even possible?
-					Debug.Fail("What to do here?");
-					break;
-				}
-
 				if(clipboardRow == clipboardData.Count) {
 					// all clipboard rows have already been pasted
 					if(!shouldPasteDuplicates) {
@@ -285,6 +278,13 @@ namespace GM.WPF.Controls
 					}
 					// should duplicate, so start again
 					clipboardRow = 0;
+				}
+
+				if(gridRow >= Items.Count) {
+					// hmm, what to do here?
+					// how is that even possible?
+					Debug.Fail("What to do here?");
+					break;
 				}
 
 				if(gridRow == maxGridRowIndex) {

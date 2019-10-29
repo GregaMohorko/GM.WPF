@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using GalaSoft.MvvmLight;
@@ -40,15 +41,17 @@ namespace GM.WPF
 	/// <summary>
 	/// A tool that was designed to be used for asynchronous search textbox loading.
 	/// <para>It is designed to asynchronously handle multiple asynchronous requests on the UI thread.</para>
-	/// <para>It contains a waiting queue where all the requests are stored. When new requests come while a previous one is still loading, they are put into a queue. When the request that was loading finishes, it only invokes the last request.</para>
+	/// <para>It contains a waiting queue where all the requests are stored. When new requests come while a previous one is still loading, they are put into a queue. When the request that was loading finishes, it only invokes the last request in the queue.</para>
 	/// <para>Everything is done on the UI thread, so requests should contain asynchronous calls to non-blocking subroutines.</para>
 	/// </summary>
-	public class AsyncRequestLoader : ObservableObject
+	public class AsyncRequestLoader : ObservableObject, IDisposable
 	{
 		/// <summary>
 		/// Determines whether any request is currently in the process of loading.
 		/// </summary>
 		public bool IsLoading { get; private set; }
+
+		private CancellationTokenSource cts;
 
 		private readonly Queue<TaskCompletionSource<bool>> waitingQueue;
 
@@ -61,13 +64,23 @@ namespace GM.WPF
 		}
 
 		/// <summary>
+		/// Releases all resources used.
+		/// </summary>
+		public void Dispose()
+		{
+			cts?.Dispose();
+			cts = null;
+		}
+
+		/// <summary>
 		/// Puts a new request into a queue.
 		/// <para>This request is invoked right away if the queue is empty and there is no previous request still loading. Otherwise, it will be invoked when the previous request finishes loading.</para>
 		/// <para>This request will not be invoked at all, if a new request comes after this one before the previous request has finished loading.</para>
 		/// <para>Must be called from the UI thread.</para>
+		/// <para>If a previous request is still loading, a cancellation request will be communicated via the <see cref="CancellationToken"/>.</para>
 		/// </summary>
 		/// <param name="newRequest">The asynchronous request that will possibly be invoked on the UI thread.</param>
-		public async Task InvokeWhenIfLast(Func<Task> newRequest)
+		public async Task InvokeWhenIfLast(Func<CancellationToken, Task> newRequest)
 		{
 			if(newRequest == null) {
 				throw new ArgumentNullException(nameof(newRequest));
@@ -77,11 +90,15 @@ namespace GM.WPF
 			}
 
 			if(IsLoading) {
-				// a previous request is still loading, lets wait for it to finish (because only one request can be loading at a time)
+				// a previous request is still loading
+				// lets cancel it and wait for it to finish (because only one request can be loading at a time)
 
-				// add to waiting list and wait
+				// add to waiting list
 				var myAwaiter = new TaskCompletionSource<bool>();
 				waitingQueue.Enqueue(myAwaiter);
+				// cancel previous request
+				cts?.Cancel();
+				// wait
 				bool shouldContinue = await myAwaiter.Task;
 				if(!shouldContinue) {
 					return;
@@ -91,7 +108,13 @@ namespace GM.WPF
 			}
 
 			// invoke
-			await newRequest.Invoke();
+			cts = new CancellationTokenSource();
+			try {
+				await newRequest.Invoke(cts.Token);
+			} catch(OperationCanceledException) {
+			}
+			cts?.Dispose();
+			cts = null;
 
 			if(waitingQueue.Count > 0) {
 				// requests are waiting ...
