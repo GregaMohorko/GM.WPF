@@ -86,11 +86,17 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 
 		private ISettingsUI Create<T>(string name, string propertyPath, bool isReadOnly)
 		{
+			if(default(T) != null) {
+				throw new ArgumentException("The type must be a nullable type.");
+			}
+
 			CheckReadOnly(isReadOnly);
 
 			T originalValue = (T)valueGetter(propertyPath);
 			if(typeof(T) == typeof(string)) {
 				return new StringSettingControl(name, propertyPath, CastApplyMethod<string>(), originalValue as string, isReadOnly);
+			} else if(typeof(T) == typeof(int?)) {
+				return new IntSettingControl(name, propertyPath, CastApplyMethod<int?>(), originalValue as int?, isReadOnly);
 			}
 
 			throw new ArgumentOutOfRangeException(nameof(T), $"The type '{typeof(T)}' is not supported as a setting.");

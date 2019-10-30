@@ -167,7 +167,7 @@ namespace GM.WPF.Controls
 				object item = itemAndCells.Key;
 				var tsvLineParts = new List<string>();
 				foreach(DataGridCellInfo cell in itemAndCells) {
-					object value = cell.Column.ClipboardContentBinding.GetValueFor(item);
+					object value = cell.Column.ClipboardContentBinding?.GetValueFor(item);
 					string text = value?.ToString();
 					tsvLineParts.Add($"\"{text}\"");
 				}

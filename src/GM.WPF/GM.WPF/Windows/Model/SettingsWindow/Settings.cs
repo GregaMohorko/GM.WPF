@@ -44,6 +44,11 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 	public class Settings : ObservableObject
 	{
 		/// <summary>
+		/// Event that is fired after the save command is executed.
+		/// </summary>
+		public event EventHandler Saved;
+
+		/// <summary>
 		/// The name of the application.
 		/// </summary>
 		public string ClientName { get; private set; }
@@ -105,7 +110,7 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 		}
 
 		/// <summary>
-		/// Saves everything.
+		/// Saves everything and invokes the <see cref="Saved"/> event.
 		/// <para>Applies all the changed values.</para>
 		/// <para>Invokes all the save methods that were provided when creating setting factories.</para>
 		/// </summary>
@@ -120,6 +125,7 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 				saveAction();
 			}
 			RaisePropertyChanged(nameof(IsDirty));
+			Saved?.Invoke(this, EventArgs.Empty);
 		}
 
 		/// <summary>

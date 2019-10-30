@@ -46,6 +46,14 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 	}
 
 	/// <summary>
+	/// A basic int setting control with a TextBox.
+	/// </summary>
+	public class IntSettingControl : SettingControl<int?>
+	{
+		internal IntSettingControl(string name, string propertyPath, Action<string, int?> applyMethod, int? originalValue, bool isReadOnly = false) : base(name, propertyPath, applyMethod, originalValue, isReadOnly) { }
+	}
+
+	/// <summary>
 	/// A string setting control with a TextBox and a "Browse..." button.
 	/// </summary>
 	public class DirectoryPathSettingControl : SettingControl<string>

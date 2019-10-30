@@ -101,6 +101,14 @@ Author: Grega Mohorko
 									<TextBox Text="{Binding Value,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsReadOnly,Mode=OneTime}" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" />
 								</StackPanel>
 							</DataTemplate>
+							<DataTemplate DataType="{x:Type settingsWindow:IntSettingControl}">
+								<StackPanel Margin="5 5 5 0">
+									<TextBlock>
+										<Run Text="{Binding Name,Mode=OneTime}" />:
+									</TextBlock>
+									<TextBox Text="{Binding Value,Mode=TwoWay, TargetNullValue='', UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsReadOnly, Mode=OneTime}" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" />
+								</StackPanel>
+							</DataTemplate>
 							<DataTemplate DataType="{x:Type settingsWindow:SettingsNote}">
 								<StackPanel Margin="5 5 5 0">
 									<TextBlock Visibility="{Binding Name,Mode=OneTime, Converter={converters:ObjectToVisibilityConverter},ConverterParameter=Collapse}">
