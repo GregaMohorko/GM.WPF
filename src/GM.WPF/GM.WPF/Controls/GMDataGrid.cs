@@ -319,10 +319,12 @@ namespace GM.WPF.Controls
 					if(column == null || column.IsReadOnly) {
 						continue;
 					}
+
+					// if a new row has to be added, it will be added on BeginEdit ...
+					BeginEditCommand.Execute(null, this);
+					// ... access the item after BeginEdit, so that the item has been created
 					object item = Items[gridRow];
 					object cellContent = clipboardData[clipboardRow][clipboardColumn];
-
-					BeginEditCommand.Execute(null, this);
 					column.OnPastingCellClipboardContent(item, cellContent);
 					CommitEditCommand.Execute(null, this);
 				}

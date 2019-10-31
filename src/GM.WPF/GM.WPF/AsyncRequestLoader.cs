@@ -64,10 +64,11 @@ namespace GM.WPF
 		}
 
 		/// <summary>
-		/// Releases all resources used.
+		/// If any request is still running, it is cancelled.
 		/// </summary>
 		public void Dispose()
 		{
+			cts?.Cancel();
 			cts?.Dispose();
 			cts = null;
 		}

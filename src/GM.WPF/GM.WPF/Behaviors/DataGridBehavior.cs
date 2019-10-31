@@ -201,8 +201,10 @@ namespace GM.WPF.Behaviors
 
 			bool ignoreScroll = GetIgnoreScroll(dataGrid);
 			if(ignoreScroll) {
-				var e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-				e2.RoutedEvent = UIElement.MouseWheelEvent;
+				var e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+				{
+					RoutedEvent = UIElement.MouseWheelEvent
+				};
 				dataGrid.RaiseEvent(e2);
 				e.Handled = true;
 				return;

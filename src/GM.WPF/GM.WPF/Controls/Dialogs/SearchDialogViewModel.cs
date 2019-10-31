@@ -41,7 +41,7 @@ namespace GM.WPF.Controls.Dialogs
 	[Obsolete("Design only.", true)]
 	class SearchDialogViewModel : SearchDialogViewModel<string> { }
 
-	class SearchDialogViewModel<T> : ViewModel
+	class SearchDialogViewModel<T> : ViewModel, IDisposable
 	{
 		public event EventHandler Submit;
 
@@ -83,6 +83,11 @@ namespace GM.WPF.Controls.Dialogs
 
 			SearchWatermark = watermark;
 			SearchText = defaultSearchText ?? string.Empty;
+		}
+
+		public void Dispose()
+		{
+			loader.Dispose();
 		}
 
 		private void Loader_PropertyChanged(object sender, PropertyChangedEventArgs e)
