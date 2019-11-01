@@ -74,9 +74,10 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="message">The message to show above the input box.</param>
 		/// <param name="watermark">The text to show in the input box.</param>
 		/// <param name="defaultText">The default text that will already be in the input box.</param>
-		public async Task<string> Show(string message = null, string watermark = null, string defaultText = null)
+		/// <param name="acceptsTab">Determines whether the textbox will accept tabulator as an input.</param>
+		public Task<string> Show(string message = null, string watermark = null, string defaultText = null, bool acceptsTab = false)
 		{
-			return await Show<string>(message, watermark, defaultText);
+			return Show<string>(message, watermark, defaultText, acceptsTab);
 		}
 
 		/// <summary>
@@ -86,12 +87,20 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="message">The message to show above the input box.</param>
 		/// <param name="watermark">The text to show in the input box.</param>
 		/// <param name="defaultValue">The default value that will already be in the input box.</param>
-		public async Task<T> Show<T>(string message = null, string watermark = null, T defaultValue = default(T))
+		public Task<T> Show<T>(string message = null, string watermark = null, T defaultValue = default)
 		{
-			var vm = new InputDialogViewModel<T>();
-			vm.Message = message;
-			vm.Watermark = watermark;
-			vm.Text = defaultValue?.ToString();
+			return Show(message, watermark, defaultValue, false);
+		}
+
+		private async Task<T> Show<T>(string message, string watermark, T defaultValue, bool acceptsTab)
+		{
+			var vm = new InputDialogViewModel<T>
+			{
+				Message = message,
+				Watermark = watermark,
+				Text = defaultValue?.ToString(),
+				AcceptsTab = acceptsTab
+			};
 			if(vm.Text == null && typeof(T) == typeof(string)) {
 				// this is to distinguish between clicking 'cancel' and clicking 'ok' with an empty input
 				vm.Text = "";
@@ -102,7 +111,7 @@ namespace GM.WPF.Controls.Dialogs
 			Close();
 
 			if(wasCancelled) {
-				return default(T);
+				return default;
 			}
 
 			return vm.Value;

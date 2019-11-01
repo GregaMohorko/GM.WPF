@@ -100,11 +100,24 @@ namespace GM.WPF.Windows
 		/// <param name="work">The action that represents the task.</param>
 		public void AddTask(string description, Action work)
 		{
-			ViewModel.AddTask(description, work);
+			AddTask(() => description, work);
 		}
 
 		/// <summary>
-		/// Executes all the actions that were set using the <see cref="AddTask(string, Action)"/> on a background thread and in the same order that they were added.
+		/// Adds an action to the task list. The action will be executed on a background thread when <see cref="ExecuteTasks"/> is called.
+		/// </summary>
+		/// <param name="descriptionGetter">The function that returns the task description. This function will be executed on the same background thread before the <paramref name="work"/> action.</param>
+		/// <param name="work">The action that represents the task.</param>
+		public void AddTask(Func<string> descriptionGetter, Action work)
+		{
+			if(descriptionGetter == null) {
+				throw new ArgumentNullException(nameof(descriptionGetter));
+			}
+			ViewModel.AddTask(descriptionGetter, work);
+		}
+
+		/// <summary>
+		/// Executes all the actions that were set using the AddTask methods on a background thread and in the same order that they were added.
 		/// <para>To cancel, use <see cref="CancellationTokenSource"/>.</para>
 		/// <para>Returns true, if it was cancelled.</para>
 		/// </summary>

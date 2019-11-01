@@ -58,7 +58,7 @@ namespace GM.WPF.Windows
 		/// </summary>
 		public int TotalTasks { get; private set; }
 
-		private readonly List<(string Description, Action Work)> tasks;
+		private readonly List<(Func<string> DescriptionGeter, Action Work)> tasks;
 
 		/// <summary>
 		/// Creates a new instance of <see cref="SplashWindowViewModel"/>.
@@ -79,7 +79,7 @@ namespace GM.WPF.Windows
 				return;
 			}
 
-			tasks = new List<(string Description, Action Work)>();
+			tasks = new List<(Func<string> DescriptionGeter, Action Work)>();
 
 			Title = "Opening";
 			if(appName != null) {
@@ -87,9 +87,9 @@ namespace GM.WPF.Windows
 			}
 		}
 
-		internal void AddTask(string description, Action work)
+		internal void AddTask(Func<string> descriptionGetter, Action work)
 		{
-			tasks.Add((description, work));
+			tasks.Add((descriptionGetter, work));
 			++TotalTasks;
 		}
 
@@ -98,11 +98,11 @@ namespace GM.WPF.Windows
 			return Task.Run(delegate
 			{
 				for(int i = 0; i < tasks.Count; ++i) {
-					(string taskDescription, Action taskAction) = tasks[i];
+					(Func<string> taskDescriptionGetter, Action taskAction) = tasks[i];
 
 					// set the progress data
 					CurrentTaskIndex = i + 1;
-					CurrentTaskDescription = taskDescription;
+					CurrentTaskDescription = taskDescriptionGetter();
 
 					if(ct.IsCancellationRequested) {
 						return;
