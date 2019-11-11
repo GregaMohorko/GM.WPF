@@ -58,7 +58,7 @@ Author: GregaMohorko
 			</Grid>
 			<Grid>
 				<DataGrid Name="_DataGrid" ItemsSource="{Binding Items,Mode=OneWay}" SelectedItem="{Binding Selected,Mode=TwoWay}" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" IsReadOnly="True" MinWidth="200" Focusable="True" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-				<controls:ProgressOverlay Message="{Binding OverlayMessage,Mode=OneWay}" Focusable="False" />
+				<controls:ProgressOverlay x:Name="_ProgressOverlay" Message="{Binding OverlayMessage,Mode=TwoWay}" Focusable="False" />
 			</Grid>
 		</DockPanel>
 		<StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" Margin="20 0 0 0">

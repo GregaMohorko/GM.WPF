@@ -238,7 +238,7 @@ namespace GM.WPF
 		}
 
 		/// <summary>
-		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state.
+		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. This must be called after <see cref="StartNewLoop(int)"/>.
 		/// <para>Check <see cref="GetProgress(int, int)"/> for details.</para>
 		/// </summary>
 		/// <param name="loopCounter">The current zero-based loop index.</param>
@@ -248,7 +248,7 @@ namespace GM.WPF
 		}
 
 		/// <summary>
-		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. The progress is being calculated inside the [start, end] range.
+		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. The progress is being calculated inside the [start, end] range. This must be called after <see cref="StartNewLoop(int)"/>.
 		/// <para>Check <see cref="GetProgress(double, double, int, int)"/> for details.</para>
 		/// </summary>
 		/// <param name="start">The start of the progress range.</param>

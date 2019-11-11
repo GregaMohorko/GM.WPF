@@ -51,13 +51,13 @@ namespace GM.WPF.Controls.Dialogs
 		public string SearchText { get; set; }
 		public string SearchWatermark { get; private set; }
 		public T Selected { get; set; }
-		public string OverlayMessage { get; set; }
 		public List<T> Items { get; private set; }
 
 		private readonly string watermark;
-		private readonly Func<string, CancellationToken, Task<List<T>>> search;
+		private readonly Func<string, CancellationToken, ProgressUpdater, Task<List<T>>> search;
 		private readonly AsyncRequestLoader loader;
-		private readonly string loadingMessage;
+		private readonly ProgressUpdater progressUpdater;
+		private readonly string defaultLoadingMessage;
 		private readonly int minSearchTextLength;
 
 		[Obsolete("Design only.", true)]
@@ -65,16 +65,16 @@ namespace GM.WPF.Controls.Dialogs
 		{
 			Title = "Search and select:";
 			SearchWatermark = "Search something ...";
-			OverlayMessage = "";
 		}
 
-		public SearchDialogViewModel(string title, Func<string, CancellationToken, Task<List<T>>> search, string loadingMessage, string watermark, int minSearchTextLength, string defaultSearchText)
+		public SearchDialogViewModel(string title, Func<string, CancellationToken, ProgressUpdater, Task<List<T>>> search, string defaultLoadingMessage, string watermark, int minSearchTextLength, string defaultSearchText, ProgressUpdater progressUpdater)
 		{
 			Title = title;
 			this.search = search;
-			this.loadingMessage = loadingMessage;
+			this.defaultLoadingMessage = defaultLoadingMessage;
 			this.watermark = watermark;
 			this.minSearchTextLength = minSearchTextLength;
+			this.progressUpdater = progressUpdater;
 
 			Command_Ok = new RelayCommand(Ok, () => Selected != null);
 
@@ -94,7 +94,14 @@ namespace GM.WPF.Controls.Dialogs
 		{
 			switch(e.PropertyName) {
 				case nameof(AsyncRequestLoader.IsLoading):
-					OverlayMessage = loader.IsLoading ? loadingMessage : null;
+					string message;
+					if(loader.IsLoading) {
+						message = defaultLoadingMessage;
+					} else {
+						message = null;
+					}
+					progressUpdater.SetMessage(message);
+					progressUpdater.SetProgress(null);
 					break;
 			}
 		}
@@ -116,7 +123,7 @@ namespace GM.WPF.Controls.Dialogs
 				if(SearchText.Length < minSearchTextLength) {
 					Items = null;
 				} else {
-					Items = await search(SearchText, ct);
+					Items = await search(SearchText, ct, progressUpdater);
 				}
 			});
 		}

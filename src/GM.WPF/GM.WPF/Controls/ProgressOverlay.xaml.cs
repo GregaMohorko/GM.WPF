@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2019 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,8 @@ namespace GM.WPF.Controls
 	/// </summary>
 	public partial class ProgressOverlay : BaseControl
 	{
+		private readonly Lazy<ProgressUpdater> updater;
+
 		/// <summary>
 		/// Represents the <see cref="Message"/> property.
 		/// </summary>
@@ -56,7 +58,7 @@ namespace GM.WPF.Controls
 		/// <summary>
 		/// Represents the <see cref="ProgressValue"/> property.
 		/// </summary>
-		public static readonly DependencyProperty ProgressValueProperty = DependencyVMProperty(nameof(ProgressValue),typeof(ProgressOverlay),typeof(ProgressOverlayViewModel));
+		public static readonly DependencyProperty ProgressValueProperty = DependencyVMProperty(nameof(ProgressValue), typeof(ProgressOverlay), typeof(ProgressOverlayViewModel));
 
 		/// <summary>
 		/// Get or set the message.
@@ -77,14 +79,33 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
+		/// Gets the <see cref="ProgressUpdater"/> that can be used for updating the values of this progress overlay.
+		/// </summary>
+		public ProgressUpdater Updater => updater.Value;
+
+		/// <summary>
 		/// Creates a new instance of <see cref="ProgressOverlay"/>.
 		/// </summary>
 		public ProgressOverlay()
 		{
 			InitializeComponent();
 
+			updater = new Lazy<ProgressUpdater>(() => new ProgressUpdater(null, SetMessageFromUpdater, SetProgressValueFromUpdater));
+
 			var vm = new ProgressOverlayViewModel();
 			ViewModel = vm;
+		}
+
+		private void SetMessageFromUpdater(object value)
+		{
+			var vm = (ProgressOverlayViewModel)ViewModel;
+			vm.Message = value?.ToString();
+		}
+
+		private void SetProgressValueFromUpdater(double? progress)
+		{
+			var vm = (ProgressOverlayViewModel)ViewModel;
+			vm.ProgressValue = progress;
 		}
 	}
 }
