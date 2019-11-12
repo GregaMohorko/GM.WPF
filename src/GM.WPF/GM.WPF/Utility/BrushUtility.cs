@@ -41,6 +41,22 @@ namespace GM.WPF.Utility
 	public static class BrushUtility
 	{
 		/// <summary>
+		/// Converts this <see cref="System.Drawing.Color"/> into a <see cref="SolidColorBrush"/>.
+		/// </summary>
+		/// <param name="drawingColor">The <see cref="System.Drawing.Color"/> to convert to <see cref="SolidColorBrush"/>.</param>
+		public static SolidColorBrush ToBrush(this System.Drawing.Color drawingColor)
+		{
+			var color = new Color
+			{
+				A = drawingColor.A,
+				R = drawingColor.R,
+				G = drawingColor.G,
+				B = drawingColor.B
+			};
+			return new SolidColorBrush(color);
+		}
+
+		/// <summary>
 		/// Converts this <see cref="Brush"/> into a <see cref="System.Drawing.Color"/>.
 		/// <para>Currently, only implemented for <see cref="SolidColorBrush"/>.</para>
 		/// </summary>
