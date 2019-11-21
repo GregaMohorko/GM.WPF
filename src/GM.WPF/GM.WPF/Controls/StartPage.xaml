@@ -114,7 +114,7 @@ Author: GregaMohorko
 							<WrapPanel>
 								<Button Style="{StaticResource Tile_1x1}" />
 								<Button Style="{StaticResource Tile_1x1}" />
-								<Button Style="{StaticResource Tile_1x1}">
+								<Button Style="{StaticResource Tile_1x1}" IsEnabled="False">
 									<DockPanel>
 										<TextBlock Text="Button" Style="{StaticResource Tile_title}" />
 										<Grid>
@@ -128,16 +128,16 @@ Author: GregaMohorko
 												<RowDefinition Height="3*" />
 												<RowDefinition />
 											</Grid.RowDefinitions>
-											<Rectangle Grid.Column="1" Grid.Row="1">
-												<Rectangle.Fill>
+											<Rectangle Grid.Column="1" Grid.Row="1" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=Foreground, Mode=OneWay}">
+												<Rectangle.OpacityMask>
 													<VisualBrush Stretch="Uniform">
 														<VisualBrush.Visual>
-															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
-																<Path Width="38" Height="38" Canvas.Left="19" Canvas.Top="19" Stretch="Fill" Fill="#FF000000" Data="F1 M 38,19C 42.9706,19 47,23.0294 47,28C 47,30.5642 45.9276,32.878 38,49C 30.0724,32.878 29,30.5642 29,28C 29,23.0294 33.0294,19 38,19 Z M 38,24C 35.7909,24 34,25.7909 34,28C 34,30.2092 35.7909,32 38,32C 40.2091,32 42,30.2092 42,28C 42,25.7909 40.2091,24 38,24 Z M 19,57L 24,42L 31.5,42L 33.5,46L 27.6641,46L 25.3324,53L 50.6676,53L 48.3359,46L 42.5,46L 44.5,42L 52,42L 57,57L 19,57 Z " />
+															<Canvas>
+																<Path Fill="#FF000000" Data="F1 M 38,19C 42.9706,19 47,23.0294 47,28C 47,30.5642 45.9276,32.878 38,49C 30.0724,32.878 29,30.5642 29,28C 29,23.0294 33.0294,19 38,19 Z M 38,24C 35.7909,24 34,25.7909 34,28C 34,30.2092 35.7909,32 38,32C 40.2091,32 42,30.2092 42,28C 42,25.7909 40.2091,24 38,24 Z M 19,57L 24,42L 31.5,42L 33.5,46L 27.6641,46L 25.3324,53L 50.6676,53L 48.3359,46L 42.5,46L 44.5,42L 52,42L 57,57L 19,57 Z " />
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>
-												</Rectangle.Fill>
+												</Rectangle.OpacityMask>
 											</Rectangle>
 										</Grid>
 									</DockPanel>
@@ -156,8 +156,8 @@ Author: GregaMohorko
 												<RowDefinition Height="3*" />
 												<RowDefinition />
 											</Grid.RowDefinitions>
-											<Rectangle Grid.Column="1" Grid.Row="1">
-												<Rectangle.Fill>
+											<Rectangle Grid.Column="1" Grid.Row="1" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=Foreground, Mode=OneWay}">
+												<Rectangle.OpacityMask>
 													<VisualBrush Stretch="Uniform">
 														<VisualBrush.Visual>
 															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
@@ -165,7 +165,7 @@ Author: GregaMohorko
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>
-												</Rectangle.Fill>
+												</Rectangle.OpacityMask>
 											</Rectangle>
 										</Grid>
 									</DockPanel>
@@ -189,8 +189,8 @@ Author: GregaMohorko
 												<RowDefinition Height="3*" />
 												<RowDefinition />
 											</Grid.RowDefinitions>
-											<Rectangle Grid.Column="1" Grid.Row="1">
-												<Rectangle.Fill>
+											<Rectangle Grid.Column="1" Grid.Row="1" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=Foreground, Mode=OneWay}">
+												<Rectangle.OpacityMask>
 													<VisualBrush Stretch="Uniform">
 														<VisualBrush.Visual>
 															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
@@ -198,7 +198,7 @@ Author: GregaMohorko
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>
-												</Rectangle.Fill>
+												</Rectangle.OpacityMask>
 											</Rectangle>
 										</Grid>
 									</DockPanel>
@@ -212,7 +212,7 @@ Author: GregaMohorko
 							<WrapPanel>
 								<Button Style="{StaticResource Tile_1x1}" />
 								<Button Style="{StaticResource Tile_1x1}" />
-								<Button Style="{StaticResource Tile_1x1}">
+								<Button Style="{StaticResource Tile_1x1}" IsEnabled="False">
 									<DockPanel>
 										<TextBlock Text="Button" Style="{StaticResource Tile_title}" />
 										<Grid>
@@ -226,8 +226,8 @@ Author: GregaMohorko
 												<RowDefinition Height="3*" />
 												<RowDefinition />
 											</Grid.RowDefinitions>
-											<Rectangle Grid.Column="1" Grid.Row="1">
-												<Rectangle.Fill>
+											<Rectangle Grid.Column="1" Grid.Row="1" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=Foreground, Mode=OneWay}">
+												<Rectangle.OpacityMask>
 													<VisualBrush Stretch="Uniform">
 														<VisualBrush.Visual>
 															<Canvas>
@@ -235,7 +235,7 @@ Author: GregaMohorko
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>
-												</Rectangle.Fill>
+												</Rectangle.OpacityMask>
 											</Rectangle>
 										</Grid>
 									</DockPanel>
@@ -254,8 +254,8 @@ Author: GregaMohorko
 												<RowDefinition Height="3*" />
 												<RowDefinition />
 											</Grid.RowDefinitions>
-											<Rectangle Grid.Column="1" Grid.Row="1">
-												<Rectangle.Fill>
+											<Rectangle Grid.Column="1" Grid.Row="1" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=Foreground, Mode=OneWay}">
+												<Rectangle.OpacityMask>
 													<VisualBrush Stretch="Uniform">
 														<VisualBrush.Visual>
 															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
@@ -263,7 +263,7 @@ Author: GregaMohorko
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>
-												</Rectangle.Fill>
+												</Rectangle.OpacityMask>
 											</Rectangle>
 										</Grid>
 									</DockPanel>
@@ -287,8 +287,8 @@ Author: GregaMohorko
 												<RowDefinition Height="3*" />
 												<RowDefinition />
 											</Grid.RowDefinitions>
-											<Rectangle Grid.Column="1" Grid.Row="1">
-												<Rectangle.Fill>
+											<Rectangle Grid.Column="1" Grid.Row="1" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=Foreground, Mode=OneWay}">
+												<Rectangle.OpacityMask>
 													<VisualBrush Stretch="Uniform">
 														<VisualBrush.Visual>
 															<Canvas Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
@@ -296,7 +296,7 @@ Author: GregaMohorko
 															</Canvas>
 														</VisualBrush.Visual>
 													</VisualBrush>
-												</Rectangle.Fill>
+												</Rectangle.OpacityMask>
 											</Rectangle>
 										</Grid>
 									</DockPanel>

@@ -83,7 +83,7 @@ namespace GM.WPF
 		/// <param name="progress">The progress to set.</param>
 		public void Set(object titleContent, object messageContent, double? progress)
 		{
-			Application.Current.Dispatcher.Invoke(delegate
+			Application.Current?.Dispatcher.Invoke(delegate
 			{
 				titleContentSetter?.Invoke(titleContent);
 				messageContentSetter?.Invoke(messageContent);
@@ -109,7 +109,7 @@ namespace GM.WPF
 		/// <param name="progress">The progress to set.</param>
 		public void Set(object messageContent, double? progress)
 		{
-			Application.Current.Dispatcher.Invoke(delegate
+			Application.Current?.Dispatcher.Invoke(delegate
 			{
 				messageContentSetter?.Invoke(messageContent);
 				progressSetter?.Invoke(progress);
@@ -133,7 +133,7 @@ namespace GM.WPF
 		/// <param name="progress">The progress to set.</param>
 		public void Set3(object titleContent, double? progress)
 		{
-			Application.Current.Dispatcher.Invoke(delegate
+			Application.Current?.Dispatcher.Invoke(delegate
 			{
 				titleContentSetter?.Invoke(titleContent);
 				progressSetter?.Invoke(progress);
@@ -156,7 +156,7 @@ namespace GM.WPF
 		/// <param name="titleContent">The title content to set.</param>
 		public void SetTitle(object titleContent)
 		{
-			Application.Current.Dispatcher.Invoke(delegate
+			Application.Current?.Dispatcher.Invoke(delegate
 			{
 				titleContentSetter?.Invoke(titleContent);
 			});
@@ -168,7 +168,7 @@ namespace GM.WPF
 		/// <param name="messageContent">The message content to set.</param>
 		public void SetMessage(object messageContent)
 		{
-			Application.Current.Dispatcher.Invoke(delegate
+			Application.Current?.Dispatcher.Invoke(delegate
 			{
 				messageContentSetter?.Invoke(messageContent);
 			});
@@ -180,7 +180,7 @@ namespace GM.WPF
 		/// <param name="progress">The progress to set.</param>
 		public void SetProgress(double? progress)
 		{
-			Application.Current.Dispatcher.Invoke(delegate
+			Application.Current?.Dispatcher.Invoke(delegate
 			{
 				progressSetter?.Invoke(progress);
 			});
@@ -235,6 +235,7 @@ namespace GM.WPF
 			reasonableStep = GetStepForProgressUpdate(iterationCount);
 			totalIterations = iterationCount;
 			lastUpdateAt = -1;
+			SetProgress(0d);
 		}
 
 		/// <summary>

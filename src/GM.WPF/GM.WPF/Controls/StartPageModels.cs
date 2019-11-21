@@ -87,6 +87,10 @@ namespace GM.WPF.Controls
 		/// Tile command.
 		/// </summary>
 		public RelayCommand Command { get; set; }
+		/// <summary>
+		/// Determines whether or not this tile is enabled.
+		/// </summary>
+		public bool IsEnabled { get; set; } = true;
 	}
 
 	/// <summary>

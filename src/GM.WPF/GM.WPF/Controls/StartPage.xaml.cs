@@ -153,7 +153,10 @@ namespace GM.WPF.Controls
 
 					// add each tile
 					foreach(StartPageTile tile in row.Tiles) {
-						var tileButton = new Button();
+						var tileButton = new Button
+						{
+							IsEnabled = tile.IsEnabled
+						};
 						_ = tilesWrapPanel.Children.Add(tileButton);
 
 						// set the command
@@ -206,7 +209,17 @@ namespace GM.WPF.Controls
 							_ = tileIconGrid.Children.Add(tileIconRectangle);
 							Grid.SetColumn(tileIconRectangle, 1);
 							Grid.SetRow(tileIconRectangle, 1);
-							tileIconRectangle.Fill = new VisualBrush
+							_ = tileIconRectangle.SetBinding(Shape.FillProperty, new Binding
+							{
+								Path = new PropertyPath(nameof(Foreground)),
+								Mode = BindingMode.OneWay,
+								RelativeSource = new RelativeSource
+								{
+									Mode = RelativeSourceMode.FindAncestor,
+									AncestorType = typeof(Button)
+								}
+							});
+							tileIconRectangle.OpacityMask = new VisualBrush
 							{
 								Stretch = Stretch.Uniform,
 								Visual = tile.Icon
