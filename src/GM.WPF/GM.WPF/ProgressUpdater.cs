@@ -226,7 +226,7 @@ namespace GM.WPF
 		private int totalIterations;
 		private int lastUpdateAt;
 		/// <summary>
-		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetProgress(int)"/> or <see cref="SetProgress(double, double, int)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
+		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetForLoop(int, bool)"/> or <see cref="SetForLoop(double, double, int, bool)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
 		/// <para>This is usefull for very long loops where updating for each iteration is pointless and would take too much of CPU time in total.</para>
 		/// </summary>
 		/// <param name="iterationCount">The number of total iterations (loop count).</param>
@@ -243,9 +243,10 @@ namespace GM.WPF
 		/// <para>Check <see cref="GetProgress(int, int)"/> for details.</para>
 		/// </summary>
 		/// <param name="loopCounter">The current zero-based loop index.</param>
-		public void SetProgress(int loopCounter)
+		/// <param name="setMessage">Determines whether or not to also update the message to '(loopCounter + 1)/totalIterations'. It will also only be updated when reasonable, which means that the number might be skipping some values.</param>
+		public void SetForLoop(int loopCounter, bool setMessage = false)
 		{
-			SetProgress(0, 1, loopCounter, totalIterations);
+			SetForLoop(0, 1, loopCounter, setMessage);
 		}
 
 		/// <summary>
@@ -255,16 +256,22 @@ namespace GM.WPF
 		/// <param name="start">The start of the progress range.</param>
 		/// <param name="end">The end of the progress range.</param>
 		/// <param name="loopCounter">The current zero-based loop index.</param>
-		public void SetProgress(double start, double end, int loopCounter)
+		/// <param name="setMessage">Determines whether or not to also update the message to '(loopCounter + 1)/totalIterations'. It will also only be updated when reasonable, which means that the number might be skipping some values.</param>
+		public void SetForLoop(double start, double end, int loopCounter, bool setMessage = false)
 		{
 			if(reasonableStep == null) {
 				throw new InvalidOperationException("You must first call StartNewLoop before using this method.");
 			}
-			if(lastUpdateAt != -1 && loopCounter < lastUpdateAt + reasonableStep.Value) {
-				return;
+			if(loopCounter < totalIterations) {
+				if(lastUpdateAt != -1 && loopCounter < lastUpdateAt + reasonableStep.Value) {
+					return;
+				}
+				lastUpdateAt = loopCounter;
 			}
-			lastUpdateAt = loopCounter;
 			SetProgress(start, end, loopCounter, totalIterations);
+			if(setMessage) {
+				SetMessage($"{loopCounter + 1}/{totalIterations} ...");
+			}
 		}
 
 		/// <summary>
