@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2019 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2018-12-11
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -41,15 +41,15 @@ namespace GM.WPF.Utility
 	/// </summary>
 	public static class BindingUtility
 	{
-		private static object ThrowIfFailed(Tuple<bool, object> result, bool throwException)
+		private static object ThrowIfFailed((bool Success, object Value) result, bool throwException)
 		{
-			if(result.Item1) {
-				return result.Item2;
+			if(result.Success) {
+				return result.Value;
 			}
 			if(!throwException) {
 				return null;
 			}
-			throw new InvalidOperationException($"The evaluation of the binding was unsuccessful ({result.Item2}).");
+			throw new InvalidOperationException($"The evaluation of the binding was unsuccessful ({result.Value}).");
 		}
 
 		/// <summary>
@@ -124,7 +124,7 @@ namespace GM.WPF.Utility
 		/// </summary>
 		/// <param name="bindingBase">The binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
-		public static Tuple<bool, object> TryGetValueFor(this BindingBase bindingBase, object obj)
+		public static (bool Success, object Value) TryGetValueFor(this BindingBase bindingBase, object obj)
 		{
 			if(bindingBase == null) {
 				throw new ArgumentNullException(nameof(bindingBase));
@@ -164,20 +164,20 @@ namespace GM.WPF.Utility
 		/// </summary>
 		/// <param name="priorityBinding">The priority binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
-		public static Tuple<bool, object> TryGetValueFor(this PriorityBinding priorityBinding, object obj)
+		public static (bool Success, object Value) TryGetValueFor(this PriorityBinding priorityBinding, object obj)
 		{
 			if(priorityBinding == null) {
 				throw new ArgumentNullException(nameof(priorityBinding));
 			}
 			// loop through with reflection
 			foreach(BindingBase pbChild in priorityBinding.Bindings) {
-				Tuple<bool, object> result = TryGetValueFor(pbChild, obj);
-				if(result.Item1) {
+				(bool Success, object Value) result = TryGetValueFor(pbChild, obj);
+				if(result.Success) {
 					return result;
 				}
 			}
 			// none of them were successful ...
-			return Tuple.Create<bool, object>(false, null);
+			return (false, null);
 		}
 
 		private class DummyDO : DependencyObject
@@ -195,7 +195,7 @@ namespace GM.WPF.Utility
 		/// </summary>
 		/// <param name="binding">The binding to use for getting the value.</param>
 		/// <param name="obj">The object from which to get the value.</param>
-		public static Tuple<bool, object> TryGetValueFor(this Binding binding, object obj)
+		public static (bool Success, object Value) TryGetValueFor(this Binding binding, object obj)
 		{
 			if(binding == null) {
 				throw new ArgumentNullException(nameof(binding));
@@ -228,10 +228,10 @@ namespace GM.WPF.Utility
 			BindingExpression bindingExpression = BindingOperations.GetBindingExpression(dummyDO, DummyDO.ValueProperty);
 			if(bindingExpression?.Status != BindingStatus.Active) {
 				// it was not
-				return Tuple.Create<bool, object>(false, bindingExpression?.Status);
+				return (false, bindingExpression?.Status);
 			}
 
-			return Tuple.Create(true, value);
+			return (true, value);
 		}
 
 		/// <summary>

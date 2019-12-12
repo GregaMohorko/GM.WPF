@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2019 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2018-12-13
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -43,6 +43,8 @@ namespace GM.WPF.Controls
 {
 	/// <summary>
 	/// A <see cref="DataGrid"/> with:
+	/// <para>- <see cref="SelectedCellContent"/></para>
+	/// <para>- <see cref="SelectedCellsWithDataCount"/></para>
 	/// <para>- ability to copy/paste comma separated values data (even directly from/to excel)</para>
 	/// <para>- ability to delete cell values (only works when <see cref="DataGrid.CanUserDeleteRows"/> is false)</para>
 	/// </summary>
@@ -52,55 +54,6 @@ namespace GM.WPF.Controls
 		{
 			var pasteCommandBinding = new CommandBinding(ApplicationCommands.Paste, new ExecutedRoutedEventHandler(OnExecutedPasteInternal), new CanExecuteRoutedEventHandler(OnCanExecutePasteInternal));
 			CommandManager.RegisterClassCommandBinding(typeof(GMDataGrid), pasteCommandBinding);
-		}
-
-		private static void OnCanExecutePasteInternal(object sender, CanExecuteRoutedEventArgs e)
-		{
-			((GMDataGrid)sender).OnCanExecutePaste(e);
-		}
-
-		private static void OnExecutedPasteInternal(object sender, ExecutedRoutedEventArgs e)
-		{
-			((GMDataGrid)sender).OnExecutedPaste(e);
-		}
-
-		/// <summary>
-		/// DependencyProperty for CanUserAddRows.
-		/// </summary>
-		public static readonly DependencyProperty CanUserPasteToNewRowsProperty = DependencyProperty.Register(nameof(CanUserPasteToNewRows), typeof(bool), typeof(GMDataGrid), new FrameworkPropertyMetadata(true, null, null));
-
-		/// <summary>
-		///     Whether the end-user can add new rows to the ItemsSource.
-		/// </summary>
-		public bool CanUserPasteToNewRows
-		{
-			get => (bool)GetValue(CanUserPasteToNewRowsProperty);
-			set => SetValue(CanUserPasteToNewRowsProperty, value);
-		}
-
-		/// <summary>
-		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="ApplicationCommands.Paste"/> command.
-		/// </summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnCanExecutePaste(CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = SelectedCells.Count > 0;
-			e.Handled = true;
-		}
-
-		/// <summary>
-		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="DataGrid.DeleteCommand"/> command.
-		/// </summary>
-		/// <param name="e">The data for the event.</param>
-		protected override void OnCanExecuteDelete(CanExecuteRoutedEventArgs e)
-		{
-			if(CanUserDeleteRows == false) {
-				e.CanExecute = true;
-				e.Handled = true;
-				return;
-			} else {
-				base.OnCanExecuteDelete(e);
-			}
 		}
 
 		/// <summary>
@@ -120,12 +73,18 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
-		/// Provides handling for the <see cref="CommandBinding.Executed"/> event associated with the <see cref="ApplicationCommands.Paste"/> command.
+		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="DataGrid.DeleteCommand"/> command.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
-		protected virtual void OnExecutedPaste(ExecutedRoutedEventArgs e)
+		protected override void OnCanExecuteDelete(CanExecuteRoutedEventArgs e)
 		{
-			ExecutePaste(e);
+			if(CanUserDeleteRows == false) {
+				e.CanExecute = true;
+				e.Handled = true;
+				return;
+			} else {
+				base.OnCanExecuteDelete(e);
+			}
 		}
 
 		/// <summary>
@@ -139,6 +98,61 @@ namespace GM.WPF.Controls
 			} else {
 				base.OnExecutedDelete(e);
 			}
+		}
+
+		/// <summary>
+		/// Sets the <see cref="SelectedCellContent"/> and <see cref="SelectedCellsWithDataCount"/> properties and then calls <see cref="DataGrid.OnSelectedCellsChanged(SelectedCellsChangedEventArgs)"/>.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected override void OnSelectedCellsChanged(SelectedCellsChangedEventArgs e)
+		{
+			UpdateSelectedCellContent();
+			UpdateSelectedCellsWithDataCount();
+			base.OnSelectedCellsChanged(e);
+		}
+
+		#region COPY/PASTE
+		private static void OnCanExecutePasteInternal(object sender, CanExecuteRoutedEventArgs e)
+		{
+			((GMDataGrid)sender).OnCanExecutePaste(e);
+		}
+
+		private static void OnExecutedPasteInternal(object sender, ExecutedRoutedEventArgs e)
+		{
+			((GMDataGrid)sender).OnExecutedPaste(e);
+		}
+
+		/// <summary>
+		/// DependencyProperty for CanUserAddRows.
+		/// </summary>
+		public static readonly DependencyProperty CanUserPasteToNewRowsProperty = DependencyProperty.Register(nameof(CanUserPasteToNewRows), typeof(bool), typeof(GMDataGrid), new FrameworkPropertyMetadata(true, null, null));
+
+		/// <summary>
+		/// Determines whether the end-user can add new rows to the ItemsSource.
+		/// </summary>
+		public bool CanUserPasteToNewRows
+		{
+			get => (bool)GetValue(CanUserPasteToNewRowsProperty);
+			set => SetValue(CanUserPasteToNewRowsProperty, value);
+		}
+
+		/// <summary>
+		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="ApplicationCommands.Paste"/> command.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnCanExecutePaste(CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = SelectedCells.Count > 0;
+			e.Handled = true;
+		}
+
+		/// <summary>
+		/// Provides handling for the <see cref="CommandBinding.Executed"/> event associated with the <see cref="ApplicationCommands.Paste"/> command.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnExecutedPaste(ExecutedRoutedEventArgs e)
+		{
+			ExecutePaste(e);
 		}
 
 		/// <summary>
@@ -332,7 +346,9 @@ namespace GM.WPF.Controls
 
 			e.Handled = true;
 		}
+		#endregion COPY/PASTE
 
+		#region DELETE
 		/// <summary>
 		/// This method is called when ApplicationCommands.Delete command is executed.
 		/// </summary>
@@ -360,5 +376,115 @@ namespace GM.WPF.Controls
 
 			e.Handled = true;
 		}
+		#endregion DELETE
+
+		#region SELECTED CELL CONTENT
+		/// <summary>
+		/// A common event for all <see cref="GMDataGrid"/> controls that occurs when the content of the current cell in any of the <see cref="GMDataGrid"/> controls changes.
+		/// </summary>
+		public static event EventHandler<object> StaticSelectedCellContentChanged;
+		/// <summary>
+		/// Occurs when the content of the current cell changes.
+		/// </summary>
+		public event EventHandler<object> SelectedCellContentChanged;
+
+		//private static readonly DependencyPropertyKey SelectedCellContentPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedCellContent), typeof(object), typeof(GMDataGrid), new PropertyMetadata());
+		//public static readonly DependencyProperty SelectedCellContentProperty = SelectedCellContentPropertyKey.DependencyProperty;
+		/// <summary>
+		/// DependencyProperty for <see cref="SelectedCellContent"/>.
+		/// </summary>
+		public static readonly DependencyProperty SelectedCellContentProperty = DependencyProperty.Register(nameof(SelectedCellContent), typeof(object), typeof(GMDataGrid), new PropertyMetadata());
+
+		/// <summary>
+		/// Gets the content of the current cell.
+		/// <para>Do not set this property.</para>
+		/// </summary>
+		public object SelectedCellContent
+		{
+			get => GetValue(SelectedCellContentProperty);
+			//set => SetValue(SelectedCellContentPropertyKey, value);
+			set
+			{
+				SetValue(SelectedCellContentProperty, value);
+				SelectedCellContentChanged?.Invoke(this, value);
+				StaticSelectedCellContentChanged?.Invoke(this, value);
+			}
+		}
+
+		private void UpdateSelectedCellContent()
+		{
+			IList<DataGridCellInfo> selectedCells = SelectedCells;
+			if(selectedCells.Count != 1) {
+				SelectedCellContent = null;
+				return;
+			}
+			var cell = selectedCells.Single();
+			if(cell.Column.ClipboardContentBinding == null) {
+				SelectedCellContent = null;
+				return;
+			}
+			(bool success, object value) = cell.Column.ClipboardContentBinding.TryGetValueFor(cell.Item);
+			if(!success) {
+				SelectedCellContent = null;
+				return;
+			}
+			SelectedCellContent = value;
+		}
+		#endregion SELECTED CELL CONTENT
+
+		#region NUMBER OF SELECTED CELLS WITH DATA
+		/// <summary>
+		/// A common event for all <see cref="GMDataGrid"/> controls that occurs when the number of selected cells that contain data in any of the <see cref="GMDataGrid"/> controls changes.
+		/// </summary>
+		public static event EventHandler<int> StaticSelectedCellsWithDataCountChanged;
+		/// <summary>
+		/// Occurs when the number of selected cells that contain data changes.
+		/// </summary>
+		public event EventHandler<int> SelectedCellsWithDataCountChanged;
+
+		/// <summary>
+		/// DependencyProperty for <see cref="SelectedCellsWithDataCount"/>.
+		/// </summary>
+		public static readonly DependencyProperty SelectedCellsWithDataCountProperty = DependencyProperty.Register(nameof(SelectedCellsWithDataCount), typeof(int), typeof(GMDataGrid));
+
+		/// <summary>
+		/// Gets the number of selected cells that contain data.
+		/// <para>Do not set this property.</para>
+		/// </summary>
+		public int SelectedCellsWithDataCount
+		{
+			get => (int)GetValue(SelectedCellsWithDataCountProperty);
+			set
+			{
+				SetValue(SelectedCellsWithDataCountProperty, value);
+				SelectedCellsWithDataCountChanged?.Invoke(this, value);
+				StaticSelectedCellsWithDataCountChanged?.Invoke(this, value);
+			}
+		}
+
+		private void UpdateSelectedCellsWithDataCount()
+		{
+			// count the number of selected cells that contain data
+			int count = 0;
+			IList<DataGridCellInfo> selectedCells = SelectedCells;
+			foreach(DataGridCellInfo cell in selectedCells) {
+				DataGridColumn column = cell.Column;
+				if(column.ClipboardContentBinding == null) {
+					continue;
+				}
+				(bool success, object value) = column.ClipboardContentBinding.TryGetValueFor(cell.Item);
+				if(success && value != null) {
+					if((value is string stringValue) && string.IsNullOrWhiteSpace(stringValue)) {
+						// empty strings don't count
+						continue;
+					}
+					++count;
+				}
+			}
+			if(SelectedCellsWithDataCount != count) {
+				SelectedCellsWithDataCount = count;
+			}
+		}
+		#endregion NUMBER OF SELECTED CELLS WITH DATA
 	}
 }
