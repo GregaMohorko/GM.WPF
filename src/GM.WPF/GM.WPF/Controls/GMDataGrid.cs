@@ -43,17 +43,19 @@ namespace GM.WPF.Controls
 {
 	/// <summary>
 	/// A <see cref="DataGrid"/> with:
+	/// <para>- ability to cut cell values</para>
+	/// <para>- ability to paste cell values</para>
+	/// <para>- ability to delete cell values (only works when <see cref="DataGrid.CanUserDeleteRows"/> is false)</para>
+	/// <para>- ability to copy/paste comma separated values data (even directly from/to excel)</para>
 	/// <para>- <see cref="SelectedCellContent"/></para>
 	/// <para>- <see cref="SelectedCellsWithDataCount"/></para>
-	/// <para>- ability to copy/paste comma separated values data (even directly from/to excel)</para>
-	/// <para>- ability to delete cell values (only works when <see cref="DataGrid.CanUserDeleteRows"/> is false)</para>
 	/// </summary>
 	public class GMDataGrid : DataGrid
 	{
 		static GMDataGrid()
 		{
-			var pasteCommandBinding = new CommandBinding(ApplicationCommands.Paste, new ExecutedRoutedEventHandler(OnExecutedPasteInternal), new CanExecuteRoutedEventHandler(OnCanExecutePasteInternal));
-			CommandManager.RegisterClassCommandBinding(typeof(GMDataGrid), pasteCommandBinding);
+			RegisterCommandCut();
+			RegisterCommandPaste();
 		}
 
 		/// <summary>
@@ -111,13 +113,73 @@ namespace GM.WPF.Controls
 			base.OnSelectedCellsChanged(e);
 		}
 
+		#region CUT
+		private static void RegisterCommandCut()
+		{
+			var cutCommandBinding = new CommandBinding(ApplicationCommands.Cut, new ExecutedRoutedEventHandler(OnExecutedCutStatic), new CanExecuteRoutedEventHandler(OnCanExecuteCutStatic));
+			CommandManager.RegisterClassCommandBinding(typeof(GMDataGrid), cutCommandBinding);
+		}
+
+		private static void OnCanExecuteCutStatic(object sender, CanExecuteRoutedEventArgs e)
+		{
+			((GMDataGrid)sender).OnCanExecuteCut(e);
+		}
+
+		private static void OnExecutedCutStatic(object sender, ExecutedRoutedEventArgs e)
+		{
+			((GMDataGrid)sender).OnExecutedCut(e);
+		}
+
+		/// <summary>
+		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="ApplicationCommands.Cut"/> command.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnCanExecuteCut(CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = SelectedCells.Count > 0;
+			e.Handled = true;
+		}
+
+		/// <summary>
+		/// Provides handling for the <see cref="CommandBinding.Executed"/> event associated with the <see cref="ApplicationCommands.Cut"/> command.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected virtual void OnExecutedCut(ExecutedRoutedEventArgs e)
+		{
+			ExecuteCut(e);
+		}
+
+		/// <summary>
+		/// This method is called when <see cref="ApplicationCommands.Cut"/> command is executed.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		private void ExecuteCut(ExecutedRoutedEventArgs e)
+		{
+			Debug.Assert(!e.Handled);
+			ExecuteCopy(e, DataGridClipboardCopyMode.ExcludeHeader);
+			if(e.Handled) {
+				// copying was successful
+				// now delete
+				e.Handled = false;
+				ExecuteDelete(e);
+				// it doesn't matter if delete was successful or not, keep the data on the clipboard ...
+			}
+		}
+		#endregion CUT
+
 		#region COPY/PASTE
-		private static void OnCanExecutePasteInternal(object sender, CanExecuteRoutedEventArgs e)
+		private static void RegisterCommandPaste()
+		{
+			var pasteCommandBinding = new CommandBinding(ApplicationCommands.Paste, new ExecutedRoutedEventHandler(OnExecutedPasteStatic), new CanExecuteRoutedEventHandler(OnCanExecutePasteStatic));
+			CommandManager.RegisterClassCommandBinding(typeof(GMDataGrid), pasteCommandBinding);
+		}
+
+		private static void OnCanExecutePasteStatic(object sender, CanExecuteRoutedEventArgs e)
 		{
 			((GMDataGrid)sender).OnCanExecutePaste(e);
 		}
 
-		private static void OnExecutedPasteInternal(object sender, ExecutedRoutedEventArgs e)
+		private static void OnExecutedPasteStatic(object sender, ExecutedRoutedEventArgs e)
 		{
 			((GMDataGrid)sender).OnExecutedPaste(e);
 		}
@@ -156,7 +218,7 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
-		/// This method is called when ApplicationCommands.Copy command is executed.
+		/// This method is called when <see cref="ApplicationCommands.Copy"/> command (or <see cref="ApplicationCommands.Cut"/>) is executed.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
 		/// <param name="clipboardCopyMode">Copy mode.</param>
@@ -195,7 +257,7 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
-		/// This method is called when ApplicationCommands.Paste command is executed.
+		/// This method is called when <see cref="ApplicationCommands.Paste"/> command is executed.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
 		private void ExecutePaste(ExecutedRoutedEventArgs e)
@@ -350,7 +412,7 @@ namespace GM.WPF.Controls
 
 		#region DELETE
 		/// <summary>
-		/// This method is called when ApplicationCommands.Delete command is executed.
+		/// This method is called when <see cref="ApplicationCommands.Delete"/> command (or <see cref="ApplicationCommands.Cut"/>) is executed.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
 		private void ExecuteDelete(ExecutedRoutedEventArgs e)
