@@ -47,8 +47,9 @@ namespace GM.WPF.Controls
 	/// <para>- ability to paste cell values</para>
 	/// <para>- ability to delete cell values (only works when <see cref="DataGrid.CanUserDeleteRows"/> is false)</para>
 	/// <para>- ability to copy/paste comma separated values data (even directly from/to excel)</para>
-	/// <para>- <see cref="SelectedCellContent"/></para>
-	/// <para>- <see cref="SelectedCellsWithDataCount"/></para>
+	/// <para>- property <see cref="ScrollViewer"/></para>
+	/// <para>- property <see cref="SelectedCellContent"/></para>
+	/// <para>- property <see cref="SelectedCellsWithDataCount"/></para>
 	/// </summary>
 	public class GMDataGrid : DataGrid
 	{
@@ -65,13 +66,7 @@ namespace GM.WPF.Controls
 		/// <exception cref="NotSupportedException"><see cref="DataGrid.ClipboardCopyMode"/> is set to <see cref="DataGridClipboardCopyMode.None"/>.</exception>
 		protected override void OnExecutedCopy(ExecutedRoutedEventArgs e)
 		{
-			DataGridClipboardCopyMode clipboardCopyMode = ClipboardCopyMode;
-
-			if(clipboardCopyMode != DataGridClipboardCopyMode.None) {
-				ExecuteCopy(e, clipboardCopyMode);
-			} else {
-				base.OnExecutedCopy(e);
-			}
+			OnExecutedCopyPrivate(e);
 		}
 
 		/// <summary>
@@ -80,13 +75,7 @@ namespace GM.WPF.Controls
 		/// <param name="e">The data for the event.</param>
 		protected override void OnCanExecuteDelete(CanExecuteRoutedEventArgs e)
 		{
-			if(CanUserDeleteRows == false) {
-				e.CanExecute = true;
-				e.Handled = true;
-				return;
-			} else {
-				base.OnCanExecuteDelete(e);
-			}
+			OnCanExecuteDeletePrivate(e);
 		}
 
 		/// <summary>
@@ -95,11 +84,7 @@ namespace GM.WPF.Controls
 		/// <param name="e">The data for the event.</param>
 		protected override void OnExecutedDelete(ExecutedRoutedEventArgs e)
 		{
-			if(CanUserDeleteRows == false) {
-				ExecuteDelete(e);
-			} else {
-				base.OnExecutedDelete(e);
-			}
+			OnExecutedDeletePrivate(e);
 		}
 
 		/// <summary>
@@ -131,6 +116,20 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
+		/// DependencyProperty for <see cref="AutoScrollToSelectedCellOnCut"/>.
+		/// </summary>
+		public static readonly DependencyProperty AutoScrollToSelectedCellOnCutProperty = DependencyProperty.Register(nameof(AutoScrollToSelectedCellOnCut), typeof(bool), typeof(GMDataGrid), new FrameworkPropertyMetadata(false, null, null));
+
+		/// <summary>
+		/// Determines whether it should auto-scroll to the currently selected cell after the Cut operation.
+		/// </summary>
+		public bool AutoScrollToSelectedCellOnCut
+		{
+			get => (bool)GetValue(AutoScrollToSelectedCellOnCutProperty);
+			set => SetValue(AutoScrollToSelectedCellOnCutProperty, value);
+		}
+
+		/// <summary>
 		/// Provides handling for the <see cref="CommandBinding.CanExecute"/> event associated with the <see cref="ApplicationCommands.Cut"/> command.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
@@ -146,7 +145,18 @@ namespace GM.WPF.Controls
 		/// <param name="e">The data for the event.</param>
 		protected virtual void OnExecutedCut(ExecutedRoutedEventArgs e)
 		{
+			bool keepCurrentVerticalOffset = !AutoScrollToSelectedCellOnCut;
+
+			int? scrollKey = null;
+			if(keepCurrentVerticalOffset) {
+				scrollKey = SaveCurrentVerticalOffset();
+			}
+
 			ExecuteCut(e);
+
+			if(keepCurrentVerticalOffset) {
+				RestoreSavedVerticalOffset(scrollKey.Value);
+			}
 		}
 
 		/// <summary>
@@ -185,10 +195,22 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
-		/// DependencyProperty for CanUserAddRows.
+		/// DependencyProperty for <see cref="AutoScrollToSelectedCellOnPaste"/>.
+		/// </summary>
+		public static readonly DependencyProperty AutoScrollToSelectedCellOnPasteProperty = DependencyProperty.Register(nameof(AutoScrollToSelectedCellOnPaste), typeof(bool), typeof(GMDataGrid), new FrameworkPropertyMetadata(false, null, null));
+		/// <summary>
+		/// DependencyProperty for <see cref="CanUserPasteToNewRows"/>.
 		/// </summary>
 		public static readonly DependencyProperty CanUserPasteToNewRowsProperty = DependencyProperty.Register(nameof(CanUserPasteToNewRows), typeof(bool), typeof(GMDataGrid), new FrameworkPropertyMetadata(true, null, null));
 
+		/// <summary>
+		/// Determines whether it should auto-scroll to the currently selected cell after the Paste operation.
+		/// </summary>
+		public bool AutoScrollToSelectedCellOnPaste
+		{
+			get => (bool)GetValue(AutoScrollToSelectedCellOnPasteProperty);
+			set => SetValue(AutoScrollToSelectedCellOnPasteProperty, value);
+		}
 		/// <summary>
 		/// Determines whether the end-user can add new rows to the ItemsSource.
 		/// </summary>
@@ -196,6 +218,17 @@ namespace GM.WPF.Controls
 		{
 			get => (bool)GetValue(CanUserPasteToNewRowsProperty);
 			set => SetValue(CanUserPasteToNewRowsProperty, value);
+		}
+
+		private void OnExecutedCopyPrivate(ExecutedRoutedEventArgs e)
+		{
+			DataGridClipboardCopyMode clipboardCopyMode = ClipboardCopyMode;
+
+			if(clipboardCopyMode != DataGridClipboardCopyMode.None) {
+				ExecuteCopy(e, clipboardCopyMode);
+			} else {
+				base.OnExecutedCopy(e);
+			}
 		}
 
 		/// <summary>
@@ -214,7 +247,18 @@ namespace GM.WPF.Controls
 		/// <param name="e">The data for the event.</param>
 		protected virtual void OnExecutedPaste(ExecutedRoutedEventArgs e)
 		{
+			bool keepCurrentVerticalOffset = !AutoScrollToSelectedCellOnPaste;
+
+			int? scrollKey = null;
+			if(keepCurrentVerticalOffset) {
+				scrollKey = SaveCurrentVerticalOffset();
+			}
+
 			ExecutePaste(e);
+
+			if(keepCurrentVerticalOffset) {
+				RestoreSavedVerticalOffset(scrollKey.Value);
+			}
 		}
 
 		/// <summary>
@@ -412,6 +456,52 @@ namespace GM.WPF.Controls
 
 		#region DELETE
 		/// <summary>
+		/// DependencyProperty for <see cref="AutoScrollToSelectedCellOnDelete"/>.
+		/// </summary>
+		public static readonly DependencyProperty AutoScrollToSelectedCellOnDeleteProperty = DependencyProperty.Register(nameof(AutoScrollToSelectedCellOnDelete), typeof(bool), typeof(GMDataGrid), new FrameworkPropertyMetadata(false, null, null));
+
+		/// <summary>
+		/// Determines whether it should auto-scroll to the currently selected cell after the Delete operation.
+		/// </summary>
+		public bool AutoScrollToSelectedCellOnDelete
+		{
+			get => (bool)GetValue(AutoScrollToSelectedCellOnDeleteProperty);
+			set => SetValue(AutoScrollToSelectedCellOnDeleteProperty, value);
+		}
+
+		private void OnCanExecuteDeletePrivate(CanExecuteRoutedEventArgs e)
+		{
+			if(CanUserDeleteRows == false) {
+				e.CanExecute = true;
+				e.Handled = true;
+				return;
+			} else {
+				base.OnCanExecuteDelete(e);
+			}
+		}
+
+		private void OnExecutedDeletePrivate(ExecutedRoutedEventArgs e)
+		{
+			if(CanUserDeleteRows) {
+				base.OnExecutedDelete(e);
+				return;
+			}
+
+			bool keepCurrentVerticalOffset = !AutoScrollToSelectedCellOnDelete;
+
+			int? scrollKey = null;
+			if(keepCurrentVerticalOffset) {
+				scrollKey = SaveCurrentVerticalOffset();
+			}
+
+			ExecuteDelete(e);
+
+			if(keepCurrentVerticalOffset) {
+				RestoreSavedVerticalOffset(scrollKey.Value);
+			}
+		}
+
+		/// <summary>
 		/// This method is called when <see cref="ApplicationCommands.Delete"/> command (or <see cref="ApplicationCommands.Cut"/>) is executed.
 		/// </summary>
 		/// <param name="e">The data for the event.</param>
@@ -439,6 +529,51 @@ namespace GM.WPF.Controls
 			e.Handled = true;
 		}
 		#endregion DELETE
+
+		#region SCROLL
+		private ScrollViewer _scrollViewer;
+		/// <summary>
+		/// Gets the <see cref="ScrollViewer"/> inside of this <see cref="DataGrid"/>.
+		/// </summary>
+		public ScrollViewer ScrollViewer
+		{
+			get
+			{
+				if(_scrollViewer == null) {
+					List<ScrollViewer> scrollViewers = VisualUtility.GetVisualChildCollection<ScrollViewer>(this, VisualUtility.TreeTraverseStrategy.BreadthFirst).ToList();
+					_scrollViewer = scrollViewers.FirstOrDefault();
+				}
+				return _scrollViewer;
+			}
+		}
+
+		private readonly Lazy<Dictionary<int, double?>> savedVerticalOffsets = new Lazy<Dictionary<int, double?>>();
+		/// <summary>
+		/// Saves the current vertical offset of <see cref="ScrollViewer"/> and returns a key with which it can be restored using <see cref="RestoreSavedVerticalOffset(int)"/>.
+		/// </summary>
+		private int SaveCurrentVerticalOffset()
+		{
+			lock(savedVerticalOffsets) {
+				int newKey = savedVerticalOffsets.Value.Count;
+				double? currentVerticalOffset = ScrollViewer?.VerticalOffset;
+				savedVerticalOffsets.Value.Add(newKey, currentVerticalOffset);
+				return newKey;
+			}
+		}
+
+		/// <summary>
+		/// Restored the previously saved vertical offset of <see cref="ScrollViewer"/> with <see cref="SaveCurrentVerticalOffset"/>.
+		/// </summary>
+		private void RestoreSavedVerticalOffset(int key)
+		{
+			lock(savedVerticalOffsets) {
+				double? savedVerticalOffset = savedVerticalOffsets.Value[key];
+				if(savedVerticalOffset != ScrollViewer?.VerticalOffset) {
+					ScrollViewer.ScrollToVerticalOffset(savedVerticalOffset.Value);
+				}
+			}
+		}
+		#endregion SCROLL
 
 		#region SELECTED CELL CONTENT
 		/// <summary>
