@@ -22,64 +22,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2020-01-09
 Author: Gregor Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using GM.Utility;
 
 namespace GM.WPF.Converters
 {
 	/// <summary>
-	/// Converter from <see cref="bool"/> to <see cref="Visibility"/>.
+	/// Converter from <see cref="bool"/> to <see cref="ScrollBarVisibility"/>.
 	/// </summary>
-	[ValueConversion(typeof(bool), typeof(Visibility))]
-	public class BoolToVisibilityConverter : BaseConverter
+	[ValueConversion(typeof(bool), typeof(ScrollBarVisibility))]
+	public class BoolToScrollBarVisibilityConverter : BaseConverter
 	{
 		/// <summary>
 		/// Inverts the value.
 		/// </summary>
 		public const string PARAM_INVERT = BoolToBoolConverter.PARAM_INVERT;
-
 		/// <summary>
-		/// Causes false to represent <see cref="Visibility.Collapsed"/> instead of <see cref="Visibility.Hidden"/>.
+		/// Causes true to represent <see cref="ScrollBarVisibility.Hidden"/> instead of <see cref="ScrollBarVisibility.Visible"/>.
 		/// </summary>
-		public const string PARAM_COLLAPSE = "collapse";
+		public const string PARAM_HIDDEN = "hidden";
+		/// <summary>
+		/// Causes true to represent <see cref="ScrollBarVisibility.Auto"/> instead of <see cref="ScrollBarVisibility.Visible"/>.
+		/// </summary>
+		public const string PARAM_AUTO = "auto";
 
 		/// <summary>
-		/// Converts the provided value with the specified parameter to <see cref="Visibility"/>.
+		/// Converts the provided value with the specified parameter to <see cref="ScrollBarVisibility"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static Visibility? Convert(object value, ref string options)
+		public static ScrollBarVisibility? Convert(object value, ref string options)
 		{
 			bool? boolValue = BoolToBoolConverter.Convert(value, ref options);
 			if(boolValue == null) {
 				return null;
 			}
 
-			var falseEquivalent = Visibility.Hidden;
-
-			if(options != null) {
-				// is already lowered in the BoolToBoolConverter
-				//options = options.ToLowerInvariant();
-
-				if(options.Contains(PARAM_COLLAPSE)) {
-					falseEquivalent = Visibility.Collapsed;
-					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
-				}
+			if(!boolValue.Value) {
+				return ScrollBarVisibility.Disabled;
+			} else {
+				// options is already lowered in the BoolToBoolConverter
+				var trueEquivalent = GetTrueEquivalent(ref options, true);
+				return trueEquivalent;
 			}
-
-			return boolValue.Value ? Visibility.Visible : falseEquivalent;
 		}
 
 		/// <summary>
@@ -89,39 +85,46 @@ namespace GM.WPF.Converters
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
 		public static bool? ConvertBack(object value, ref string options)
 		{
-			if(!(value is Visibility visibilityValue)) {
+			if(!(value is ScrollBarVisibility scrollBarVisibilityValue)) {
 				return null;
 			}
 
-			var invert = false;
-			var falseEquivalent = Visibility.Hidden;
-
-			if(options != null) {
-				options = options.ToLowerInvariant();
-
-				if(options.Contains(PARAM_COLLAPSE)) {
-					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
-					if(visibilityValue == Visibility.Hidden) {
-						return null;
-					}
-					falseEquivalent = Visibility.Collapsed;
-				} else if(visibilityValue == Visibility.Collapsed) {
-					options = StringUtility.RemoveFirstOf(options, PARAM_COLLAPSE);
-					return null;
+			var trueEquivalent = GetTrueEquivalent(ref options);
+			bool boolValue;
+			if(scrollBarVisibilityValue == ScrollBarVisibility.Disabled) {
+				boolValue = false;
+			} else {
+				if(scrollBarVisibilityValue != trueEquivalent) {
+					throw new Exception($"Value is not '{ScrollBarVisibility.Disabled}', but it is not a true equivalent either. The true equivalent is '{trueEquivalent}', but the provided value to convert to bool is '{scrollBarVisibilityValue}'.");
 				}
-				if(options.Contains(PARAM_INVERT)) {
-					invert = true;
-					options = StringUtility.RemoveFirstOf(options, PARAM_INVERT);
-				}
+				boolValue = true;
 			}
 
-			bool boolValue = visibilityValue != falseEquivalent;
-
-			if(invert) {
-				boolValue = !boolValue;
-			}
+			boolValue = (bool)BoolToBoolConverter.Convert(boolValue, ref options);
 
 			return boolValue;
+		}
+
+		private static ScrollBarVisibility GetTrueEquivalent(ref string options, bool alreadyConvertedToLower = false)
+		{
+			if(options != null) {
+				if(!alreadyConvertedToLower) {
+					options = options.ToLowerInvariant();
+				}
+
+				if(options.Contains(PARAM_HIDDEN)) {
+					if(options.Contains(PARAM_AUTO)) {
+						throw new Exception($"Converter parameters '{PARAM_HIDDEN}' and '{PARAM_AUTO}' are exclusive. Both were provided: '{options}'.");
+					}
+					options = StringUtility.RemoveFirstOf(options, PARAM_HIDDEN);
+					return ScrollBarVisibility.Hidden;
+				} else if(options.Contains(PARAM_AUTO)) {
+					options = StringUtility.RemoveFirstOf(options, PARAM_AUTO);
+					return ScrollBarVisibility.Auto;
+				}
+			}
+
+			return ScrollBarVisibility.Visible;
 		}
 
 		/// <summary>

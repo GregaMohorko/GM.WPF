@@ -139,6 +139,7 @@
     <Compile Include="Controls\TimePickerViewModel.cs" />
     <Compile Include="Converters\BaseConverter.cs" />
     <Compile Include="Converters\BoolToBoolConverter.cs" />
+    <Compile Include="Converters\BoolToScrollBarVisibilityConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\FunctionToStringConverter.cs" />
     <Compile Include="Converters\ICollectionToBoolConverter.cs" />

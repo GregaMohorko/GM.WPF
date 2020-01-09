@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-10-30
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -75,10 +75,6 @@ namespace GM.WPF.Behaviors
 		{
 			var dataGrid = (DataGrid)target;
 
-			if(!(bool)e.NewValue) {
-				return;
-			}
-
 			void loadedRowHandler(object sender, DataGridRowEventArgs ea)
 			{
 				if(!GetDisplayRowNumber(dataGrid)) {
@@ -87,7 +83,6 @@ namespace GM.WPF.Behaviors
 				}
 				ea.Row.Header = ea.Row.GetIndex() + 1;
 			}
-			dataGrid.LoadingRow += loadedRowHandler;
 
 			void itemsChangedHandler(object sender, ItemsChangedEventArgs ea)
 			{
@@ -99,7 +94,14 @@ namespace GM.WPF.Behaviors
 					row.Header = row.GetIndex() + 1;
 				}
 			}
-			dataGrid.ItemContainerGenerator.ItemsChanged += itemsChangedHandler;
+
+			if(!(bool)e.NewValue) {
+				dataGrid.LoadingRow -= loadedRowHandler;
+				dataGrid.ItemContainerGenerator.ItemsChanged -= itemsChangedHandler;
+			} else {
+				dataGrid.LoadingRow += loadedRowHandler;
+				dataGrid.ItemContainerGenerator.ItemsChanged += itemsChangedHandler;
+			}
 		}
 		#endregion // DisplayRowNumber
 
@@ -169,10 +171,10 @@ namespace GM.WPF.Behaviors
 			bool ignoreScroll = GetIgnoreScroll(target);
 			bool shiftWheelScrollsHorizontally = GetShiftWheelScrollsHorizontally(target);
 
+			dataGrid.PreviewMouseWheel -= PreviewMouseWheel;
+
 			if(ignoreScroll || shiftWheelScrollsHorizontally) {
 				dataGrid.PreviewMouseWheel += PreviewMouseWheel;
-			} else {
-				dataGrid.PreviewMouseWheel -= PreviewMouseWheel;
 			}
 		}
 

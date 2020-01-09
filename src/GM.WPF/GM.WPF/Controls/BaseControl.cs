@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-10-30
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -62,9 +62,12 @@ namespace GM.WPF.Controls
 		/// </summary>
 		protected ViewModel ViewModel
 		{
-			get => ((FrameworkElement)Content).DataContext as ViewModel;
+			get => (Content as FrameworkElement)?.DataContext as ViewModel;
 			set
 			{
+				if(Content == null) {
+					throw new InvalidOperationException("You cannot set the ViewModel if Content of the control is null.");
+				}
 				DisposeViewModel();
 				((FrameworkElement)Content).DataContext = value;
 			}
@@ -99,6 +102,54 @@ namespace GM.WPF.Controls
 
 		#region DEPENDENCY PROPERTIES
 
+		#region DEPENDENCY PROPERTIES - DEPENDENCYDEFAULTPROPERTY
+		/// <summary>
+		/// Creates a dependency property.
+		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <param name="name">The name of the dependency property.</param>
+		protected static DependencyProperty DependencyDefaultProperty<TOwner>(string name)
+		{
+			return DependencyDefaultProperty(name, typeof(TOwner));
+		}
+
+		/// <summary>
+		/// Creates a dependency property.
+		/// </summary>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		protected static DependencyProperty DependencyDefaultProperty(string name, Type ownerType)
+		{
+			Type propertyType = ownerType?.GetPropertyTypeReal(name);
+			object propertyTypeDefaultValue = propertyType?.GetDefault();
+			return RegisterDependencyProperty(name, ownerType, propertyType, propertyTypeDefaultValue, propertyTypeDefaultValue, null);
+		}
+
+		/// <summary>
+		/// Creates a dependency property with the specified default value.
+		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="defaultValue">The default value of this property.</param>
+		protected static DependencyProperty DependencyDefaultProperty<TOwner>(string name, object defaultValue)
+		{
+			return DependencyDefaultProperty(name, typeof(TOwner), defaultValue);
+		}
+
+		/// <summary>
+		/// Creates a dependency property with the specified default value.
+		/// </summary>
+		/// <param name="name">The name of the dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		/// <param name="defaultValue">The default value of this property.</param>
+		protected static DependencyProperty DependencyDefaultProperty(string name, Type ownerType, object defaultValue)
+		{
+			Type propertyType = ownerType?.GetPropertyTypeReal(name);
+			object propertyTypeDefaultValue = propertyType?.GetDefault();
+			return RegisterDependencyProperty(name, ownerType, propertyType, defaultValue, propertyTypeDefaultValue, null);
+		}
+		#endregion DEPENDENCY PROPERTIES - DEPENDENCYDEFAULTPROPERTY
+
 		#region DEPENDENCY PROPERTIES - DEPENDENCYNOTIFYPROPERTY
 		/// <summary>
 		/// Creates a dependency property that, when updated, will call the specified callback method.
@@ -121,7 +172,12 @@ namespace GM.WPF.Controls
 		/// <param name="propertyChangedCallback">The name of the method to call when this property changes. The method must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</param>
 		protected static DependencyProperty DependencyNotifyProperty(string name, Type ownerType, string propertyChangedCallback)
 		{
-			return DependencyNotifyProperty(name, ownerType, null, propertyChangedCallback);
+			if(propertyChangedCallback == null) {
+				throw new ArgumentNullException(nameof(propertyChangedCallback));
+			}
+			Type propertyType = ownerType?.GetPropertyTypeReal(name);
+			object propertyTypeDefaultValue = propertyType?.GetDefault();
+			return RegisterDependencyProperty(name, ownerType, propertyType, propertyTypeDefaultValue, propertyTypeDefaultValue, propertyChangedCallback);
 		}
 
 		/// <summary>
@@ -147,36 +203,58 @@ namespace GM.WPF.Controls
 		/// <param name="propertyChangedCallback">The name of the method to call when this property changes. The method must be an instance method with one parameter of type <see cref="DependencyPropertyChangedEventArgs"/>.</param>
 		protected static DependencyProperty DependencyNotifyProperty(string name, Type ownerType, object defaultValue, string propertyChangedCallback)
 		{
+			if(propertyChangedCallback == null) {
+				throw new ArgumentNullException(nameof(propertyChangedCallback));
+			}
+			Type propertyType = ownerType?.GetPropertyTypeReal(name);
+			object propertyTypeDefaultValue = propertyType?.GetDefault();
+			return RegisterDependencyProperty(name, ownerType, propertyType, defaultValue, propertyTypeDefaultValue, propertyChangedCallback);
+		}
+		#endregion DEPENDENCY PROPERTIES - DEPENDENCYNOTIFYPROPERTY
+
+		private static DependencyProperty RegisterDependencyProperty(string name, Type ownerType, Type propertyType, object defaultValue, object propertyTypeDefaultValue, string propertyChangedCallback)
+		{
+			if(ownerType == null) {
+				throw new ArgumentNullException(nameof(ownerType));
+			}
 			if(!ownerType.IsSubclassOf(typeof(BaseControl))) {
 				throw new ArgumentException($"The owner type must be a child of {nameof(BaseControl)}. {ownerType.Name} is not.", nameof(ownerType));
 			}
 
-			MethodInfo callbackMethod = ownerType.GetMethod(propertyChangedCallback, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-			{
-				if(callbackMethod == null) {
-					throw new ArgumentException($"The callback method named '{propertyChangedCallback}' does not exist in type '{ownerType.Name}'.", nameof(propertyChangedCallback));
+			PropertyMetadata metadata;
+			if(defaultValue == propertyTypeDefaultValue && propertyChangedCallback == null) {
+				metadata = new PropertyMetadata();
+			} else if(propertyChangedCallback == null) {
+				metadata = new PropertyMetadata(defaultValue);
+			} else {
+				MethodInfo callbackMethod = ownerType.GetMethod(propertyChangedCallback, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				{
+					if(callbackMethod == null) {
+						throw new ArgumentException($"The callback method named '{propertyChangedCallback}' does not exist in type '{ownerType.Name}'.", nameof(propertyChangedCallback));
+					}
+					if(callbackMethod.ReturnType != typeof(void)) {
+						throw new ArgumentException("The callback method must be void.", nameof(propertyChangedCallback));
+					}
+					var parameters = callbackMethod.GetParameters();
+					if(parameters.Length != 1) {
+						throw new ArgumentException("The callback method must have exactly one parameter.", nameof(propertyChangedCallback));
+					}
+					if(parameters[0].ParameterType != typeof(DependencyPropertyChangedEventArgs)) {
+						throw new ArgumentException($"The parameter of the callback method must be of type {nameof(DependencyPropertyChangedEventArgs)}.", nameof(propertyChangedCallback));
+					}
 				}
-				if(callbackMethod.ReturnType != typeof(void)) {
-					throw new ArgumentException("The callback method must be void.", nameof(propertyChangedCallback));
+
+				// create a static callback method that will call the instance callback method
+				void staticCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+				{
+					_ = callbackMethod.Invoke(d, new object[] { e });
 				}
-				var parameters = callbackMethod.GetParameters();
-				if(parameters.Length != 1) {
-					throw new ArgumentException("The callback method must have exactly one parameter.", nameof(propertyChangedCallback));
-				}
-				if(parameters[0].ParameterType != typeof(DependencyPropertyChangedEventArgs)) {
-					throw new ArgumentException($"The parameter of the callback method must be of type {nameof(DependencyPropertyChangedEventArgs)}.", nameof(propertyChangedCallback));
-				}
+
+				metadata = new PropertyMetadata(defaultValue, staticCallback);
 			}
 
-			void staticCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
-			{
-				_ = callbackMethod.Invoke(d, new object[] { e });
-			}
-
-			Type propertyType = ownerType.GetPropertyTypeReal(name);
-			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(defaultValue, staticCallback));
+			return DependencyProperty.Register(name, propertyType, ownerType, metadata);
 		}
-		#endregion DEPENDENCY PROPERTIES - DEPENDENCYNOTIFYPROPERTY
 
 		#region DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTY
 		/// <summary>

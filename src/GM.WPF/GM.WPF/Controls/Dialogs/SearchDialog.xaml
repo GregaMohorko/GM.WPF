@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2019-5-1
-Author: GregaMohorko
+Author: Gregor Mohorko
 -->
 <local:TaskDialog x:Class="GM.WPF.Controls.Dialogs.SearchDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -58,7 +58,7 @@ Author: GregaMohorko
 			</Grid>
 			<Grid>
 				<DataGrid Name="_DataGrid" ItemsSource="{Binding Items,Mode=OneWay}" SelectedItem="{Binding Selected,Mode=TwoWay}" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" IsReadOnly="True" MinWidth="200" Focusable="True" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-				<controls:ProgressOverlay x:Name="_ProgressOverlay" Message="{Binding OverlayMessage,Mode=TwoWay}" Focusable="False" />
+				<controls:ProgressOverlay x:Name="_ProgressOverlay" Focusable="False" />
 			</Grid>
 		</DockPanel>
 		<StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" Margin="20 0 0 0">
