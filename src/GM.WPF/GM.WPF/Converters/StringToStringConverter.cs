@@ -22,54 +22,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2017-10-30
+Created: 2020-01-15
 Author: Gregor Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using GM.Utility;
 
 namespace GM.WPF.Converters
 {
 	/// <summary>
-	/// Converter from <see cref="bool"/> to <see cref="bool"/>.
+	/// Converter from <see cref="string"/> to <see cref="string"/>.
+	/// <para>Look at constants starting with PARAM_ for parameter options.</para>
 	/// </summary>
-	[ValueConversion(typeof(bool), typeof(bool))]
-	public class BoolToBoolConverter : BaseConverter
+	[ValueConversion(typeof(string), typeof(string))]
+	public class StringToStringConverter : BaseConverter
 	{
 		/// <summary>
-		/// Inverts the value.
+		/// Transforms into lowercase.
 		/// </summary>
-		public const string PARAM_INVERT = "invert";
+		public const string PARAM_LOWERCASE = "lowercase";
+		/// <summary>
+		/// Transforms into UPPERCASE.
+		/// </summary>
+		public const string PARAM_UPPERCASE = "uppercase";
+		/// <summary>
+		/// Transforms into PascalCase.
+		/// </summary>
+		public const string PARAM_PASCALCASE = "pascalcase";
+		/// <summary>
+		/// Transforms into Title Case.
+		/// </summary>
+		public const string PARAM_TITLECASE = "titlecase";
 
 		/// <summary>
-		/// Converts the provided value with the specified parameter to <see cref="bool"/>.
+		/// Converts the provided value with the specified parameter to <see cref="string"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static bool? Convert(object value, ref string options)
+		public static string Convert(object value, ref string options)
 		{
-			if(!(value is bool boolValue)) {
+			if(!(value is string stringValue)) {
 				return null;
 			}
 
 			if(options != null) {
 				options = options.ToLowerInvariant();
 
-				if(options.Contains(PARAM_INVERT)) {
-					boolValue = !boolValue;
-					options = StringUtility.RemoveFirstOf(options, PARAM_INVERT);
+				if(options.Contains(PARAM_LOWERCASE)) {
+					stringValue = stringValue.ToLowerInvariant();
+				} else if(options.Contains(PARAM_UPPERCASE)) {
+					stringValue = stringValue.ToUpperInvariant();
+				} else if(options.Contains(PARAM_PASCALCASE)) {
+					stringValue = stringValue.ToPascalCase();
+				} else if(options.Contains(PARAM_TITLECASE)) {
+					stringValue = stringValue.ToTitleCase();
 				}
 			}
 
-			return boolValue;
+			return stringValue;
 		}
 
 		/// <summary>
@@ -94,8 +112,8 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			string options = parameter as string;
-			return Convert(value, ref options);
+			// format of the original text is lost
+			return DependencyProperty.UnsetValue;
 		}
 	}
 }
