@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Gregor Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -269,6 +269,8 @@ namespace GM.WPF.Controls
 		private void ExecuteCopy(ExecutedRoutedEventArgs e, DataGridClipboardCopyMode clipboardCopyMode)
 		{
 			// copy all selected cells as a tab-delimited text ONLY (without style, formatting, etc.)
+			const char SEPARATOR_CHAR = '\t';
+			string SEPARATOR_STRING = SEPARATOR_CHAR.ToString();
 
 			IList<DataGridCellInfo> selectedCells = SelectedCells;
 
@@ -280,7 +282,7 @@ namespace GM.WPF.Controls
 				// include the column headers in the 1st line
 				var columns = selectedCells.Select(c => c.Column).Distinct().ToList();
 				var columnHeaders = columns.Select(c => c.Header?.ToString());
-				tsvLines.Add(string.Join("\t", columnHeaders));
+				tsvLines.Add(string.Join(SEPARATOR_STRING, columnHeaders));
 			}
 
 			foreach(var itemAndCells in selectedCellsByItem) {
@@ -289,9 +291,11 @@ namespace GM.WPF.Controls
 				foreach(DataGridCellInfo cell in itemAndCells) {
 					object value = cell.Column.ClipboardContentBinding?.GetValueFor(item);
 					string text = value?.ToString();
-					tsvLineParts.Add($"\"{text}\"");
+					// only surround with double quotes if text is null/empty or if it contains tab character
+					string newLinePart = CsvUtility.SurroundWithDoubleQuotes(text, true, false, SEPARATOR_CHAR);
+					tsvLineParts.Add(newLinePart);
 				}
-				string tsvLine = string.Join("\t", tsvLineParts);
+				string tsvLine = string.Join(SEPARATOR_STRING, tsvLineParts);
 				tsvLines.Add(tsvLine);
 			}
 
@@ -372,13 +376,13 @@ namespace GM.WPF.Controls
 
 				shouldPasteDuplicates =
 					// selected column count is biggger or equal to clipboard column count
-					numberOfSelectedColumns >= numberOfClipboardColumns
+					(numberOfSelectedColumns >= numberOfClipboardColumns)
 					// selected column count is dividable by clipboard column count
-					&& numberOfSelectedColumns % numberOfClipboardColumns == 0
+					&& ((numberOfSelectedColumns % numberOfClipboardColumns) == 0)
 					// selected row count is bigger or equal to clipboard row count
-					&& numberOfSelectedRows >= numberOfClipboardRows
+					&& (numberOfSelectedRows >= numberOfClipboardRows)
 					// selected row count is dividable by clipboard row count
-					&& numberOfSelectedRows % numberOfClipboardRows == 0;
+					&& ((numberOfSelectedRows % numberOfClipboardRows) == 0);
 				break;
 			}
 
