@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2019-09-25
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -223,6 +223,7 @@ namespace GM.WPF
 
 		// fields for loop
 		private int? reasonableStep;
+		private double? start, end;
 		private int totalIterations;
 		private int lastUpdateAt;
 		/// <summary>
@@ -232,6 +233,20 @@ namespace GM.WPF
 		/// <param name="iterationCount">The number of total iterations (loop count).</param>
 		public void StartNewLoop(int iterationCount)
 		{
+			StartNewLoop(0, 1, iterationCount);
+		}
+
+		/// <summary>
+		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetForLoop(int, bool)"/> or <see cref="SetForLoop(double, double, int, bool)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
+		/// <para>This is usefull for very long loops where updating for each iteration is pointless and would take too much of CPU time in total.</para>
+		/// </summary>
+		/// <param name="start">The start of the progress range.</param>
+		/// <param name="end">The end of the progress range.</param>
+		/// <param name="iterationCount">The number of total iterations (loop count).</param>
+		public void StartNewLoop(double start, double end, int iterationCount)
+		{
+			this.start = start;
+			this.end = end;
 			reasonableStep = GetStepForProgressUpdate(iterationCount);
 			totalIterations = iterationCount;
 			lastUpdateAt = -1;
@@ -239,25 +254,12 @@ namespace GM.WPF
 		}
 
 		/// <summary>
-		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. This must be called after <see cref="StartNewLoop(int)"/>.
+		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. This must be called after <see cref="StartNewLoop(int)"/> or <see cref="StartNewLoop(double, double, int)"/>.
 		/// <para>Check <see cref="GetProgress(int, int)"/> for details.</para>
 		/// </summary>
 		/// <param name="loopCounter">The current zero-based loop index.</param>
 		/// <param name="setMessage">Determines whether or not to also update the message to '(loopCounter + 1)/totalIterations'. It will also only be updated when reasonable, which means that the number might be skipping some values.</param>
 		public void SetForLoop(int loopCounter, bool setMessage = false)
-		{
-			SetForLoop(0, 1, loopCounter, setMessage);
-		}
-
-		/// <summary>
-		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state. The progress is being calculated inside the [start, end] range. This must be called after <see cref="StartNewLoop(int)"/>.
-		/// <para>Check <see cref="GetProgress(double, double, int, int)"/> for details.</para>
-		/// </summary>
-		/// <param name="start">The start of the progress range.</param>
-		/// <param name="end">The end of the progress range.</param>
-		/// <param name="loopCounter">The current zero-based loop index.</param>
-		/// <param name="setMessage">Determines whether or not to also update the message to '(loopCounter + 1)/totalIterations'. It will also only be updated when reasonable, which means that the number might be skipping some values.</param>
-		public void SetForLoop(double start, double end, int loopCounter, bool setMessage = false)
 		{
 			if(reasonableStep == null) {
 				throw new InvalidOperationException("You must first call StartNewLoop before using this method.");
@@ -268,7 +270,7 @@ namespace GM.WPF
 				}
 				lastUpdateAt = loopCounter;
 			}
-			SetProgress(start, end, loopCounter, totalIterations);
+			SetProgress(start.Value, end.Value, loopCounter, totalIterations);
 			if(setMessage) {
 				SetMessage($"{loopCounter + 1}/{totalIterations} ...");
 			}
