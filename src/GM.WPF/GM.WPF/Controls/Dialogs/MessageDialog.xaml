@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-11-26
-Author: Grega Mohorko
+Author: Gregor Mohorko
 -->
 <local:TaskDialog x:Class="GM.WPF.Controls.Dialogs.MessageDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -31,6 +31,7 @@ Author: Grega Mohorko
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:local="clr-namespace:GM.WPF.Controls.Dialogs"
+		xmlns:behaviors="clr-namespace:GM.WPF.Behaviors"
 		mc:Ignorable="d"
 		d:DesignHeight="300"
 		d:DesignWidth="300"
@@ -40,7 +41,9 @@ Author: Grega Mohorko
 			<RowDefinition />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<TextBlock Name="_TextBlock" Text="Message" FontSize="18" Margin="0 0 0 10" TextWrapping="Wrap" Padding="5" />
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+			<TextBlock Name="_TextBlock" Text="Message" FontSize="18" Margin="0 0 0 10" TextWrapping="Wrap" Padding="5" behaviors:TextBlockBehavior.IsTextSelectionEnabled="True" />
+		</ScrollViewer>
 		<Button Content="OK" Width="150" Height="32" HorizontalAlignment="Right" Grid.Row="1" IsDefault="True" Click="Button_OK_Click" />
 	</Grid>
 </local:TaskDialog>

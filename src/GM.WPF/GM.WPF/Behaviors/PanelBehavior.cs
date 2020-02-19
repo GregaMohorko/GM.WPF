@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2018-11-14
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -67,6 +67,9 @@ namespace GM.WPF.Behaviors
 		/// <param name="target">The target.</param>
 		public static Thickness GetSpacing(DependencyObject target)
 		{
+			if(target == null) {
+				throw new ArgumentNullException(nameof(target));
+			}
 			return (Thickness)target.GetValue(SpacingProperty);
 		}
 
@@ -77,6 +80,9 @@ namespace GM.WPF.Behaviors
 		/// <param name="value">The value.</param>
 		public static void SetSpacing(DependencyObject target, Thickness value)
 		{
+			if(target == null) {
+				throw new ArgumentNullException(nameof(target));
+			}
 			target.SetValue(SpacingProperty, value);
 		}
 

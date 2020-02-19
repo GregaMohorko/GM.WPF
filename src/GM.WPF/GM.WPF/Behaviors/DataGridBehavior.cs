@@ -58,6 +58,9 @@ namespace GM.WPF.Behaviors
 		/// <param name="target">The target.</param>
 		public static bool GetDisplayRowNumber(DependencyObject target)
 		{
+			if(target == null) {
+				throw new ArgumentNullException(nameof(target));
+			}
 			return (bool)target.GetValue(DisplayRowNumberProperty);
 		}
 
@@ -68,6 +71,9 @@ namespace GM.WPF.Behaviors
 		/// <param name="value">The value.</param>
 		public static void SetDisplayRowNumber(DependencyObject target, bool value)
 		{
+			if(target == null) {
+				throw new ArgumentNullException(nameof(target));
+			}
 			target.SetValue(DisplayRowNumberProperty, value);
 		}
 
