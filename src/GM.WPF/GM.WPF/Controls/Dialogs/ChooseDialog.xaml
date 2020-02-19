@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-11-28
-Author: Grega Mohorko
+Author: Gregor Mohorko
 -->
 <local:TaskDialog x:Class="GM.WPF.Controls.Dialogs.ChooseDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -31,6 +31,7 @@ Author: Grega Mohorko
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:local="clr-namespace:GM.WPF.Controls.Dialogs"
+		xmlns:behaviors="clr-namespace:GM.WPF.Behaviors"
 		mc:Ignorable="d"
 		d:DesignHeight="300"
 		d:DesignWidth="500"
@@ -41,7 +42,9 @@ Author: Grega Mohorko
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<TextBlock Name="_TextBlock_Question" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" Text="Question?" />
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+			<TextBlock Name="_TextBlock_Question" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" Text="Question?" behaviors:TextBlockBehavior.IsTextSelectionEnabled="True" />
+		</ScrollViewer>
 		<WrapPanel Name="_WrapPanel_Buttons" Grid.Row="1" HorizontalAlignment="Stretch">
 			<WrapPanel.Resources>
 				<Style TargetType="Button">
@@ -56,7 +59,8 @@ Author: Grega Mohorko
 			<Button Content="Long answer 2" />
 			<Button Content="3" />
 			<Button Content="Answer 4" />
+			<Button Content="Answer 5" />
 		</WrapPanel>
-		<Button Content="Cancel" Grid.Row="2" Margin="0 20 0 0" Width="100" Height="32" HorizontalAlignment="Right" Click="Button_Cancel_Click" />
+		<Button Name="_Button_Cancel" Content="Cancel" Grid.Row="2" Margin="0 20 0 0" Width="100" Height="32" HorizontalAlignment="Right" Click="Button_Cancel_Click" />
 	</Grid>
 </local:TaskDialog>

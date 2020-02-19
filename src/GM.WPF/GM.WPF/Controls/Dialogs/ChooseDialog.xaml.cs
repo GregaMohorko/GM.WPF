@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-11-28
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -44,7 +44,7 @@ using System.Windows.Shapes;
 namespace GM.WPF.Controls.Dialogs
 {
 	/// <summary>
-	/// Interaction logic for ChooseDialog.xaml
+	/// A dialog where the user can choose from multiple answers.
 	/// </summary>
 	public partial class ChooseDialog : TaskDialog
 	{
@@ -63,27 +63,41 @@ namespace GM.WPF.Controls.Dialogs
 		/// </summary>
 		/// <param name="question">Question text.</param>
 		/// <param name="answers">The answers to choose from.</param>
-		public async Task<int?> Show(string question, params string[] answers)
+		public Task<int?> Show(string question, params string[] answers)
+		{
+			return Show(question, true, answers);
+		}
+
+		/// <summary>
+		/// Shows the choose dialog and waits for the users response.
+		/// </summary>
+		/// <param name="question">Question text.</param>
+		/// <param name="canCancel">Determines whether the Cancel button is visible.</param>
+		/// <param name="answers">The answers to choose from.</param>
+		public async Task<int?> Show(string question, bool canCancel, params string[] answers)
 		{
 			_TextBlock_Question.Text = question;
 			_WrapPanel_Buttons.Children.Clear();
+			_Button_Cancel.Visibility = canCancel ? Visibility.Visible : Visibility.Collapsed;
 
 			int? response = null;
 
 			for(int i = 0; i < answers.Length; i++) {
-				var answerButton = new Button();
-				answerButton.Content = answers[i];
-				answerButton.Tag = i;
+				var answerButton = new Button
+				{
+					Content = answers[i],
+					Tag = i
+				};
 				answerButton.Click += delegate
 				{
 					response = (int)answerButton.Tag;
 					EndDialog();
 				};
 
-				_WrapPanel_Buttons.Children.Add(answerButton);
+				_ = _WrapPanel_Buttons.Children.Add(answerButton);
 			}
 
-			await WaitDialog();
+			_ = await WaitDialog();
 			Close();
 
 			return response;
