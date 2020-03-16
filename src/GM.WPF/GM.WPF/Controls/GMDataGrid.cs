@@ -27,6 +27,7 @@ Author: Gregor Mohorko
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -34,15 +35,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using GM.Utility;
 using GM.Windows.Utility;
+using GM.WPF.Patterns.UndoRedo;
 using GM.WPF.Utility;
 
 namespace GM.WPF.Controls
 {
 	/// <summary>
 	/// A <see cref="DataGrid"/> with:
+	/// <para>- undo/redo functionality (if the owning window is registered with <see cref="GMUndoRedo"/>)</para>
+	/// <para>- cell by cell editing (and not row by row as is default)</para>
 	/// <para>- ability to cut cell values</para>
 	/// <para>- ability to paste cell values</para>
 	/// <para>- ability to delete cell values (only works when <see cref="DataGrid.CanUserDeleteRows"/> is false)</para>
@@ -57,6 +62,24 @@ namespace GM.WPF.Controls
 		{
 			RegisterCommandCut();
 			RegisterCommandPaste();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="GMDataGrid"/> class.
+		/// </summary>
+		public GMDataGrid()
+		{
+			Loaded += GMDataGrid_Loaded_ForUndoRedo;
+		}
+
+		/// <summary>
+		/// Calls the <see cref="DataGrid.OnCellEditEnding(DataGridCellEditEndingEventArgs)"/> and then manually commits the edit and adds the undo command to the associated undo/redo manager.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected override void OnCellEditEnding(DataGridCellEditEndingEventArgs e)
+		{
+			base.OnCellEditEnding(e);
+			CommitEditAndHandleUndoRedo(e);
 		}
 
 		/// <summary>
@@ -97,6 +120,90 @@ namespace GM.WPF.Controls
 			UpdateSelectedCellsWithDataCount();
 			base.OnSelectedCellsChanged(e);
 		}
+
+		#region UNDO/REDO
+		private GMUndoRedo undoRedo;
+		private bool isManuallyCommittingEdit;
+
+		private void GMDataGrid_Loaded_ForUndoRedo(object sender, RoutedEventArgs e)
+		{
+			// find the undoredo associated with the window in which this datagrid is in
+			if(undoRedo != null) {
+				throw new NotImplementedException("How is this possible? The Loaded event should fire only once.");
+			}
+			undoRedo = GMUndoRedo.GetInstance(this);
+		}
+
+		private void CommitEditAndHandleUndoRedo(DataGridCellEditEndingEventArgs e)
+		{
+			if(undoRedo == null) {
+				return;
+			}
+			if(isManuallyCommittingEdit) {
+				return;
+			}
+			if(e.Cancel || e.EditAction != DataGridEditAction.Commit) {
+				// only add to the stack if it's a non-cancelled commit
+				return;
+			}
+
+			object editedItem = e.Row.Item;
+			string columnHeader = e.Column.Header as string;
+			BindingBase binding = e.Column.ClipboardContentBinding;
+			if(binding == null) {
+				throw new NotImplementedException("How is this possible? How does the DataGrid know which property to edit then?");
+			}
+			object oldValue = binding.GetValueFor(editedItem);
+
+			// manually commit the edit so that we can get the new value
+			isManuallyCommittingEdit = true;
+			_ = CommitEdit(DataGridEditingUnit.Row, false);
+			isManuallyCommittingEdit = false;
+
+			object newValue = binding.GetValueFor(editedItem);
+
+			if(oldValue == newValue) {
+				// nothing was changed, no need to mark undo/redo command
+				return;
+			}
+
+			// add the undo command to the undo/redo manager
+			string oldValueDescription = oldValue?.ToString()?.ShortenWith3Dots(10);
+			string newValueDescription = newValue?.ToString()?.ShortenWith3Dots(10);
+			string description = $"Edit {columnHeader} from '{oldValueDescription}' to '{newValueDescription}'";
+			void undo() => binding.SetValueFor(editedItem, oldValue);
+			void redo() => binding.SetValueFor(editedItem, newValue);
+			var undoCommand = new InvertibleCommand(description, undo, redo);
+			undoRedo.Add(undoCommand);
+		}
+
+		private void UndoRedo_HandlePaste(List<(Action undo, Action redo)> undoRedoActions, int cellsPasted, int newItemsAdded)
+		{
+			if(undoRedoActions.Count == 0) {
+				return;
+			}
+			if(undoRedoActions.Count > (cellsPasted + newItemsAdded)) {
+				throw new NotImplementedException("The count of undo/redo actions should be less (in case there were any new items added) or equal to the sum of cells pasted and new items added.");
+			}
+			string description = $"Paste {cellsPasted} cell{(cellsPasted > 1 ? "s" : "")}";
+			if(newItemsAdded > 0) {
+				description += $", add {newItemsAdded} items";
+			} else if(undoRedoActions.Count != cellsPasted) {
+				throw new NotImplementedException("The count of undo/redo actions should match the number of cells pasted, because no new items were added.");
+			}
+			// force refresh after edits
+			undoRedoActions.Add((Items.Refresh, Items.Refresh));
+			undoRedo.Add(description, undoRedoActions);
+		}
+
+		private void UndoRedo_HandleDelete(List<(Action undo, Action redo)> undoRedoActions)
+		{
+			string description = $"Delete {undoRedoActions.Count} cell{(undoRedoActions.Count > 1 ? "s" : "")}";
+			// force refresh after edits
+			undoRedoActions.Add((Items.Refresh, Items.Refresh));
+			undoRedo.Add(description, undoRedoActions);
+		}
+		#endregion UNDO/REDO
 
 		#region CUT
 		private static void RegisterCommandCut()
@@ -386,6 +493,14 @@ namespace GM.WPF.Controls
 				break;
 			}
 
+			List<(Action undo, Action redo)> undoRedoActions = null;
+			if(undoRedo != null) {
+				undoRedoActions = new List<(Action undo, Action redo)>();
+			}
+
+			int newItemsAdded = 0;
+			int cellsPasted = 0;
+
 			// iterate through all the rows
 			int maxGridRowIndex = Items.Count - 1;
 			int startIndexOfDisplayColumn = (SelectionUnit != DataGridSelectionUnit.FullRow) ? leftTopmostColumn : 0;
@@ -411,12 +526,16 @@ namespace GM.WPF.Controls
 					break;
 				}
 
+				bool isNewItem = false;
+				bool newItemAddedToUndoRedoActions = false;
 				if(gridRow == maxGridRowIndex) {
 					if(!CanUserPasteToNewRows) {
 						break;
 					} else {
 						// new row will automatically be added
 						++maxGridRowIndex;
+						isNewItem = true;
+						++newItemsAdded;
 					}
 				}
 
@@ -444,14 +563,77 @@ namespace GM.WPF.Controls
 						continue;
 					}
 
+					object cellContent = clipboardData[clipboardRow][clipboardColumn];
+					BindingBase binding = column.ClipboardContentBinding;
+					if(binding == null) {
+						throw new NotImplementedException($"Column '{column.Header}' is missing '{nameof(column.ClipboardContentBinding)}'.");
+					}
+
+					isManuallyCommittingEdit = true;
 					// if a new row has to be added, it will be added on BeginEdit ...
 					BeginEditCommand.Execute(null, this);
 					// ... access the item after BeginEdit, so that the item has been created
+					// before BeginEdit, the CurrentItem is of type NewItemPlaceholder
 					object item = Items[gridRow];
-					object cellContent = clipboardData[clipboardRow][clipboardColumn];
-					column.OnPastingCellClipboardContent(item, cellContent);
+					object oldValue = binding.GetValueFor(item, true);
+					if(oldValue == cellContent) {
+						// nothing to edit
+						CancelEditCommand.Execute(null, this);
+						isManuallyCommittingEdit = false;
+						continue;
+					}
+					void pasteValue()
+					{
+						column.OnPastingCellClipboardContent(item, cellContent);
+					}
+					if(undoRedo != null) {
+						if(isNewItem) {
+							if(!newItemAddedToUndoRedoActions) {
+								// add action that removes/adds this item
+								void undoAdd()
+								{
+									if(ItemsSource is IList listSource) {
+										listSource.Remove(item);
+									} else {
+										Items.Remove(item);
+									}
+								}
+								void redoAdd()
+								{
+									if(ItemsSource is IList listSource) {
+										_ = listSource.Add(item);
+									} else {
+										_ = Items.Add(item);
+									}
+								}
+								undoRedoActions.Add((undoAdd, redoAdd));
+								newItemAddedToUndoRedoActions = true;
+							}
+						} else {
+							// editing columns of new items is not needed, when undoing/redoing, the whole object and it's state will be added/removed
+							void undo() => binding.SetValueFor(item, oldValue);
+							void redo()
+							{
+								// this is done because column.OnPastingCellClipboardContent triggers editing of cells
+								CurrentItem = item;
+								isManuallyCommittingEdit = true;
+								BeginEditCommand.Execute(null, this);
+								pasteValue();
+								CommitEditCommand.Execute(null, this);
+								isManuallyCommittingEdit = false;
+							}
+							undoRedoActions.Add((undo, redo));
+						}
+					}
+					pasteValue();
 					CommitEditCommand.Execute(null, this);
+					isManuallyCommittingEdit = false;
+
+					++cellsPasted;
 				}
+			}
+			if(undoRedo != null) {
+				UndoRedo_HandlePaste(undoRedoActions, cellsPasted, newItemsAdded);
 			}
 
 			e.Handled = true;
@@ -512,6 +694,12 @@ namespace GM.WPF.Controls
 		private void ExecuteDelete(ExecutedRoutedEventArgs e)
 		{
 			IList<DataGridCellInfo> selectedCells = SelectedCells;
+
+			List<(Action undo, Action redo)> undoRedoActions = null;
+			if(undoRedo != null) {
+				undoRedoActions = new List<(Action undo, Action redo)>();
+			}
+
 			foreach(DataGridCellInfo cell in selectedCells) {
 				DataGridColumn column = cell.Column;
 				if(column.IsReadOnly) {
@@ -519,15 +707,38 @@ namespace GM.WPF.Controls
 				}
 				object item = cell.Item;
 				object cellContent = null;
-
-				BeginEditCommand.Execute(null, this);
-				// using column.OnPastingCellClipboardContent did not paste on all cells sometimes ... which is weird!
-				// that's why I'm first trying to set it manually using binding
-				bool? bindingSuccessful = column.ClipboardContentBinding?.TrySetValueFor(item, cellContent);
-				if(bindingSuccessful != true) {
-					column.OnPastingCellClipboardContent(item, cellContent);
+				BindingBase binding = column.ClipboardContentBinding;
+				if(binding == null) {
+					throw new InvalidOperationException($"Column '{column.Header}' is missing '{nameof(column.ClipboardContentBinding)}'.");
 				}
-				CommitEditCommand.Execute(null, this);
+				object oldValue = binding.GetValueFor(item, true);
+				if(oldValue == cellContent) {
+					// nothing to delete
+					continue;
+				}
+
+				void deleteValue()
+				{
+					CurrentItem = item;
+					isManuallyCommittingEdit = true;
+					BeginEditCommand.Execute(null, this);
+					// using column.OnPastingCellClipboardContent did not paste on all cells sometimes ... which is weird!
+					// that's why I'm setting it manually using binding
+					// column.OnPastingCellClipboardContent(item, cellContent);
+					binding.SetValueFor(item, cellContent);
+					CommitEditCommand.Execute(null, this);
+					isManuallyCommittingEdit = false;
+				}
+
+				if(undoRedo != null) {
+					void undo() => binding.SetValueFor(item, oldValue);
+					undoRedoActions.Add((undo, deleteValue));
+				}
+
+				deleteValue();
+			}
+			if(undoRedo != null) {
+				UndoRedo_HandleDelete(undoRedoActions);
 			}
 
 			e.Handled = true;
