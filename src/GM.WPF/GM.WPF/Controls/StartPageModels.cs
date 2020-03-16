@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2019-09-05
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -91,6 +91,10 @@ namespace GM.WPF.Controls
 		/// Determines whether or not this tile is enabled.
 		/// </summary>
 		public bool IsEnabled { get; set; } = true;
+		/// <summary>
+		/// Determines whether or not this tile is a default. There should only be one default tile.
+		/// </summary>
+		public bool IsDefault { get; set; } = false;
 	}
 
 	/// <summary>
