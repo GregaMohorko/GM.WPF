@@ -129,9 +129,10 @@ namespace GM.WPF.Controls
 		{
 			// find the undoredo associated with the window in which this datagrid is in
 			if(undoRedo != null) {
-				throw new NotImplementedException("How is this possible? The Loaded event should fire only once.");
+				throw new NotImplementedException("How is this possible? This handler is registered only at beginning, and then removed when loaded for the first time.");
 			}
 			undoRedo = GMUndoRedo.GetInstance(this);
+			Loaded -= GMDataGrid_Loaded_ForUndoRedo;
 		}
 
 		private void CommitEditAndHandleUndoRedo(DataGridCellEditEndingEventArgs e)
