@@ -727,6 +727,8 @@ namespace GM.WPF.Controls
 					// that's why I'm setting it manually using binding
 					// column.OnPastingCellClipboardContent(item, cellContent);
 					binding.SetValueFor(item, cellContent);
+					// commit edit 2 times, otherwise there were exceptions being thrown saying that it is still inside a commit transaction ... I don't know why
+					CommitEditCommand.Execute(null, this);
 					CommitEditCommand.Execute(null, this);
 					isManuallyCommittingEdit = false;
 				}
