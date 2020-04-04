@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -104,16 +104,12 @@ namespace GM.WPF.Windows
 					CurrentTaskIndex = i + 1;
 					CurrentTaskDescription = taskDescriptionGetter();
 
-					if(ct.IsCancellationRequested) {
-						return;
-					}
+					ct.ThrowIfCancellationRequested();
 
 					// execute the task
 					taskAction.Invoke();
 
-					if(ct.IsCancellationRequested) {
-						return;
-					}
+					ct.ThrowIfCancellationRequested();
 				}
 			}, ct);
 		}

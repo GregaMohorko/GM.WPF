@@ -227,7 +227,7 @@ namespace GM.WPF
 		private int totalIterations;
 		private int lastUpdateAt;
 		/// <summary>
-		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetForLoop(int, bool)"/> or <see cref="SetForLoop(double, double, int, bool)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
+		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetForLoop(int, bool)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
 		/// <para>This is usefull for very long loops where updating for each iteration is pointless and would take too much of CPU time in total.</para>
 		/// </summary>
 		/// <param name="iterationCount">The number of total iterations (loop count).</param>
@@ -237,7 +237,7 @@ namespace GM.WPF
 		}
 
 		/// <summary>
-		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetForLoop(int, bool)"/> or <see cref="SetForLoop(double, double, int, bool)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
+		/// Call this before entering a loop. Then, in every iteration, call either <see cref="SetForLoop(int, bool)"/>. It will only update the progress when it is reasonable (so that the progress moves by not less than 1 percent).
 		/// <para>This is usefull for very long loops where updating for each iteration is pointless and would take too much of CPU time in total.</para>
 		/// </summary>
 		/// <param name="start">The start of the progress range.</param>

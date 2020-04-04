@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Grega Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using GM.Utility;
 
 namespace GM.WPF.Windows
 {
@@ -123,25 +124,7 @@ namespace GM.WPF.Windows
 		/// </summary>
 		public async Task<bool> ExecuteTasks()
 		{
-			// https://johnthiriet.com/cancel-asynchronous-operation-in-csharp
-
-			var taskCompletionSource = new TaskCompletionSource<object>();
-
-			_ = CancellationTokenSource.Token.Register(delegate
-			{
-				_ = taskCompletionSource.TrySetCanceled();
-			});
-
-			Task completedTask = await Task.WhenAny(ViewModel.ExecuteTasks(CancellationTokenSource.Token), taskCompletionSource.Task);
-
-			try {
-				// the task is finished and the await will return immediately (the point of this is to throw exception if it occured)
-				await completedTask;
-			} catch(OperationCanceledException) {
-				// do nothing ...
-			}
-
-			return CancellationTokenSource.IsCancellationRequested;
+			return await TaskUtility.AwaitOrCancel(ViewModel.ExecuteTasks(CancellationTokenSource.Token), CancellationTokenSource.Token);
 		}
 
 		/// <summary>
