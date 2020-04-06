@@ -27,6 +27,7 @@ Author: Gregor Mohorko
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,9 +64,14 @@ namespace GM.WPF.Patterns.UndoRedo
 			return instances.SingleOrDefault(ur => ur.registeredWindowTypes.Contains(currentWindowType) || ur.registeredWindows.Contains(window));
 		}
 
+		/// <summary>
+		/// Gets or sets the maximum amount of undo actions. Default is 100.
+		/// </summary>
+		public int MaximumHistoryCount { get; set; } = 100;
+
 		private readonly List<Window> registeredWindows;
 		private readonly List<Type> registeredWindowTypes;
-		private readonly Stack<InvertibleCommand> undoStack;
+		private readonly LinkedList<InvertibleCommand> undoStack;
 		private readonly Stack<InvertibleCommand> redoStack;
 
 		/// <summary>
@@ -75,7 +81,7 @@ namespace GM.WPF.Patterns.UndoRedo
 		{
 			registeredWindows = new List<Window>();
 			registeredWindowTypes = new List<Type>();
-			undoStack = new Stack<InvertibleCommand>();
+			undoStack = new LinkedList<InvertibleCommand>();
 			redoStack = new Stack<InvertibleCommand>();
 
 			instances.Add(this);
@@ -256,11 +262,16 @@ namespace GM.WPF.Patterns.UndoRedo
 		/// <param name="undoCommand">The undo command.</param>
 		public void Add(InvertibleCommand undoCommand)
 		{
-			undoStack.Push(undoCommand);
+			_ = undoStack.AddLast(undoCommand);
 			RaisePropertyChanged(nameof(AvailableUndoCommands));
 			if(redoStack.Count > 0) {
+				// when adding something new to undo, clear the current redo stack
+				// this is to avoid multiple realities ...
 				redoStack.Clear();
 				RaisePropertyChanged(nameof(AvailableRedoCommands));
+			}
+			while(undoStack.Count > MaximumHistoryCount) {
+				undoStack.RemoveFirst();
 			}
 		}
 
@@ -290,15 +301,21 @@ namespace GM.WPF.Patterns.UndoRedo
 
 		private void UndoRedo(bool undo)
 		{
-			Stack<InvertibleCommand> executingStack = undo ? undoStack : redoStack;
-			Stack<InvertibleCommand> oppositeStack = undo ? redoStack : undoStack;
-
-			if(executingStack.Count == 0) {
-				// how did this happen? hmm ...
-				return;
+			{
+				ICollection executingStack = undo ? (ICollection)undoStack : redoStack;
+				if(executingStack.Count == 0) {
+					// how did this happen? hmm ...
+					return;
+				}
 			}
 			// take the topmost command from the executing stack
-			InvertibleCommand commandToExecute = executingStack.Pop();
+			InvertibleCommand commandToExecute;
+			if(undo) {
+				commandToExecute = undoStack.Last.Value;
+				undoStack.RemoveLast();
+			} else {
+				commandToExecute = redoStack.Pop();
+			}
 			if(!commandToExecute.CanExecute(null)) {
 				// if this happens, it is a bad design from the programmer using this pattern, but just in case
 				return;
@@ -307,7 +324,11 @@ namespace GM.WPF.Patterns.UndoRedo
 			commandToExecute.Execute(null);
 			// push the inverted command to the opposite stack
 			InvertibleCommand invertedCommand = commandToExecute.GetInvertedCommand();
-			oppositeStack.Push(invertedCommand);
+			if(undo) {
+				redoStack.Push(invertedCommand);
+			} else {
+				_ = undoStack.AddLast(invertedCommand);
+			}
 
 			RaisePropertyChanged(nameof(AvailableUndoCommands));
 			RaisePropertyChanged(nameof(AvailableRedoCommands));

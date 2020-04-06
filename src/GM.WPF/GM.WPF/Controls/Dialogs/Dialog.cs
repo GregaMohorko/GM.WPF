@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-10-30
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -35,6 +35,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using GM.Utility;
 using GM.WPF.Utility;
 
 namespace GM.WPF.Controls.Dialogs
@@ -130,12 +131,14 @@ namespace GM.WPF.Controls.Dialogs
 
 		/// <summary>
 		/// Sets a new background of this dialog.
+		/// <para>Also sets <see cref="Control.Foreground"/> to either black or white, depending on the luminosity of the specified background color using <see cref="ColorUtility.GetFontColorToBackground(System.Drawing.Color)"/>.</para>
 		/// </summary>
 		/// <param name="background">A new background to set.</param>
 		public void SetBackground(Brush background)
 		{
 			var contentWrapper = Content as DialogContentWrapper;
-			contentWrapper._Border.Background = background;
+			contentWrapper._Border.Background = background ?? throw new ArgumentNullException(nameof(background));
+			Foreground = ColorUtility.GetFontColorToBackground(background.ToDrawingColor()).ToBrush();
 		}
 
 		/// <summary>
