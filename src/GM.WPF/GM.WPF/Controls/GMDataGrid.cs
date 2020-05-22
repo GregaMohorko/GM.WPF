@@ -833,8 +833,8 @@ namespace GM.WPF.Controls
 				SelectedCellContent = null;
 				return;
 			}
-			var cell = selectedCells.Single();
-			if(cell.Column.ClipboardContentBinding == null) {
+			DataGridCellInfo cell = selectedCells.Single();
+			if(cell.Column?.ClipboardContentBinding == null) {
 				SelectedCellContent = null;
 				return;
 			}
@@ -884,7 +884,7 @@ namespace GM.WPF.Controls
 			IList<DataGridCellInfo> selectedCells = SelectedCells;
 			foreach(DataGridCellInfo cell in selectedCells) {
 				DataGridColumn column = cell.Column;
-				if(column.ClipboardContentBinding == null) {
+				if(column?.ClipboardContentBinding == null) {
 					continue;
 				}
 				(bool success, object value) = column.ClipboardContentBinding.TryGetValueFor(cell.Item);
