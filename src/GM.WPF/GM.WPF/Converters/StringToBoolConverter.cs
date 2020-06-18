@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,11 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-10-30
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -41,9 +40,7 @@ namespace GM.WPF.Converters
 {
 	/// <summary>
 	/// Converter from <see cref="string"/> to <see cref="bool"/>.
-	/// <para>
-	/// Is considered true, when the string is not null.
-	/// </para>
+	/// <para>Is considered true, when the string is not null.</para>
 	/// </summary>
 	[ValueConversion(typeof(string), typeof(bool))]
 	public class StringToBoolConverter : BaseConverter
@@ -63,14 +60,14 @@ namespace GM.WPF.Converters
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
-		public static bool? Convert(object value,ref string options)
+		public static bool? Convert(object value, ref string options)
 		{
 			string stringValue = value as string;
 
 			bool boolValue = stringValue != null;
 
-			if(options!=null) {
-				options = options.ToLower();
+			if(options != null) {
+				options = options.ToLowerInvariant();
 
 				if(options.Contains(PARAM_EMPTY)) {
 					boolValue = boolValue && stringValue.Length > 0;

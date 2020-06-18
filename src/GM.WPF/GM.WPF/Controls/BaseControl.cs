@@ -44,7 +44,7 @@ namespace GM.WPF.Controls
 	/// <summary>
 	/// The base class for user controls. If used inside <see cref="Windows.BaseWindow"/>, the view model (if present) and the control itself will both automatically be disposed (if disposable) when window closes.
 	/// <para>For view model, use <see cref="ViewModel"/> property.</para>
-	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MainWindowViewModel,IsDesignTimeCreatable=True}"'.</para>
+	/// <para>For design time view model data, use 'd:DataContext="{d:DesignInstance Type=local:MyControlViewModel,IsDesignTimeCreatable=True}"'.</para>
 	/// <para>For registering dependency properties with view models, use <see cref="DependencyVMProperty(string, Type, Type, string, bool)"/>.</para>
 	/// </summary>
 	public class BaseControl : UserControl
