@@ -33,6 +33,9 @@ Improved dialogs:
  - Added vertical scroll.</releaseNotes>
 	<dependencies>
 		<dependency id="GM.Utility" version="1.3.0" />
+		<dependency id="CommonServiceLocator" version="2.0.5" />
+		<dependency id="GM.Windows.Utility" version="1.0.5.1" />
+		<dependency id="MvvmLightLibs" version="5.4.1.1" />
 	</dependencies>
   </metadata>
   <files>
