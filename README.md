@@ -26,8 +26,8 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 .NET Framework 4.7.1
 
 ## Author and License
-Grega Mohorko ([www.mohorko.info](https://www.mohorko.info))
+Gregor Mohorko ([www.mohorko.info](https://www.mohorko.info))
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
-[MIT License](./LICENSE)
+[MIT License](./LICENSE.md)

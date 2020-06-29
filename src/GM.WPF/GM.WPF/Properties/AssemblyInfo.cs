@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("GM.WPF")]
 [assembly: AssemblyDescription("Library with various controls, utilities and base classes for MVVM driven WPF development.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Grega Mohorko")]
+[assembly: AssemblyCompany("Gregor Mohorko")]
 [assembly: AssemblyProduct("GM.WPF")]
-[assembly: AssemblyCopyright("Copyright © Grega Mohorko 2019")]
+[assembly: AssemblyCopyright("Copyright © Grega Mohorko 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.3.0.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]
+[assembly: AssemblyFileVersion("1.4.0.0")]
