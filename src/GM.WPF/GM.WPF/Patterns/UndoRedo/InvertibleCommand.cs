@@ -32,12 +32,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight.CommandWpf;
+using GM.Utility.Patterns.UndoRedo;
 
 namespace GM.WPF.Patterns.UndoRedo
 {
 	/// <summary>
 	/// A command that has an invertible command to it. It relays it's functionality to other objects by invoking delegates.
-	/// <para>Used in undo/redo pattern, where for every action there must exist an invertable action.</para>
 	/// </summary>
 	public class InvertibleCommand : RelayCommand
 	{
@@ -46,14 +46,8 @@ namespace GM.WPF.Patterns.UndoRedo
 		/// </summary>
 		public event EventHandler Executed;
 
-		/// <summary>
-		/// The description of this command.
-		/// </summary>
-		public string Description { get; private set; }
-
-		private readonly Action execute;
+		internal readonly UndoRedoAction undoRedoAction;
 		private readonly Func<bool> canExecute;
-		private readonly Action invertedExecute;
 		private readonly Func<bool> canInvertedExecute;
 
 		/// <summary>
@@ -62,12 +56,7 @@ namespace GM.WPF.Patterns.UndoRedo
 		/// <param name="description">The description of the command.</param>
 		/// <param name="execute">The action.</param>
 		/// <param name="invertedExecute">The inverted action.</param>
-		public InvertibleCommand(string description, Action execute, Action invertedExecute) : base(execute)
-		{
-			Description = description;
-			this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
-			this.invertedExecute = invertedExecute ?? throw new ArgumentNullException(nameof(invertedExecute));
-		}
+		public InvertibleCommand(string description, Action execute, Action invertedExecute) : this(new UndoRedoAction(description, execute, invertedExecute)) { }
 
 		/// <summary>
 		/// Creates a new instance of <see cref="InvertibleCommand"/>.
@@ -77,24 +66,35 @@ namespace GM.WPF.Patterns.UndoRedo
 		/// <param name="canExecute">The execution status logic.</param>
 		/// <param name="invertedExecute">The inverted action.</param>
 		/// <param name="canInvertedExecute">The inverted execution status logic.</param>
-		public InvertibleCommand(string description, Action execute, Func<bool> canExecute, Action invertedExecute, Func<bool> canInvertedExecute) : base(execute, canExecute)
+		public InvertibleCommand(string description, Action execute, Func<bool> canExecute, Action invertedExecute, Func<bool> canInvertedExecute) : this(new UndoRedoAction(description, execute, invertedExecute), canExecute, canInvertedExecute) { }
+
+		private InvertibleCommand(UndoRedoAction undoRedoAction) : base(undoRedoAction.Action)
 		{
-			Description = description;
-			this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
+			this.undoRedoAction = undoRedoAction;
+		}
+
+		private InvertibleCommand(UndoRedoAction undoRedoAction, Func<bool> canExecute, Func<bool> canInvertedExecute) : base(undoRedoAction.Action, canExecute)
+		{
+			this.undoRedoAction = undoRedoAction;
 			this.canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
-			this.invertedExecute = invertedExecute ?? throw new ArgumentNullException(nameof(invertedExecute));
 			this.canInvertedExecute = canInvertedExecute ?? throw new ArgumentNullException(nameof(canInvertedExecute));
 		}
+
+		/// <summary>
+		/// The description of this command.
+		/// </summary>
+		public string Description => undoRedoAction.Description;
 
 		/// <summary>
 		/// Returns a command that inverts the action of this command.
 		/// </summary>
 		public InvertibleCommand GetInvertedCommand()
 		{
+			UndoRedoAction invertedUndoRedoAction = undoRedoAction.GetInvertedUndoRedoAction();
 			if(canExecute == null) {
-				return new InvertibleCommand(Description, invertedExecute, execute);
+				return new InvertibleCommand(invertedUndoRedoAction);
 			}
-			return new InvertibleCommand(Description, invertedExecute, canInvertedExecute, execute, canExecute);
+			return new InvertibleCommand(invertedUndoRedoAction, canInvertedExecute, canExecute);
 		}
 
 		/// <summary>

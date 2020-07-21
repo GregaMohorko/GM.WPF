@@ -40,7 +40,7 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
  - [SplashWindow](src/GM.WPF/GM.WPF/Windows/SplashWindow.cs)
 
 **Patterns**:
- - [GMUndoRedo](src/GM.WPF/GM.WPF/Patterns/UndoRedo/GMUndoRedo.cs)
+ - [Undo/Redo](src/GM.WPF/GM.WPF/Patterns/UndoRedo/GMWPFUndoRedo.cs)
 
 **Tools**:
  - [AsyncRequestLoader](src/GM.WPF/GM.WPF/AsyncRequestLoader.cs)

@@ -27,32 +27,31 @@ Author: Gregor Mohorko
 */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using GalaSoft.MvvmLight;
+using GM.Utility.Patterns.UndoRedo;
 
 namespace GM.WPF.Patterns.UndoRedo
 {
 	/// <summary>
-	/// Represents an Undo/Redo manager.
+	/// Represents an Undo/Redo manager that can be used in a WPF application.
 	/// <para>You need to register all the window types for which you want to use this instance of undo/redo manager. You can create a new undo/redo manager for each of your windows or you can use one undo/redo manager for all of them. One window (or window type) can only be bound to one undo/redo manager.</para>
-	/// <para>A classical approach to implement undo/redo is to allow changes on the model only through commands. And every command should be invertible. The user then executes an action, the application creates a command, executes it and puts an inverted command on the undo-stack. When the user clicks on undo, the application executes the top-most (inverse) command on the undo-stack, inverts it again (to get the original command again) and puts it on the redo-stack. That's it.</para>
+	/// <seealso cref="InvertibleCommand"/>.
 	/// </summary>
-	public class GMUndoRedo : ObservableObject
+	public class GMWPFUndoRedo : GMUndoRedo
 	{
-		private static readonly List<GMUndoRedo> instances = new List<GMUndoRedo>();
+		private static readonly List<GMWPFUndoRedo> instances = new List<GMWPFUndoRedo>();
 
 		/// <summary>
 		/// Tries to find the undo/redo manager associated with the <see cref="Window"/> object that hosts the content tree within which the specified dependency object is located.
 		/// <para>Uses <see cref="Window.GetWindow(DependencyObject)"/>.</para>
 		/// </summary>
 		/// <param name="dependencyObject">The dependency object that is in the content tree of a window.</param>
-		public static GMUndoRedo GetInstance(DependencyObject dependencyObject)
+		public static GMWPFUndoRedo GetInstance(DependencyObject dependencyObject)
 		{
 			// try to find the window
 			Window window = Window.GetWindow(dependencyObject);
@@ -64,25 +63,16 @@ namespace GM.WPF.Patterns.UndoRedo
 			return instances.SingleOrDefault(ur => ur.registeredWindowTypes.Contains(currentWindowType) || ur.registeredWindows.Contains(window));
 		}
 
-		/// <summary>
-		/// Gets or sets the maximum amount of undo actions. Default is 100.
-		/// </summary>
-		public int MaximumHistoryCount { get; set; } = 100;
-
 		private readonly List<Window> registeredWindows;
 		private readonly List<Type> registeredWindowTypes;
-		private readonly LinkedList<InvertibleCommand> undoStack;
-		private readonly Stack<InvertibleCommand> redoStack;
 
 		/// <summary>
-		/// Creates a new instance of <see cref="GMUndoRedo"/>.
+		/// Creates a new instance of <see cref="GMWPFUndoRedo"/>.
 		/// </summary>
-		public GMUndoRedo()
+		public GMWPFUndoRedo()
 		{
 			registeredWindows = new List<Window>();
 			registeredWindowTypes = new List<Type>();
-			undoStack = new LinkedList<InvertibleCommand>();
-			redoStack = new Stack<InvertibleCommand>();
 
 			instances.Add(this);
 		}
@@ -147,30 +137,6 @@ namespace GM.WPF.Patterns.UndoRedo
 		}
 
 		/// <summary>
-		/// Gets a list of descriptions of available undo commands.
-		/// </summary>
-		public List<string> AvailableUndoCommands => undoStack
-			.Select(ic => ic.Description)
-			.ToList();
-		/// <summary>
-		/// Gets a list of descriptions of available redo commands.
-		/// </summary>
-		public List<string> AvailableRedoCommands => redoStack
-			.Select(ic => ic.Description)
-			.ToList();
-
-		/// <summary>
-		/// Clears the undo/redo stacks.
-		/// </summary>
-		public void Clear()
-		{
-			undoStack.Clear();
-			redoStack.Clear();
-			RaisePropertyChanged(nameof(AvailableUndoCommands));
-			RaisePropertyChanged(nameof(AvailableRedoCommands));
-		}
-
-		/// <summary>
 		/// Creates an <see cref="InvertibleCommand"/> that, when executed, will automatically put the inverted command to the undo stack.
 		/// </summary>
 		/// <param name="description">The description of the command.</param>
@@ -202,88 +168,19 @@ namespace GM.WPF.Patterns.UndoRedo
 		{
 			var ic = (InvertibleCommand)sender;
 			// get the inverted command that represents the undo command
-			InvertibleCommand undoCommand = ic.GetInvertedCommand();
-			Add(undoCommand);
-		}
-
-		/// <summary>
-		/// Adds the specified undo/redo actions to the undo/redo stack as a single action.
-		/// <para>If there are currently any actions on the redo stack, they will be removed.</para>
-		/// </summary>
-		/// <param name="description">The description of the action.</param>
-		/// <param name="undoRedoActions">The undo/redo actions.</param>
-		public void Add(string description, List<(Action undo, Action redo)> undoRedoActions)
-		{
-			if(undoRedoActions == null) {
-				throw new ArgumentNullException(nameof(undoRedoActions));
-			}
-			if(undoRedoActions.Count == 0) {
-				return;
-			}
-			List<Action> undoActions = undoRedoActions
-				.Select(t => t.undo)
-				.ToList();
-			List<Action> redoActions = undoRedoActions
-				.Select(t => t.redo)
-				.ToList();
-
-			void undo()
-			{
-				foreach(Action undoAction in undoActions) {
-					undoAction();
-				}
-			}
-			void redo()
-			{
-				foreach(Action redoAction in redoActions) {
-					redoAction();
-				}
-			}
-			Add(description, undo, redo);
-		}
-
-		/// <summary>
-		/// Adds the specified undo/redo action to the undo/redo stack.
-		/// <para>If there are currently any actions on the redo stack, they will be removed.</para>
-		/// </summary>
-		/// <param name="description">The description of the action.</param>
-		/// <param name="undo">The undo action.</param>
-		/// <param name="redo">The redo action.</param>
-		public void Add(string description, Action undo, Action redo)
-		{
-			var undoCommand = new InvertibleCommand(description, undo, redo);
-			Add(undoCommand);
-		}
-
-		/// <summary>
-		/// Adds the provided undo command to the undo stack.
-		/// <para>If there are currently any actions on the redo stack, they will be removed.</para>
-		/// </summary>
-		/// <param name="undoCommand">The undo command.</param>
-		public void Add(InvertibleCommand undoCommand)
-		{
-			_ = undoStack.AddLast(undoCommand);
-			RaisePropertyChanged(nameof(AvailableUndoCommands));
-			if(redoStack.Count > 0) {
-				// when adding something new to undo, clear the current redo stack
-				// this is to avoid multiple realities ...
-				redoStack.Clear();
-				RaisePropertyChanged(nameof(AvailableRedoCommands));
-			}
-			while(undoStack.Count > MaximumHistoryCount) {
-				undoStack.RemoveFirst();
-			}
+			UndoRedoAction undoAction = ic.undoRedoAction.GetInvertedUndoRedoAction();
+			Add(undoAction);
 		}
 
 		private void OnCanExecuteUndo(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = undoStack.Count > 0;
+			e.CanExecute = CanUndo;
 			e.Handled = true;
 		}
 
 		private void OnCanExecuteRedo(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = redoStack.Count > 0;
+			e.CanExecute = CanRedo;
 			e.Handled = true;
 		}
 
@@ -297,41 +194,6 @@ namespace GM.WPF.Patterns.UndoRedo
 		{
 			UndoRedo(false);
 			e.Handled = true;
-		}
-
-		private void UndoRedo(bool undo)
-		{
-			{
-				ICollection executingStack = undo ? (ICollection)undoStack : redoStack;
-				if(executingStack.Count == 0) {
-					// how did this happen? hmm ...
-					return;
-				}
-			}
-			// take the topmost command from the executing stack
-			InvertibleCommand commandToExecute;
-			if(undo) {
-				commandToExecute = undoStack.Last.Value;
-				undoStack.RemoveLast();
-			} else {
-				commandToExecute = redoStack.Pop();
-			}
-			if(!commandToExecute.CanExecute(null)) {
-				// if this happens, it is a bad design from the programmer using this pattern, but just in case
-				return;
-			}
-			// execute the command
-			commandToExecute.Execute(null);
-			// push the inverted command to the opposite stack
-			InvertibleCommand invertedCommand = commandToExecute.GetInvertedCommand();
-			if(undo) {
-				redoStack.Push(invertedCommand);
-			} else {
-				_ = undoStack.AddLast(invertedCommand);
-			}
-
-			RaisePropertyChanged(nameof(AvailableUndoCommands));
-			RaisePropertyChanged(nameof(AvailableRedoCommands));
 		}
 	}
 }

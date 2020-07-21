@@ -46,7 +46,7 @@ namespace GM.WPF.Controls
 {
 	/// <summary>
 	/// A <see cref="DataGrid"/> with:
-	/// <para>- undo/redo functionality (if the owning window is registered with <see cref="GMUndoRedo"/>)</para>
+	/// <para>- undo/redo functionality (if the owning window is registered with <see cref="GMWPFUndoRedo"/>)</para>
 	/// <para>- cell by cell editing (and not row by row as is default)</para>
 	/// <para>- ability to cut cell values</para>
 	/// <para>- ability to paste cell values</para>
@@ -122,7 +122,7 @@ namespace GM.WPF.Controls
 		}
 
 		#region UNDO/REDO
-		private GMUndoRedo undoRedo;
+		private GMWPFUndoRedo undoRedo;
 		private bool isManuallyCommittingEdit;
 
 		private void GMDataGrid_Loaded_ForUndoRedo(object sender, RoutedEventArgs e)
@@ -131,7 +131,7 @@ namespace GM.WPF.Controls
 			if(undoRedo != null) {
 				throw new NotImplementedException("How is this possible? This handler is registered only at beginning, and then removed when loaded for the first time.");
 			}
-			undoRedo = GMUndoRedo.GetInstance(this);
+			undoRedo = GMWPFUndoRedo.GetInstance(this);
 			Loaded -= GMDataGrid_Loaded_ForUndoRedo;
 		}
 
