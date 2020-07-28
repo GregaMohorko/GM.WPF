@@ -163,8 +163,13 @@ namespace GM.WPF.Controls
 
 			object newValue = binding.GetValueFor(editedItem);
 
-			if(oldValue == newValue) {
-				// nothing was changed, no need to mark undo/redo command
+			if(oldValue != null) {
+				if(oldValue.Equals(newValue)) {
+					// nothing was changed, no need to mark undo/redo command
+					return;
+				}
+			} else if(newValue == null) {
+				// both are null, nothing was changed, no need to mark undo/redo command
 				return;
 			}
 

@@ -112,8 +112,14 @@ namespace GM.WPF.Converters
 		/// <param name="culture">The culture to use in the converter.</param>
 		public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			// format of the original text is lost
-			return DependencyProperty.UnsetValue;
+			if(value is null) {
+				return null;
+			}
+			// format of the original text is lost, so let's just return the string as it currently is
+			if(!(value is string valueS)) {
+				return DependencyProperty.UnsetValue;
+			}
+			return valueS;
 		}
 	}
 }

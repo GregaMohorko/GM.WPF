@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Gregor Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -252,20 +252,17 @@ namespace GM.WPF.Utility
 				Converter = binding.Converter,
 				ConverterParameter = binding.ConverterParameter,
 				ConverterCulture = binding.ConverterCulture,
-				FallbackValue = binding.FallbackValue,
 				StringFormat = binding.StringFormat,
-				TargetNullValue = binding.TargetNullValue,
 				ValidatesOnDataErrors = binding.ValidatesOnDataErrors,
 				ValidatesOnExceptions = binding.ValidatesOnExceptions,
 				ValidatesOnNotifyDataErrors = binding.ValidatesOnNotifyDataErrors,
 				Source = obj,
+				FallbackValue = value,
 				Mode = BindingMode.OneWayToSource
 			};
 
 			var dummyDO = new DummyDO();
 			_ = BindingOperations.SetBinding(dummyDO, DummyDO.ValueProperty, tmpBinding);
-
-			dummyDO.Value = value;
 
 			// check if it was successful
 			BindingExpression bindingExpression = BindingOperations.GetBindingExpression(dummyDO, DummyDO.ValueProperty);
