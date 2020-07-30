@@ -29,6 +29,8 @@ Author: Gregor Mohorko
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -70,6 +72,29 @@ namespace GM.WPF.Controls
 		public GMDataGrid()
 		{
 			Loaded += GMDataGrid_Loaded_ForUndoRedo;
+		}
+
+		/// <summary>
+		/// Captures the sort event in undo/redo manager (if it exists) and raises the <see cref="DataGrid.Sorting"/> event.
+		/// </summary>
+		/// <param name="e">The data for the event.</param>
+		protected override void OnSorting(DataGridSortingEventArgs e)
+		{
+			List<SortDescription> sortDescriptionsBefore = null;
+			if(undoRedo != null) {
+				sortDescriptionsBefore = Items.SortDescriptions
+					.Select(sd => new SortDescription(sd.PropertyName, sd.Direction))
+					.ToList();
+			}
+
+			base.OnSorting(e);
+
+			if(undoRedo != null) {
+				List<SortDescription> sortDescriptionsAfter = Items.SortDescriptions
+					.Select(sd => new SortDescription(sd.PropertyName, sd.Direction))
+					.ToList();
+				CaptureSortingInUndoRedo(sortDescriptionsBefore, sortDescriptionsAfter);
+			}
 		}
 
 		/// <summary>
@@ -123,6 +148,7 @@ namespace GM.WPF.Controls
 
 		#region UNDO/REDO
 		private GMWPFUndoRedo undoRedo;
+		private Dictionary<string, DataGridColumn[]> propertyNameToColumns;
 		private bool isManuallyCommittingEdit;
 
 		private void GMDataGrid_Loaded_ForUndoRedo(object sender, RoutedEventArgs e)
@@ -133,6 +159,88 @@ namespace GM.WPF.Controls
 			}
 			undoRedo = GMWPFUndoRedo.GetInstance(this);
 			Loaded -= GMDataGrid_Loaded_ForUndoRedo;
+
+			if(undoRedo != null) {
+				Columns.CollectionChanged += Columns_CollectionChanged_ForUndoRedo;
+			}
+		}
+
+		private void Columns_CollectionChanged_ForUndoRedo(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			switch(e.Action) {
+				case NotifyCollectionChangedAction.Move:
+					// do nothing
+					break;
+				case NotifyCollectionChangedAction.Add:
+				case NotifyCollectionChangedAction.Remove:
+				case NotifyCollectionChangedAction.Replace:
+				case NotifyCollectionChangedAction.Reset:
+					// reset the cache of columns
+					propertyNameToColumns = null;
+					break;
+				default:
+					throw new NotImplementedException($"Unsupported notify collection changed action: '{e.Action}'.");
+			}
+		}
+
+		private void CaptureSortingInUndoRedo(List<SortDescription> sortsbefore, List<SortDescription> sortsAfter)
+		{
+			if(undoRedo == null) {
+				return;
+			}
+
+			if(propertyNameToColumns == null) {
+				propertyNameToColumns = new Dictionary<string, DataGridColumn[]>();
+			}
+
+			List<(SortDescription sort, DataGridColumn[] columns)> findAssociatedColumns(List<SortDescription> sorts)
+			{
+				var associatedColumns = new List<(SortDescription sort, DataGridColumn[] columns)>();
+				foreach(SortDescription sd in sorts) {
+					if(!propertyNameToColumns.TryGetValue(sd.PropertyName, out DataGridColumn[] columnsWithSameSortMemberPath)) {
+						// search for and add
+						columnsWithSameSortMemberPath = Columns.Where(c => c.SortMemberPath == sd.PropertyName).ToArray();
+						propertyNameToColumns.Add(sd.PropertyName, columnsWithSameSortMemberPath);
+					}
+					associatedColumns.Add((sd, columnsWithSameSortMemberPath));
+				}
+				return associatedColumns;
+			}
+
+			List<(SortDescription sort, DataGridColumn[] columns)> before = findAssociatedColumns(sortsbefore);
+			List<(SortDescription sort, DataGridColumn[] columns)> after = findAssociatedColumns(sortsAfter);
+
+			var sortDescriptions = new List<string>();
+			foreach((SortDescription sd, DataGridColumn[] columns) in after) {
+				string columnsS = string.Join("/", columns.Select(c => c.Header)).Replace("\n", " ").RemoveAllOf("\r");
+				string sortDescription = $"{(sd.Direction == ListSortDirection.Ascending ? "ascending" : "descending")} by {columnsS}";
+				sortDescriptions.Add(sortDescription);
+			}
+			string description = $"Sort {string.Join(", ", sortDescriptions)}";
+
+			void sort(List<(SortDescription sort, DataGridColumn[] columns)> sorts)
+			{
+				Items.SortDescriptions.Clear();
+				foreach(DataGridColumn c in Columns) {
+					c.SortDirection = null;
+				}
+				foreach((SortDescription sd, DataGridColumn[] columns) in sorts) {
+					Items.SortDescriptions.Add(sd);
+					foreach(DataGridColumn c in columns) {
+						c.SortDirection = sd.Direction;
+					}
+				}
+				Items.Refresh();
+			}
+			void undo()
+			{
+				sort(before);
+			};
+			void redo()
+			{
+				sort(after);
+			};
+			undoRedo.Add(description, undo, redo);
 		}
 
 		private void CommitEditAndHandleUndoRedo(DataGridCellEditEndingEventArgs e)
