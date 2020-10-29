@@ -287,8 +287,7 @@ namespace GM.WPF.Controls
 			string description = $"Edit {columnHeader} from '{oldValueDescription}' to '{newValueDescription}'";
 			void undo() => binding.SetValueFor(editedItem, oldValue);
 			void redo() => binding.SetValueFor(editedItem, newValue);
-			var undoCommand = new InvertibleCommand(description, undo, redo);
-			undoRedo.Add(undoCommand);
+			undoRedo.Add(description, undo, redo);
 		}
 
 		private void UndoRedo_HandlePaste(List<(Action undo, Action redo)> undoRedoActions, int cellsPasted, int newItemsAdded)

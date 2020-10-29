@@ -27,9 +27,9 @@ Author: Gregor Mohorko
 */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -38,6 +38,7 @@ using System.Windows;
 using System.Windows.Controls;
 using GM.Utility;
 using GM.WPF.MVVM;
+using GM.WPF.Utility;
 
 namespace GM.WPF.Controls
 {
@@ -347,6 +348,8 @@ namespace GM.WPF.Controls
 			return DependencyVMProperty(name, ownerType, defaultValue, viewModelType, null, nullifyWhenParentTabItemIsNotSelected);
 		}
 
+		private static ConcurrentDictionary<BaseControl, TabItem> controlToTabItem;
+
 		/// <summary>
 		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
 		/// </summary>
@@ -376,8 +379,6 @@ namespace GM.WPF.Controls
 
 			object typeDefaultValue = propertyType.GetDefault();
 
-			TabItem tabItem = null;
-			TabControl tabControl;
 			object actualValue = typeDefaultValue;
 			void propertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
@@ -388,10 +389,10 @@ namespace GM.WPF.Controls
 					// sets the new value of the property to the property in the view model
 					vm.SetProperty(viewModelPropertyName, e.NewValue);
 				} else {
-					void SetValueBasedOnTabItemIsSelected()
+					void SetValueBasedOnTabItemIsSelected(TabItem tab)
 					{
 						object currentValue = vm.GetPropertyValue(viewModelPropertyName);
-						if(tabItem.IsSelected) {
+						if(tab.IsSelected) {
 							if(currentValue != actualValue) {
 								vm.SetProperty(viewModelPropertyName, actualValue);
 							}
@@ -402,23 +403,45 @@ namespace GM.WPF.Controls
 						}
 					}
 
-					if(tabItem == null) {
-						// this is the first time this is called
-						tabItem = baseControl.TryToFindParentTabItem();
-						if(tabItem == null) {
-							throw new Exception($"If you set the {nameof(nullifyWhenParentTabItemIsNotSelected)} parameter to true, then that control must be placed inside a TabItem.");
+					if(controlToTabItem == null) {
+						controlToTabItem = new ConcurrentDictionary<BaseControl, TabItem>();
+					}
+
+					// get the parent tab item of this control
+					if(!controlToTabItem.TryGetValue(baseControl, out TabItem tabItem)) {
+						// this is the first time this is called for this control
+						// find the parent tab control that has at least 2 items (otherwise there is no sense because a single tab item cannot be deselected)
+						TabControl tabControl;
+						{
+							FrameworkElement current = baseControl;
+							do {
+								tabItem = current.TryGetParent<TabItem>();
+								if(tabItem == null) {
+									throw new Exception($"If you set the {nameof(nullifyWhenParentTabItemIsNotSelected)} parameter to true, then that control must be placed inside a TabItem.");
+								}
+								tabControl = tabItem.TryGetParent<TabControl>();
+								current = tabControl;
+							} while(tabControl.Items.Count < 2);
 						}
-						tabControl = baseControl.FindParentTabControl(tabItem);
+						_ = controlToTabItem.AddOrUpdate(baseControl, tabItem, (bc, existing) =>
+						{
+							if(existing != tabItem) {
+								// this shouldn't happen
+								throw new NotImplementedException("This should never happen.");
+							}
+							return tabItem;
+						});
 						tabControl.SelectionChanged += (sender, selectionChangedArgs) =>
 						{
 							if(selectionChangedArgs.Source != tabControl) {
 								return;
 							}
-							SetValueBasedOnTabItemIsSelected();
+							SetValueBasedOnTabItemIsSelected(tabItem);
 						};
 					}
+
 					actualValue = e.NewValue;
-					SetValueBasedOnTabItemIsSelected();
+					SetValueBasedOnTabItemIsSelected(tabItem);
 				}
 			}
 
@@ -427,30 +450,6 @@ namespace GM.WPF.Controls
 			}
 
 			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(defaultValue, propertyChangedCallback));
-		}
-
-		private TabItem TryToFindParentTabItem()
-		{
-			var current = Parent as FrameworkElement;
-			while(current != null) {
-				if(current is TabItem tabItem) {
-					return tabItem;
-				}
-				current = current.Parent as FrameworkElement;
-			}
-			return null;
-		}
-
-		private TabControl FindParentTabControl(TabItem tabItem)
-		{
-			var current = tabItem.Parent as FrameworkElement;
-			while(current != null) {
-				if(current is TabControl tabControl) {
-					return tabControl;
-				}
-				current = current.Parent as FrameworkElement;
-			}
-			return null;
 		}
 		#endregion DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTY
 
