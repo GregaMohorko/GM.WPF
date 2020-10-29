@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-10-30
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -32,6 +32,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -123,6 +124,24 @@ namespace GM.WPF.Utility
 		public static bool MoveFocusUp(this FrameworkElement element)
 		{
 			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up));
+		}
+
+		/// <summary>
+		/// Returns the first parent of type <typeparamref name="TControl"/> of this element, or null if this control is not inside a <typeparamref name="TControl"/>.
+		/// </summary>
+		/// <typeparam name="TControl">The type of parent to search for.</typeparam>
+		/// <param name="element">The element of which to search for parent <typeparamref name="TControl"/>.</param>
+		public static TControl TryGetParent<TControl>(this FrameworkElement element) where TControl : FrameworkElement
+		{
+			Type tControlType = typeof(TControl);
+			var current = element.Parent as FrameworkElement;
+			while(current != null) {
+				if(tControlType.IsAssignableFrom(current.GetType())) {
+					return (TControl)current;
+				}
+				current = current.Parent as FrameworkElement;
+			}
+			return null;
 		}
 	}
 }
