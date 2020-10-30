@@ -87,6 +87,10 @@
     <Compile Include="Behaviors\TextBlockBehavior.cs" />
     <Compile Include="Controls\BaseControl.cs" />
     <Compile Include="Controls\ClosingControl.cs" />
+    <Compile Include="Controls\Dialogs\DateDialog.xaml.cs">
+      <DependentUpon>DateDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Dialogs\DateDialogViewModel.cs" />
     <Compile Include="Controls\Dialogs\Dialog.cs" />
     <Compile Include="Controls\Dialogs\ChooseDialog.xaml.cs">
       <DependentUpon>ChooseDialog.xaml</DependentUpon>
@@ -191,6 +195,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\Dialogs\ChooseDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Dialogs\DateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
