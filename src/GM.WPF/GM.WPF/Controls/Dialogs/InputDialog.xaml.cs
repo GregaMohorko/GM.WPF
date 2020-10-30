@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-11-28
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -75,9 +75,10 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="watermark">The text to show in the input box.</param>
 		/// <param name="defaultText">The default text that will already be in the input box.</param>
 		/// <param name="acceptsTab">Determines whether the textbox will accept tabulator as an input.</param>
-		public Task<string> Show(string message = null, string watermark = null, string defaultText = null, bool acceptsTab = false)
+		/// <param name="acceptsReturn">Determines whether the textbox will accept return as an input (meaning it's probably multiline).</param>
+		public Task<string> Show(string message = null, string watermark = null, string defaultText = null, bool acceptsTab = false, bool acceptsReturn = false)
 		{
-			return Show<string>(message, watermark, defaultText, acceptsTab);
+			return Show<string>(message, watermark, defaultText, acceptsTab, acceptsReturn);
 		}
 
 		/// <summary>
@@ -89,17 +90,18 @@ namespace GM.WPF.Controls.Dialogs
 		/// <param name="defaultValue">The default value that will already be in the input box.</param>
 		public Task<T> Show<T>(string message = null, string watermark = null, T defaultValue = default)
 		{
-			return Show(message, watermark, defaultValue, false);
+			return Show(message, watermark, defaultValue, false, false);
 		}
 
-		private async Task<T> Show<T>(string message, string watermark, T defaultValue, bool acceptsTab)
+		private async Task<T> Show<T>(string message, string watermark, T defaultValue, bool acceptsTab, bool acceptsReturn)
 		{
 			var vm = new InputDialogViewModel<T>
 			{
 				Message = message,
 				Watermark = watermark,
 				Text = defaultValue?.ToString(),
-				AcceptsTab = acceptsTab
+				AcceptsTab = acceptsTab,
+				AcceptsReturn = acceptsReturn
 			};
 			if(vm.Text == null && typeof(T) == typeof(string)) {
 				// this is to distinguish between clicking 'cancel' and clicking 'ok' with an empty input

@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2018-11-14
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -44,6 +44,7 @@ namespace GM.WPF.Controls.Dialogs
 		public string Message { get; set; }
 		public string Watermark { get; set; }
 		public bool AcceptsTab { get; set; }
+		public bool AcceptsReturn { get; set; }
 		public T Value { get; private set; }
 		public bool CanSubmit { get; private set; }
 

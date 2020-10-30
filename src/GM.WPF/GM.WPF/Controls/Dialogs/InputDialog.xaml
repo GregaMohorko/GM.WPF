@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-11-28
-Author: Grega Mohorko
+Author: Gregor Mohorko
 -->
 <local:TaskDialog x:Class="GM.WPF.Controls.Dialogs.InputDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -45,7 +45,7 @@ Author: Grega Mohorko
 		<TextBlock Text="{Binding Message,Mode=OneWay}" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" />
 		<Grid Grid.Row="1" Background="White" Margin="0 0 0 10">
 			<Label Name="_Label_Watermark" Content="{Binding Watermark,Mode=OneWay}" FontSize="18" Foreground="Gray" />
-			<TextBox Name="_TextBox" Text="{Binding Text,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" AcceptsTab="{Binding AcceptsTab,Mode=OneWay}" FontSize="18" VerticalContentAlignment="Center" TextWrapping="Wrap" Background="Transparent" />
+			<TextBox Name="_TextBox" Text="{Binding Text,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" AcceptsTab="{Binding AcceptsTab,Mode=OneWay}" AcceptsReturn="{Binding AcceptsReturn, Mode=OneWay}" FontSize="18" VerticalContentAlignment="Center" TextWrapping="Wrap" Background="Transparent" />
 		</Grid>
 		<Button Content="Cancel" Grid.Row="2" Width="100" Height="32" HorizontalAlignment="Left" Click="Button_Cancel_Click" />
 		<Button Content="OK" IsEnabled="{Binding CanSubmit,Mode=OneWay}" Grid.Row="2" Width="150" Height="32" HorizontalAlignment="Right" IsDefault="True" Click="Button_OK_Click" />
