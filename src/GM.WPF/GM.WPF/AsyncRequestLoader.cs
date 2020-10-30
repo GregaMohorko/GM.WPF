@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2019-09-27
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -47,9 +47,26 @@ namespace GM.WPF
 	public class AsyncRequestLoader : ObservableObject, IDisposable
 	{
 		/// <summary>
+		/// Occurs when the <see cref="IsLoading"/> changes.
+		/// </summary>
+		public event EventHandler<bool> IsLoadingChanged;
+
+		private bool _isLoading;
+		/// <summary>
 		/// Determines whether any request is currently in the process of loading.
 		/// </summary>
-		public bool IsLoading { get; private set; }
+		public bool IsLoading
+		{
+			get => _isLoading;
+			set
+			{
+				if(_isLoading == value) {
+					return;
+				}
+				_isLoading = value;
+				IsLoadingChanged?.Invoke(this, _isLoading);
+			}
+		}
 
 		private CancellationTokenSource cts;
 

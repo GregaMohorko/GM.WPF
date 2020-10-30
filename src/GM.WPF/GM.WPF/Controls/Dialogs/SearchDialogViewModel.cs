@@ -79,7 +79,7 @@ namespace GM.WPF.Controls.Dialogs
 			Command_Ok = new RelayCommand(Ok, () => Selected != null);
 
 			loader = new AsyncRequestLoader();
-			loader.PropertyChanged += Loader_PropertyChanged;
+			loader.IsLoadingChanged += Loader_IsLoadingChanged;
 
 			SearchWatermark = watermark;
 			SearchText = defaultSearchText ?? string.Empty;
@@ -90,20 +90,11 @@ namespace GM.WPF.Controls.Dialogs
 			loader.Dispose();
 		}
 
-		private void Loader_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Loader_IsLoadingChanged(object sender, bool isLoading)
 		{
-			switch(e.PropertyName) {
-				case nameof(AsyncRequestLoader.IsLoading):
-					string message;
-					if(loader.IsLoading) {
-						message = defaultLoadingMessage;
-					} else {
-						message = null;
-					}
-					progressUpdater.SetMessage(message);
-					progressUpdater.SetProgress(null);
-					break;
-			}
+			string message = isLoading ? defaultLoadingMessage : null;
+			progressUpdater.SetMessage(message);
+			progressUpdater.SetProgress(null);
 		}
 
 #pragma warning disable IDE0051 // Remove unused private members
