@@ -72,6 +72,20 @@ namespace GM.WPF.Controls.Dialogs
 		/// Shows the choose dialog and waits for the users response.
 		/// </summary>
 		/// <param name="question">Question text.</param>
+		/// <param name="answers">The answers to choose from.</param>
+		public async Task<int> ShowNoCancel(string question, params string[] answers)
+		{
+			int? decision = await Show(question, false, answers);
+			if(decision == null) {
+				throw new NotImplementedException("How can it be null?");
+			}
+			return decision.Value;
+		}
+
+		/// <summary>
+		/// Shows the choose dialog and waits for the users response.
+		/// </summary>
+		/// <param name="question">Question text.</param>
 		/// <param name="canCancel">Determines whether the Cancel button is visible.</param>
 		/// <param name="answers">The answers to choose from.</param>
 		public async Task<int?> Show(string question, bool canCancel, params string[] answers)
