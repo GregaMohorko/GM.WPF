@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2020 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-10-29
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -33,6 +33,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 
@@ -49,5 +50,18 @@ namespace GM.WPF.MVVM
 		/// Gets a value that indicates whether a debugger is attached to the process.
 		/// </summary>
 		public bool IsDebuggerAttached => Debugger.IsAttached;
+		/// <summary>
+		/// Determines whether the control is in design mode.
+		/// </summary>
+		public new bool IsInDesignMode => IsInDesignModeStatic;
+		/// <summary>
+		/// Determines whether the control is in design mode.
+		/// </summary>
+		public static new bool IsInDesignModeStatic { get; }
+
+		static ViewModel()
+		{
+			IsInDesignModeStatic = DesignerProperties.GetIsInDesignMode(new DependencyObject());
+		}
 	}
 }
