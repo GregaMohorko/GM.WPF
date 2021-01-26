@@ -348,7 +348,13 @@ namespace GM.WPF.Controls
 			return DependencyVMProperty(name, ownerType, defaultValue, viewModelType, null, nullifyWhenParentTabItemIsNotSelected);
 		}
 
-		private static ConcurrentDictionary<BaseControl, TabItem> controlToTabItem;
+		private static ConcurrentDictionary<BaseControl, SearchForTabItemResult> controlToTabItem;
+
+		private class SearchForTabItemResult
+		{
+			public TabItem TabItem;
+			public bool WasSkippedDueToItemCountBeing1;
+		}
 
 		/// <summary>
 		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
@@ -385,9 +391,14 @@ namespace GM.WPF.Controls
 				var baseControl = (BaseControl)d;
 				var vm = baseControl.ViewModel;
 
-				if(!nullifyWhenParentTabItemIsNotSelected) {
+				void setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected()
+				{
 					// sets the new value of the property to the property in the view model
 					vm.SetProperty(viewModelPropertyName, e.NewValue);
+				}
+
+				if(!nullifyWhenParentTabItemIsNotSelected) {
+					setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected();
 				} else {
 					void SetValueBasedOnTabItemIsSelected(TabItem tab)
 					{
@@ -404,40 +415,58 @@ namespace GM.WPF.Controls
 					}
 
 					if(controlToTabItem == null) {
-						controlToTabItem = new ConcurrentDictionary<BaseControl, TabItem>();
+						controlToTabItem = new ConcurrentDictionary<BaseControl, SearchForTabItemResult>();
 					}
 
 					// get the parent tab item of this control
-					if(!controlToTabItem.TryGetValue(baseControl, out TabItem tabItem)) {
-						// this is the first time this is called for this control
-						// find the parent tab control that has at least 2 items (otherwise there is no sense because a single tab item cannot be deselected)
-						TabControl tabControl;
-						{
-							FrameworkElement current = baseControl;
-							do {
-								tabItem = current.TryGetParent<TabItem>();
-								if(tabItem == null) {
-									throw new Exception($"If you set the {nameof(nullifyWhenParentTabItemIsNotSelected)} parameter to true, then that control must be placed inside a TabItem.");
-								}
-								tabControl = tabItem.TryGetParent<TabControl>();
-								current = tabControl;
-							} while(tabControl.Items.Count < 2);
+					TabItem tabItem;
+					{
+						if(!controlToTabItem.TryGetValue(baseControl, out SearchForTabItemResult tabItemSearchResult)) {
+							// this is the first time this is called for this control
+							tabItemSearchResult = new SearchForTabItemResult();
+							_ = controlToTabItem.TryAdd(baseControl, tabItemSearchResult);
 						}
-						_ = controlToTabItem.AddOrUpdate(baseControl, tabItem, (bc, existing) =>
-						{
-							if(existing != tabItem) {
-								// this shouldn't happen
-								throw new NotImplementedException("This should never happen.");
+
+						if(tabItemSearchResult.TabItem != null) {
+							tabItem = tabItemSearchResult.TabItem;
+						} else {
+							// find the parent tab control that has at least 2 items (otherwise there is no sense because a single tab item cannot be deselected)
+							TabControl tabControl;
+							{
+								FrameworkElement current = baseControl;
+								while(true) {
+									tabItem = current.TryGetParent<TabItem>();
+									if(tabItem == null) {
+										throw new Exception($"If you set the {nameof(nullifyWhenParentTabItemIsNotSelected)} parameter to true, then that control must be placed inside a TabItem.");
+									}
+									tabControl = tabItem.TryGetParent<TabControl>();
+									if(tabControl.Items.Count < 2) {
+										if(!tabItemSearchResult.WasSkippedDueToItemCountBeing1) {
+											// only mark and do the same thing as if nullifyWhenParentTabItemIsNotSelected=false
+											// the search will be done the next time again, and hopefully, there will be more items now (but do this only once)
+											// this scenario can happen when you have a TabControl in a DataTemplate and controls are added one-by-one and this method gets called for the 1st TabItem when it is indeed the only TabItem in the TabControl :)
+											tabItemSearchResult.WasSkippedDueToItemCountBeing1 = true;
+											setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected();
+											return;
+										}
+									} else {
+										// we found a TabControl with more than 1 item
+										break;
+									}
+									current = tabControl;
+								};
 							}
-							return tabItem;
-						});
-						tabControl.SelectionChanged += (sender, selectionChangedArgs) =>
-						{
-							if(selectionChangedArgs.Source != tabControl) {
-								return;
-							}
-							SetValueBasedOnTabItemIsSelected(tabItem);
-						};
+
+							tabItemSearchResult.TabItem = tabItem;
+
+							tabControl.SelectionChanged += (sender, selectionChangedArgs) =>
+							{
+								if(selectionChangedArgs.Source != tabControl) {
+									return;
+								}
+								SetValueBasedOnTabItemIsSelected(tabItem);
+							};
+						}
 					}
 
 					actualValue = e.NewValue;
