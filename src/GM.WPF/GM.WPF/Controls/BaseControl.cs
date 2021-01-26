@@ -349,11 +349,12 @@ namespace GM.WPF.Controls
 		}
 
 		private static ConcurrentDictionary<BaseControl, SearchForTabItemResult> controlToTabItem;
+		private static ConcurrentDictionary<TabControl, BaseControl> tabControlsWithSingleItems;
 
 		private class SearchForTabItemResult
 		{
 			public TabItem TabItem;
-			public bool WasSkippedDueToItemCountBeing1;
+			public TabItem SkippedDueToBeingSingle;
 		}
 
 		/// <summary>
@@ -414,8 +415,10 @@ namespace GM.WPF.Controls
 						}
 					}
 
+					// init
 					if(controlToTabItem == null) {
 						controlToTabItem = new ConcurrentDictionary<BaseControl, SearchForTabItemResult>();
+						tabControlsWithSingleItems = new ConcurrentDictionary<TabControl, BaseControl>();
 					}
 
 					// get the parent tab item of this control
@@ -441,13 +444,22 @@ namespace GM.WPF.Controls
 									}
 									tabControl = tabItem.TryGetParent<TabControl>();
 									if(tabControl.Items.Count < 2) {
-										if(!tabItemSearchResult.WasSkippedDueToItemCountBeing1) {
+										if(tabItemSearchResult.SkippedDueToBeingSingle == null) {
 											// only mark and do the same thing as if nullifyWhenParentTabItemIsNotSelected=false
-											// the search will be done the next time again, and hopefully, there will be more items now (but do this only once)
+											// the search will be done the next time again, and hopefully, there will be more items then (but do it only once)
 											// this scenario can happen when you have a TabControl in a DataTemplate and controls are added one-by-one and this method gets called for the 1st TabItem when it is indeed the only TabItem in the TabControl :)
-											tabItemSearchResult.WasSkippedDueToItemCountBeing1 = true;
+
+											tabItemSearchResult.SkippedDueToBeingSingle = tabItem;
+											// this should always successfully add since we check/set the flag above
+											_ = tabControlsWithSingleItems.TryAdd(tabControl, baseControl);
+
 											setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected();
 											return;
+										}
+										// apparently this tab control is going to stay only with 1 TabItem
+										_ = tabControlsWithSingleItems.TryRemove(tabControl, out BaseControl baseControl1);
+										if(baseControl != baseControl1) {
+											throw new Exception("This should never happen.");
 										}
 									} else {
 										// we found a TabControl with more than 1 item
@@ -465,6 +477,25 @@ namespace GM.WPF.Controls
 									return;
 								}
 								SetValueBasedOnTabItemIsSelected(tabItem);
+
+								// check if this tab control was skipped
+								if(tabControlsWithSingleItems.TryRemove(tabControl, out BaseControl skippedBaseControl)) {
+									// this base control was skipped
+									// get and set the TabItem of this base control
+									TabItem tabItem2;
+									{
+										SearchForTabItemResult skippedTabItemResult = controlToTabItem[skippedBaseControl];
+										skippedTabItemResult.TabItem = skippedTabItemResult.SkippedDueToBeingSingle;
+										tabItem2 = skippedTabItemResult.TabItem;
+									}
+									tabControl.SelectionChanged += (sender2, selectionChangedArgs2) =>
+									{
+										if(selectionChangedArgs2.Source != tabControl) {
+											return;
+										}
+										SetValueBasedOnTabItemIsSelected(tabItem2);
+									};
+								}
 							};
 						}
 					}
