@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2020 Gregor Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -348,13 +348,14 @@ namespace GM.WPF.Controls
 			return DependencyVMProperty(name, ownerType, defaultValue, viewModelType, null, nullifyWhenParentTabItemIsNotSelected);
 		}
 
+		// could probably use normal Dictionary, since all of this is always run on the main UI thread
 		private static ConcurrentDictionary<BaseControl, SearchForTabItemResult> controlToTabItem;
 		private static ConcurrentDictionary<TabControl, BaseControl> tabControlsWithSingleItems;
 
 		private class SearchForTabItemResult
 		{
 			public TabItem TabItem;
-			public TabItem SkippedDueToBeingSingle;
+			public (TabItem TabItem, object TypeDefaultValue, string ControlPropertyName, string ViewModelPropertyName)? SkippedDueToBeingSingle;
 		}
 
 		/// <summary>
@@ -386,31 +387,37 @@ namespace GM.WPF.Controls
 
 			object typeDefaultValue = propertyType.GetDefault();
 
-			object actualValue = typeDefaultValue;
 			void propertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
 			{
 				var baseControl = (BaseControl)d;
-				var vm = baseControl.ViewModel;
 
 				void setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected()
 				{
 					// sets the new value of the property to the property in the view model
-					vm.SetProperty(viewModelPropertyName, e.NewValue);
+					baseControl.ViewModel.SetProperty(viewModelPropertyName, e.NewValue);
 				}
 
 				if(!nullifyWhenParentTabItemIsNotSelected) {
 					setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected();
 				} else {
-					void SetValueBasedOnTabItemIsSelected(TabItem tab)
+					void SetValueBasedOnTabItemIsSelected2(BaseControl control, TabItem tab, object typeDefault, string controlPropertyName, string vmPropertyName)
 					{
-						object currentValue = vm.GetPropertyValue(viewModelPropertyName);
+						object newValue = control.GetPropertyValue(controlPropertyName);
+						SetValueBasedOnTabItemIsSelected(control, tab, typeDefault, controlPropertyName, vmPropertyName, newValue);
+					}
+
+					void SetValueBasedOnTabItemIsSelected(BaseControl control, TabItem tab, object typeDefault, string controlPropertyName, string vmPropertyName, object newValue)
+					{
+						var viewModel = control.ViewModel;
+						object currentValue = viewModel.GetPropertyValue(vmPropertyName);
+
 						if(tab.IsSelected) {
-							if(currentValue != actualValue) {
-								vm.SetProperty(viewModelPropertyName, actualValue);
+							if(currentValue != newValue) {
+								viewModel.SetProperty(vmPropertyName, newValue);
 							}
 						} else {
-							if(currentValue != typeDefaultValue) {
-								vm.SetProperty(viewModelPropertyName, typeDefaultValue);
+							if(currentValue != typeDefault) {
+								viewModel.SetProperty(vmPropertyName, typeDefault);
 							}
 						}
 					}
@@ -449,7 +456,7 @@ namespace GM.WPF.Controls
 											// the search will be done the next time again, and hopefully, there will be more items then (but do it only once)
 											// this scenario can happen when you have a TabControl in a DataTemplate and controls are added one-by-one and this method gets called for the 1st TabItem when it is indeed the only TabItem in the TabControl :)
 
-											tabItemSearchResult.SkippedDueToBeingSingle = tabItem;
+											tabItemSearchResult.SkippedDueToBeingSingle = (tabItem, typeDefaultValue, name, viewModelPropertyName);
 											// this should always successfully add since we check/set the flag above
 											_ = tabControlsWithSingleItems.TryAdd(tabControl, baseControl);
 
@@ -459,7 +466,7 @@ namespace GM.WPF.Controls
 										// apparently this tab control is going to stay only with 1 TabItem
 										_ = tabControlsWithSingleItems.TryRemove(tabControl, out BaseControl baseControl1);
 										if(baseControl != baseControl1) {
-											throw new Exception("This should never happen.");
+											//throw new Exception("This should never happen.");
 										}
 									} else {
 										// we found a TabControl with more than 1 item
@@ -476,32 +483,35 @@ namespace GM.WPF.Controls
 								if(selectionChangedArgs.Source != tabControl) {
 									return;
 								}
-								SetValueBasedOnTabItemIsSelected(tabItem);
+								SetValueBasedOnTabItemIsSelected2(baseControl, tabItem, typeDefaultValue, name, viewModelPropertyName);
 
 								// check if this tab control was skipped
 								if(tabControlsWithSingleItems.TryRemove(tabControl, out BaseControl skippedBaseControl)) {
 									// this base control was skipped
 									// get and set the TabItem of this base control
 									TabItem tabItem2;
+									object typeDefaultValue2;
+									string name2;
+									string viewModelPropertyName2;
 									{
 										SearchForTabItemResult skippedTabItemResult = controlToTabItem[skippedBaseControl];
-										skippedTabItemResult.TabItem = skippedTabItemResult.SkippedDueToBeingSingle;
-										tabItem2 = skippedTabItemResult.TabItem;
+										(tabItem2, typeDefaultValue2, name2, viewModelPropertyName2) = skippedTabItemResult.SkippedDueToBeingSingle.Value;
+										skippedTabItemResult.TabItem = tabItem2;
 									}
 									tabControl.SelectionChanged += (sender2, selectionChangedArgs2) =>
 									{
 										if(selectionChangedArgs2.Source != tabControl) {
 											return;
 										}
-										SetValueBasedOnTabItemIsSelected(tabItem2);
+										
+										SetValueBasedOnTabItemIsSelected2(skippedBaseControl, tabItem2, typeDefaultValue2, name2, viewModelPropertyName2);
 									};
 								}
 							};
 						}
 					}
 
-					actualValue = e.NewValue;
-					SetValueBasedOnTabItemIsSelected(tabItem);
+					SetValueBasedOnTabItemIsSelected(baseControl, tabItem, typeDefaultValue, name, viewModelPropertyName, e.NewValue);
 				}
 			}
 
