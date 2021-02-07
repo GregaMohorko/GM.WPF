@@ -106,7 +106,7 @@ namespace GM.WPF.Behaviors
 		private static void DisableTextSelection(TextBlock textBlock)
 		{
 			if(registeredEditors == null) {
-				// nothings was registered yet
+				// nothing was registered yet
 				return;
 			}
 			TextEditorWrapper editor = registeredEditors[textBlock];

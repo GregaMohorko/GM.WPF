@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2020 Gregor Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,6 +52,19 @@ namespace GM.WPF.Utility
 			bool predicate(Visual v) => (v is UIElement uie) && uie.Focusable;
 			var firstFocusable = element.GetVisualChildCollection(predicate, VisualUtility.TreeTraverseStrategy.DepthFirst).FirstOrDefault() as UIElement;
 			return firstFocusable?.Focus() ?? false;
+		}
+
+		/// <summary>
+		/// Returns the <see cref="FrameworkElement.Parent"/> property of this element. If it is null, it returns <see cref="FrameworkElement.TemplatedParent"/>.
+		/// <para>In cases where you don't know exactly the elements tree, this method should be preferred over simply using the <see cref="FrameworkElement.Parent"/>, because if this element is in a <see cref="FrameworkTemplate"/>, the <see cref="FrameworkElement.Parent"/> returns null, whereas the <see cref="FrameworkElement.TemplatedParent"/> returns the data template and you can then continue to move upward the elements tree.</para>
+		/// </summary>
+		/// <param name="element">The element whose parent to return.</param>
+		public static DependencyObject GetParent(this FrameworkElement element)
+		{
+			if(element.Parent != null) {
+				return element.Parent;
+			}
+			return element.TemplatedParent;
 		}
 
 		/// <summary>
@@ -134,12 +147,12 @@ namespace GM.WPF.Utility
 		public static TControl TryGetParent<TControl>(this FrameworkElement element) where TControl : FrameworkElement
 		{
 			Type tControlType = typeof(TControl);
-			var current = element.Parent as FrameworkElement;
+			var current = element.GetParent() as FrameworkElement;
 			while(current != null) {
 				if(tControlType.IsAssignableFrom(current.GetType())) {
 					return (TControl)current;
 				}
-				current = current.Parent as FrameworkElement;
+				current = current.GetParent() as FrameworkElement;
 			}
 			return null;
 		}

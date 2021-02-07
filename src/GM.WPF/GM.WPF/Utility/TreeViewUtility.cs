@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2018-4-17
-Author: GregaMohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -47,10 +47,10 @@ namespace GM.WPF.Utility
 		public static void Select(this TreeViewItem treeViewItem)
 		{
 			// expand all parents
-			TreeViewItem parent = treeViewItem.Parent as TreeViewItem;
+			TreeViewItem parent = treeViewItem.GetParent() as TreeViewItem;
 			while(parent != null) {
 				parent.IsExpanded = true;
-				parent = parent.Parent as TreeViewItem;
+				parent = parent.GetParent() as TreeViewItem;
 			}
 			// select the item
 			treeViewItem.IsSelected = true;
