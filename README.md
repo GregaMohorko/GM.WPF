@@ -49,6 +49,7 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 **Behaviors**:
  - [DataGrid](src/GM.WPF/GM.WPF/Behaviors/DataGridBehavior.cs)
  - [Panel](src/GM.WPF/GM.WPF/Behaviors/PanelBehavior.cs)
+ - [TabItem](src/GM.WPF/GM.WPF/Behaviors/TabItemBehavior.cs)
  - [TextBlock](src/GM.WPF/GM.WPF/Behaviors/TextBlockBehavior.cs)
 
 **Converters**:
@@ -83,6 +84,6 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 ## Author and License
 Gregor Mohorko ([www.mohorko.info](https://www.mohorko.info))
 
-Copyright (c) 2020 Gregor Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 [MIT License](./LICENSE.md)
