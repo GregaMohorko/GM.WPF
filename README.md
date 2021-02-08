@@ -48,6 +48,7 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
 
 **Behaviors**:
  - [DataGrid](src/GM.WPF/GM.WPF/Behaviors/DataGridBehavior.cs)
+ - [FrameworkElement](src/GM.WPF/GM.WPF/Behaviors/FrameworkElementBehavior.cs)
  - [Panel](src/GM.WPF/GM.WPF/Behaviors/PanelBehavior.cs)
  - [TabItem](src/GM.WPF/GM.WPF/Behaviors/TabItemBehavior.cs)
  - [TextBlock](src/GM.WPF/GM.WPF/Behaviors/TextBlockBehavior.cs)

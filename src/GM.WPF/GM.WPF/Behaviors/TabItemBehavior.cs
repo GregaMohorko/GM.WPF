@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Project: GM.WPF
-Created: 2020-02-19
+Created: 2021-02-07
 Author: Gregor Mohorko
 */
 
@@ -84,170 +84,10 @@ namespace GM.WPF.Behaviors
 			}
 
 			if((bool)e.NewValue) {
-				RegisterNullificationOfDataContext(tabControl, tabItem);
-				NullifyDataContext(tabItem);
+				FrameworkElementBehavior.RegisterNullificationAndNullifyDataContext(tabControl, tabItem, tabItem);
 			} else {
-				UnregisterNullificationOfDataContext(tabControl, tabItem);
-				TrySetDataContextBack(tabItem);
+				FrameworkElementBehavior.UnregisterNullificationAndRestoreDataContext(tabControl, tabItem, tabItem);
 			}
-		}
-
-		// no need to have concurrent dictionaries since everything is run on the main UI thread
-		private static Dictionary<TabControl, List<TabItem>> registeredTabControlsAndItems;
-		private static Dictionary<TabItem, (BindingBase Binding, object Value)> nullifiedDataContexts;
-
-		private static void RegisterNullificationOfDataContext(TabControl tabControl, TabItem tabItem)
-		{
-			if(registeredTabControlsAndItems == null) {
-				// init
-				registeredTabControlsAndItems = new Dictionary<TabControl, List<TabItem>>();
-				nullifiedDataContexts = new Dictionary<TabItem, (BindingBase Binding, object Value)>();
-			}
-
-			List<TabItem> registeredItemsOfThisTabControl;
-			{
-				// check if this TabItem is already registered
-				TabControl alreadyRegisteredTabControl = registeredTabControlsAndItems
-					.SingleOrDefault(kvp => kvp.Value.Contains(tabItem))
-					.Key;
-				if(alreadyRegisteredTabControl != null) {
-					// already registered
-					if(alreadyRegisteredTabControl == tabControl) {
-						// already registered to the same TabControl
-						// nothing to do here
-						return;
-					} else {
-						// already registered to a different TabControl
-						// maybe this TabItem was moved to another TabControl?
-						// remove the old TabControl
-						UnregisterNullificationOfDataContext(alreadyRegisteredTabControl, tabItem);
-					}
-				}
-
-				if(!registeredTabControlsAndItems.TryGetValue(tabControl, out registeredItemsOfThisTabControl)) {
-					// register this TabControl
-					registeredItemsOfThisTabControl = new List<TabItem>();
-					registeredTabControlsAndItems.Add(tabControl, registeredItemsOfThisTabControl);
-
-					tabControl.SelectionChanged += RegisteredTabControl_SelectionChanged;
-				}
-			}
-
-			// register this TabItem
-			registeredItemsOfThisTabControl.Add(tabItem);
-		}
-
-		private static void UnregisterNullificationOfDataContext(TabControl tabControl, TabItem tabItem)
-		{
-			if(registeredTabControlsAndItems == null) {
-				// nothing was registered yet
-				return;
-			}
-
-			if(!registeredTabControlsAndItems.TryGetValue(tabControl, out List<TabItem> registeredItemsOfThisTabControl)) {
-				// nothing to do here
-				return;
-			}
-
-			// unregister this TabItem
-			_ = registeredItemsOfThisTabControl.Remove(tabItem);
-
-			if(registeredItemsOfThisTabControl.Count == 0) {
-				// unregister this TabControl
-				tabControl.SelectionChanged -= RegisteredTabControl_SelectionChanged;
-				_ = registeredTabControlsAndItems.Remove(tabControl);
-			}
-		}
-
-		private static void RegisteredTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			if(!(e.Source is TabControl tabControl)) {
-				return;
-			}
-
-			List<TabItem> registeredTabItemsOfThisTabControl = registeredTabControlsAndItems[tabControl];
-
-			// add datacontext to newly selected tab items
-			foreach(TabItem selectedTabItem in e.AddedItems.OfType<TabItem>()) {
-				TrySetDataContextBack(selectedTabItem);
-			}
-
-			// remove datacontext from newly deselected tab items
-			foreach(TabItem unselectedTabItem in e.RemovedItems.OfType<TabItem>()) {
-				if(registeredTabItemsOfThisTabControl.Contains(unselectedTabItem)) {
-					NullifyDataContext(unselectedTabItem);
-				}
-			}
-		}
-
-		private static void TrySetDataContextBack(TabItem tabItem)
-		{
-			if(nullifiedDataContexts.TryGetValue(tabItem, out (BindingBase Binding, object Value) nullification)) {
-				// set DataContext back
-
-				// check that it wasn't set to anything else while being nullified by this behavior
-				// if it was, don't overwrite it
-				if(tabItem.DataContext == null) {
-					// it wasn't set to anything else
-
-					if(nullification.Binding != null) {
-						// set the binding back
-						_ = tabItem.SetBinding(FrameworkElement.DataContextProperty, nullification.Binding);
-					} else {
-						// apparently there was no binding
-						// set the datacontext value back
-						tabItem.DataContext = nullification.Value;
-					}
-				}
-
-				_ = nullifiedDataContexts.Remove(tabItem);
-			}
-		}
-
-		private static void NullifyDataContext(TabItem tabItem)
-		{
-			BindingBase binding;
-			object value = default;
-
-			// try to find the binding first
-			{
-				FrameworkElement dataContextSource = tabItem;
-				bool wasPreviousSourceContentPresenter = false;
-				while(true) {
-					binding = BindingOperations.GetBindingBase(dataContextSource, FrameworkElement.DataContextProperty);
-					if(binding != null) {
-						// binding found
-						break;
-					}
-					if(wasPreviousSourceContentPresenter && dataContextSource is ContentControl) {
-						binding = BindingOperations.GetBindingBase(dataContextSource, ContentControl.ContentProperty);
-						if(binding != null) {
-							// binding found
-							break;
-						}
-					}
-					wasPreviousSourceContentPresenter = dataContextSource is ContentPresenter;
-					dataContextSource = dataContextSource.GetParent() as FrameworkElement;
-					if(dataContextSource == null) {
-						// there is no binding on DataContext
-						break;
-					}
-				}
-				if(binding != null && dataContextSource != tabItem) {
-					// we will be setting the binding to the TabItem, so just create a dummy binding that will use the same value as the parent
-					binding = new Binding
-					{
-						Mode = BindingMode.OneWay
-					};
-				}
-			}
-			if(binding == null) {
-				// use the value
-				value = tabItem.DataContext;
-			}
-
-			nullifiedDataContexts.Add(tabItem, (binding, value));
-			tabItem.DataContext = null;
 		}
 		#endregion NullifyDataContextWhenInactive
 	}

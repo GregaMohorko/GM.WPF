@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="AsyncRequestLoader.cs" />
     <Compile Include="Behaviors\DataGridBehavior.cs" />
+    <Compile Include="Behaviors\FrameworkElementBehavior.cs" />
     <Compile Include="Behaviors\PanelBehavior.cs" />
     <Compile Include="Behaviors\TabItemBehavior.cs" />
     <Compile Include="Behaviors\TextBlockBehavior.cs" />
