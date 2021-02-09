@@ -14,13 +14,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>WPF MVVM controls utility extensions dialogs converters behaviors windows</tags>
-	<releaseNotes>Added DateDialog.
-Added AsyncRequestLoader.IsLoadingChanged, ChooseDialog.ShowNoCancel, FrameworkElementUtility.TryGetParent.
-Added possibility to write multiline text into InputDialog using the Return button for newline.
-Moved Undo/Redo implementation to GM.Utility package.
-GMDataGrid now capturing sort into undo/redo stack.
-Improved binding utility and equal checking inside GMDataGrid.
-Fixed a bug in DependencyVMProperty: NullifyWhenParentTabItemIsNotSelected didn't work when same control was used more than once.</releaseNotes>
+	<releaseNotes>Added TabItemBehavior, FrameworkElementBehavior.
+Added FrameworkElementUtility.GetParent.
+Marked BaseControl.DependencyVMProperty.nullifyWhenParentTabItemIsNotSelected as obsolete with a warning.</releaseNotes>
 	<dependencies>
 		<dependency id="GM.Utility" version="1.3.1" />
 		<dependency id="CommonServiceLocator" version="2.0.5" />

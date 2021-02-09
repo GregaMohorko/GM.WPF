@@ -97,7 +97,7 @@ namespace GM.WPF
 		/// <para>Must be called from the UI thread.</para>
 		/// <para>If a previous request is still loading, a cancellation request will be communicated via the <see cref="CancellationToken"/>.</para>
 		/// </summary>
-		/// <param name="newRequest">The asynchronous request that will possibly be invoked on the UI thread.</param>
+		/// <param name="newRequest">The asynchronous request that will possibly be invoked on the UI thread. Should contain asynchronous calls to non-blocking subroutines.</param>
 		public async Task InvokeWhenIfLast(Func<CancellationToken, Task> newRequest)
 		{
 			if(newRequest == null) {
