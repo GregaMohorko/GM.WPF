@@ -152,7 +152,9 @@ namespace GM.WPF.Behaviors
 			registeredElementsOfThisTabItem.Add(frameworkElement);
 
 			// nullify
-			NullifyDataContext(frameworkElement);
+			if(!tabItem.IsSelected) {
+				NullifyDataContext(frameworkElement, tabItem);
+			}
 		}
 
 		internal static void UnregisterNullificationAndRestoreDataContext(TabControl tabControl, TabItem tabItem, FrameworkElement frameworkElement)
@@ -222,7 +224,7 @@ namespace GM.WPF.Behaviors
 			}
 		}
 
-		private static void NullifyDataContext(FrameworkElement frameworkElement)
+		private static void NullifyDataContext(FrameworkElement frameworkElement, TabItem tabItem = null)
 		{
 			BindingBase binding;
 			object value = default;
@@ -247,12 +249,26 @@ namespace GM.WPF.Behaviors
 							break;
 						}
 					}
-					wasPreviousSourceContentPresenter = dataContextSource is ContentPresenter;
-					dataContextSource = dataContextSource.GetParent() as FrameworkElement;
-					if(dataContextSource == null) {
-						// there is no binding on DataContext
+					FrameworkElement parent = dataContextSource.GetParent() as FrameworkElement;
+					if(parent == null) {
+						// there currently is no binding on DataContext
+						if(!dataContextSource.IsLoaded && tabItem != null) {
+							// this was probably called from a UserControl, from constructor, from InitializeComponent()
+							// try again when it is initialized
+							void InitializedHandler(object sender, RoutedEventArgs e)
+							{
+								dataContextSource.Loaded -= InitializedHandler;
+								if(!tabItem.IsSelected) {
+									NullifyDataContext(frameworkElement);
+								}
+							}
+							dataContextSource.Loaded += InitializedHandler;
+							return;
+						}
 						break;
 					}
+					wasPreviousSourceContentPresenter = dataContextSource is ContentPresenter;
+					dataContextSource = parent;
 				}
 				if(binding != null && dataContextSource != frameworkElement) {
 					// we will be setting the binding to the original element, so just create a dummy binding that will use the same value as the parent
