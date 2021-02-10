@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2019 Grega Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-12-4
-Author: Grega Mohorko
+Author: Gregor Mohorko
 -->
 <local:BaseControl x:Class="GM.WPF.Controls.ProgressOverlay"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -33,7 +33,7 @@ Author: Grega Mohorko
 		xmlns:local="clr-namespace:GM.WPF.Controls"
 		xmlns:converters="clr-namespace:GM.WPF.Converters"
 		mc:Ignorable="d"
-		d:DesignHeight="300"
+		d:DesignHeight="200"
 		d:DesignWidth="300"
 		Foreground="White"
 		d:DataContext="{d:DesignInstance Type=local:ProgressOverlayViewModel,IsDesignTimeCreatable=True}"
@@ -45,8 +45,8 @@ Author: Grega Mohorko
 			<ColumnDefinition MinWidth="5" />
 		</Grid.ColumnDefinitions>
 		<StackPanel Grid.Column="1" VerticalAlignment="Center">
-			<TextBlock Name="_Text" Text="{Binding Message,Mode=OneWay}" Visibility="{Binding Message,Mode=OneWay,Converter={converters:StringToVisibilityConverter},ConverterParameter=EmptyCollapse}" HorizontalAlignment="Center" Padding="5" TextWrapping="Wrap" />
-			<ProgressBar Value="{Binding ProgressValueNotNullable,Mode=OneWay}" IsIndeterminate="{Binding IsIndeterminate,Mode=OneWay}" Height="15" Opacity="0.8" />
+			<TextBlock Text="{Binding Message, Mode=OneWay}" Visibility="{Binding Message, Mode=OneWay, Converter={converters:StringToVisibilityConverter}, ConverterParameter=EmptyCollapse}" HorizontalAlignment="Center" Padding="5" TextWrapping="Wrap" />
+			<ProgressBar Value="{Binding ProgressValueNotNullable, Mode=OneWay}" IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}" Height="15" Opacity="0.8" />
 		</StackPanel>
 	</Grid>
 </local:BaseControl>

@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2017 Grega Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2017-12-7
-Author: GregaMohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -40,7 +40,7 @@ namespace GM.WPF.Controls
 		public string Message { get; set; }
 		public double? ProgressValue { get; set; }
 
-		public bool IsVisible => !string.IsNullOrEmpty(Message) || ProgressValue != null;
+		public bool IsVisible => Message != null || ProgressValue != null;
 		public bool IsIndeterminate => ProgressValue == null;
 
 		public double ProgressValueNotNullable => ProgressValue != null ? ProgressValue.Value : 0;
@@ -49,6 +49,8 @@ namespace GM.WPF.Controls
 		{
 			if(IsInDesignMode) {
 				Message = "This is an example of progress message ...";
+				//Message = "";
+				return;
 			}
 		}
 	}
