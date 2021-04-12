@@ -147,8 +147,10 @@
     <Compile Include="Converters\BoolToBoolConverter.cs" />
     <Compile Include="Converters\BoolToScrollBarVisibilityConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\EnumToCollectionConverter.cs" />
     <Compile Include="Converters\FunctionToStringConverter.cs" />
     <Compile Include="Converters\ICollectionToBoolConverter.cs" />
+    <Compile Include="Converters\ICollectionToCountConverter.cs" />
     <Compile Include="Converters\ICollectionToVisibilityConverter.cs" />
     <Compile Include="Converters\IListToIListConverter.cs" />
     <Compile Include="Converters\IntToVisibilityConverter.cs" />
