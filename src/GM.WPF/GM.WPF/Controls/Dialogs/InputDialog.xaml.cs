@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2020 Gregor Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using GM.WPF.Converters;
 
 namespace GM.WPF.Controls.Dialogs
 {
@@ -55,17 +54,6 @@ namespace GM.WPF.Controls.Dialogs
 		public InputDialog()
 		{
 			InitializeComponent();
-
-			_TextBox.TextChanged += TextBox_TextChanged;
-		}
-
-		private const string TEXTBOX_TEXTCHANGED_CONVERTERPARAMETER = StringToVisibilityConverter.PARAM_EMPTY + "_" + StringToVisibilityConverter.PARAM_INVERT;
-
-		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			// this should be done in XAML using Binding, but it doesn't seem to work ...
-			string options = TEXTBOX_TEXTCHANGED_CONVERTERPARAMETER;
-			_Label_Watermark.Visibility = (Visibility)StringToVisibilityConverter.Convert(_TextBox.Text, ref options);
 		}
 
 		/// <summary>
