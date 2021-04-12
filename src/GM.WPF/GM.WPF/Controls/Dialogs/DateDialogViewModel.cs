@@ -38,17 +38,7 @@ namespace GM.WPF.Controls.Dialogs
 	class DateDialogViewModel : ViewModel
 	{
 		public string Message { get; set; }
-		public bool CanSubmit { get; private set; }
-		private DateTime? _date;
-		public DateTime? Date
-		{
-			get => _date;
-			set
-			{
-				_date = value;
-				CanSubmit = _date != null;
-			}
-		}
+		public DateTime? Date { get; set; }
 
 		public DateDialogViewModel()
 		{
