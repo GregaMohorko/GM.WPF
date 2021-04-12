@@ -317,13 +317,13 @@ namespace GM.WPF.Controls
 		/// <typeparam name="TViewModel">The type of the view model.</typeparam>
 		/// <param name="name">The name of the dependency property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty<TOwner, TViewModel>(string name, bool nullifyWhenParentTabItemIsNotSelected)
 		{
-			// TODO obsolete v1.4.1.1, 2021-02-08
+			// TODO obsolete 2021-04-12
+			// warning: 2021-02-08
+			// error: 2021-04-12
 			// repeat all this in all other methods below
-			// in next release, mark it as compile-time error and add in the obsolete message (... and will be removed in the next release)
-			// in next release, remove it
 			return DependencyVMProperty(name, typeof(TOwner), typeof(TViewModel), null, nullifyWhenParentTabItemIsNotSelected);
 		}
 
@@ -335,7 +335,7 @@ namespace GM.WPF.Controls
 		/// <param name="name">The name of the dependency property.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty<TOwner, TViewModel>(string name, string viewModelPropertyName, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMProperty(name, typeof(TOwner), typeof(TViewModel), viewModelPropertyName, nullifyWhenParentTabItemIsNotSelected);
@@ -348,7 +348,7 @@ namespace GM.WPF.Controls
 		/// <typeparam name="TViewModel">The type of the view model.</typeparam>
 		/// <param name="name">The name of the dependency property.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
-		[Obsolete("This method is deprecated and will be removed in the next releases. Please use DependencyVMProperty(string, object, string) instead.", false)]
+		[Obsolete("This method is deprecated and will be removed in the next releases. Please use DependencyVMProperty(string, object, string) instead.", true)]
 		protected static DependencyProperty DependencyVMProperty<TOwner, TViewModel>(string name, string viewModelPropertyName)
 		{
 			return DependencyVMProperty<TOwner, TViewModel>(name, null, viewModelPropertyName);
@@ -361,7 +361,7 @@ namespace GM.WPF.Controls
 		/// <param name="ownerType">The type of the control.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, Type viewModelType, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMProperty(name, ownerType, null, viewModelType, null, nullifyWhenParentTabItemIsNotSelected);
@@ -375,7 +375,7 @@ namespace GM.WPF.Controls
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, Type viewModelType, string viewModelPropertyName, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMProperty(name, ownerType, null, viewModelType, viewModelPropertyName, nullifyWhenParentTabItemIsNotSelected);
@@ -388,7 +388,7 @@ namespace GM.WPF.Controls
 		/// <param name="ownerType">The type of the control.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
-		[Obsolete("This method is deprecated and will be removed in the next releases. Please use DependencyVMProperty(string, Type, Type, object, string) instead.", false)]
+		[Obsolete("This method is deprecated and will be removed in the next releases and will be removed in the next releases. Please use DependencyVMProperty(string, Type, Type, object, string) instead.", true)]
 		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, Type viewModelType, string viewModelPropertyName)
 		{
 			return DependencyVMPropertyPrivate(name, ownerType, viewModelType, null, viewModelPropertyName, false);
@@ -402,7 +402,7 @@ namespace GM.WPF.Controls
 		/// <param name="name">The name of the dependency property.</param>
 		/// <param name="defaultValue">The default value of this property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty<TOwner, TViewModel>(string name, object defaultValue, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMProperty(name, typeof(TOwner), defaultValue, typeof(TViewModel), null, nullifyWhenParentTabItemIsNotSelected);
@@ -417,7 +417,7 @@ namespace GM.WPF.Controls
 		/// <param name="defaultValue">The default value of this property.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty<TOwner, TViewModel>(string name, object defaultValue, string viewModelPropertyName, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMProperty(name, typeof(TOwner), defaultValue, typeof(TViewModel), viewModelPropertyName, nullifyWhenParentTabItemIsNotSelected);
@@ -431,7 +431,7 @@ namespace GM.WPF.Controls
 		/// <param name="defaultValue">The default value of this property.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMProperty(name, ownerType, defaultValue, viewModelType, null, nullifyWhenParentTabItemIsNotSelected);
@@ -446,7 +446,7 @@ namespace GM.WPF.Controls
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
 		/// <param name="nullifyWhenParentTabItemIsNotSelected">Determines whether or not to automatically set this property to the null (or default) value when the first found TabItem parent is not selected.</param>
-		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", false)]
+		[Obsolete("Using nullifyWhenParentTabItemIsNotSelected has been marked obsolete and will be removed in the next releases. It is the responsibility of the one that is using this control to do the nullification when the parent TabItem is unselected. To help achieve the same behavior, GM.WPF.Behaviors.TabItemBehavior.NullifyDataContextWhenInactive can be used.", true)]
 		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName, bool nullifyWhenParentTabItemIsNotSelected)
 		{
 			return DependencyVMPropertyPrivate(name, ownerType, viewModelType, defaultValue, viewModelPropertyName, nullifyWhenParentTabItemIsNotSelected);
@@ -460,7 +460,7 @@ namespace GM.WPF.Controls
 		/// <param name="defaultValue">The default value of this property.</param>
 		/// <param name="viewModelType">The type of the view model.</param>
 		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
-		[Obsolete("This method is deprecated and will be removed in the next releases. Please use DependencyVMProperty(string, Type, Type, object, string) instead.", false)]
+		[Obsolete("This method is deprecated and will be removed in the next releases. Please use DependencyVMProperty(string, Type, Type, object, string) instead.", true)]
 		protected static DependencyProperty DependencyVMProperty(string name, Type ownerType, object defaultValue, Type viewModelType, string viewModelPropertyName)
 		{
 			return DependencyVMProperty(name, ownerType, viewModelType, defaultValue, viewModelPropertyName);
