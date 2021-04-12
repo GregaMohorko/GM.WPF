@@ -249,8 +249,7 @@ namespace GM.WPF.Behaviors
 							break;
 						}
 					}
-					FrameworkElement parent = dataContextSource.GetParent() as FrameworkElement;
-					if(parent == null) {
+					if(!(dataContextSource.GetParent() is FrameworkElement parent)) {
 						// there currently is no binding on DataContext
 						if(!dataContextSource.IsLoaded && tabItem != null) {
 							// this was probably called from a UserControl, from constructor, from InitializeComponent()
