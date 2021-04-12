@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2020 Gregor Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -258,8 +258,21 @@ namespace GM.WPF
 		/// <para>Check <see cref="GetProgress(int, int)"/> for details.</para>
 		/// </summary>
 		/// <param name="loopCounter">The current zero-based loop index.</param>
-		/// <param name="setMessage">Determines whether or not to also update the message to '(loopCounter + 1)/totalIterations'. It will also only be updated when reasonable, which means that the number might be skipping some values.</param>
+		/// <param name="setMessage">Determines whether or not to also update the message to "(loopCounter + 1)/totalIterations". It will also only be updated when reasonable, which means that the number might be skipping some values.</param>
 		public void SetForLoop(int loopCounter, bool setMessage = false)
+		{
+			SetForLoop(loopCounter, setMessage ? string.Empty : null);
+		}
+
+		/// <summary>
+		/// If a reasonable amount of iterations have passed, it updates the progress to the current loop state and sets the specified step message. This must be called after <see cref="StartNewLoop(int)"/> or <see cref="StartNewLoop(double, double, int)"/>.
+		/// </summary>
+		/// <param name="loopCounter">The current zero-based loop index.</param>
+		/// <param name="stepMessage">The message that describes the current step. It will be showed after the steps progress: "(loopCounter + 1)/totalIterations: <paramref name="stepMessage"/>".
+		/// <para>If null, it doesn't show any message.</para>
+		/// <para>If empty, it will only show steps progress "(loopCounter + 1)/totalIterations".</para>
+		/// </param>
+		public void SetForLoop(int loopCounter, string stepMessage)
 		{
 			if(reasonableStep == null) {
 				throw new InvalidOperationException("You must first call StartNewLoop before using this method.");
@@ -271,8 +284,12 @@ namespace GM.WPF
 				lastUpdateAt = loopCounter;
 			}
 			SetProgress(start.Value, end.Value, loopCounter, totalIterations);
-			if(setMessage) {
-				SetMessage($"{loopCounter + 1}/{totalIterations} ...");
+			if(stepMessage != null) {
+				string message = $"{loopCounter + 1}/{totalIterations}";
+				if(stepMessage.Length > 0) {
+					message += $": {stepMessage}";
+				}
+				SetMessage(message);
 			}
 		}
 

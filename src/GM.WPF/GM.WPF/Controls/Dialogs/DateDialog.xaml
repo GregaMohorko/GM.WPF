@@ -43,8 +43,8 @@ Author: Gregor Mohorko
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<TextBlock Text="{Binding Message, Mode=OneWay}" FontSize="18" Margin="0 0 0 10" Padding="5" TextWrapping="Wrap" />
-		<DatePicker Grid.Row="1" SelectedDate="{Binding Date,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" FontSize="18" />
+		<DatePicker Name="_DatePicker" Grid.Row="1" SelectedDate="{Binding Date,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" FontSize="18" />
 		<Button Content="Cancel" Grid.Row="2" Width="100" Height="32" HorizontalAlignment="Left" Click="Button_Cancel_Click" />
-		<Button Content="OK" IsEnabled="{Binding CanSubmit,Mode=OneWay}" Grid.Row="2" Width="150" Height="32" HorizontalAlignment="Right" IsDefault="True" Click="Button_OK_Click" />
+		<Button Content="OK" Grid.Row="2" Width="150" Height="32" HorizontalAlignment="Right" IsDefault="True" Click="Button_OK_Click" />
 	</Grid>
 </local:TaskDialog>

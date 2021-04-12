@@ -24,6 +24,7 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
  - [StartPage](src/GM.WPF/GM.WPF/Controls/StartPage.xaml.cs)
  - [TimeControl](src/GM.WPF/GM.WPF/Controls/TimeControl.xaml.cs)
  - [TimePicker](src/GM.WPF/GM.WPF/Controls/TimePicker.xaml.cs)
+ - [WatermarkTextBox](src/GM.WPF/GM.WPF/Controls/WatermarkTextBox.xaml.cs)
 
 **Dialogs**:
  - [DialogPanel](src/GM.WPF/GM.WPF/Controls/Dialogs/DialogPanel.xaml.cs)
@@ -51,14 +52,17 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
  - [FrameworkElement](src/GM.WPF/GM.WPF/Behaviors/FrameworkElementBehavior.cs)
  - [Panel](src/GM.WPF/GM.WPF/Behaviors/PanelBehavior.cs)
  - [TabItem](src/GM.WPF/GM.WPF/Behaviors/TabItemBehavior.cs)
+ - [TabControl](src/GM.WPF/GM.WPF/Behaviors/TabControlBehavior.cs)
  - [TextBlock](src/GM.WPF/GM.WPF/Behaviors/TextBlockBehavior.cs)
 
 **Converters**:
  - [BoolToBool](src/GM.WPF/GM.WPF/Converters/BoolToBoolConverter.cs)
  - [BoolToScrollBarVisibility](src/GM.WPF/GM.WPF/Converters/BoolToScrollBarVisibilityConverter.cs)
  - [BoolToVisibility](src/GM.WPF/GM.WPF/Converters/BoolToVisibilityConverter.cs)
+ - [EnumToCollectionConverter](src/GM.WPF/GM.WPF/Converters/EnumToCollectionConverter.cs)
  - [FunctionToString](src/GM.WPF/GM.WPF/Converters/FunctionToStringConverter.cs)
  - [ICollectionToBool](src/GM.WPF/GM.WPF/Converters/ICollectionToBoolConverter.cs)
+ - [ICollectionToCountConverter](src/GM.WPF/GM.WPF/Converters/ICollectionToCountConverter.cs)
  - [ICollectionToVisibility](src/GM.WPF/GM.WPF/Converters/ICollectionToVisibilityConverter.cs)
  - [IListToIList](src/GM.WPF/GM.WPF/Converters/IListToIListConverter.cs)
  - [IntToVisibility](src/GM.WPF/GM.WPF/Converters/IntToVisibilityConverter.cs)

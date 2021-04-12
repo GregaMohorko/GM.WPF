@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2021 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 Project: GM.WPF
 Created: 2018-11-27
-Author: Grega Mohorko
+Author: Gregor Mohorko
 */
 
 using System;
@@ -59,13 +59,13 @@ namespace GM.WPF.Converters
 		public const string PARAM_ATLEAST = "atleast";
 
 		/// <summary>
-		/// Converts the provided value with the specified parameter to <see cref="ICollection"/>.
+		/// Converts the provided value with the specified parameter to <see cref="bool"/>.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <param name="options">The parameter, usually a string. For supported options, check the class constants starting with PARAM_.</param>
 		public static bool? Convert(object value, ref string options)
 		{
-			if(!(value is IList collection)) {
+			if(!(value is ICollection collection)) {
 				return null;
 			}
 
@@ -104,12 +104,8 @@ namespace GM.WPF.Converters
 		}
 
 		/// <summary>
-		/// Converts a value.
+		/// <inheritdoc />
 		/// </summary>
-		/// <param name="value">The value produced by the binding source.</param>
-		/// <param name="targetType">The type of the binding target property.</param>
-		/// <param name="parameter">The converter parameter to use.</param>
-		/// <param name="culture">The culture to use in the converter.</param>
 		public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			string options = parameter as string;
@@ -117,12 +113,8 @@ namespace GM.WPF.Converters
 		}
 
 		/// <summary>
-		/// Converts a value.
+		/// <inheritdoc />
 		/// </summary>
-		/// <param name="value">The value that is produced by the binding target.</param>
-		/// <param name="targetType">The type to convert to.</param>
-		/// <param name="parameter">The converter parameter to use.</param>
-		/// <param name="culture">The culture to use in the converter.</param>
 		public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			// converting back is disabled because the information about the collection is lost

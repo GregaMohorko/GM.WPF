@@ -29,12 +29,14 @@ Author: Gregor Mohorko
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using GM.Utility;
 
 namespace GM.WPF.Utility
 {
@@ -64,7 +66,43 @@ namespace GM.WPF.Utility
 			if(element.Parent != null) {
 				return element.Parent;
 			}
-			return element.TemplatedParent;
+			if(element.TemplatedParent != null) {
+				return element.TemplatedParent;
+			}
+			return ((Visual)element).GetPropertyValue("VisualParent", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetProperty) as DependencyObject;
+		}
+
+		/// <summary>
+		/// Gets the key by which to identify this control within the visual tree.
+		/// <para>Uses the control tree path to determine the key.</para>
+		/// <para>Useful when you want to save settings for a control within the visual tree that is instantiated dynamically using templates.</para>
+		/// </summary>
+		public static string GetUniqueControlKeyByVisualTree(this FrameworkElement element)
+		{
+			var keyBuilder = new StringBuilder();
+
+			FrameworkElement current = element;
+			while(true) {
+				if(!(GetParent(current) is FrameworkElement parent)) {
+					break;
+				}
+				int? index = null;
+				if(parent is Panel parentPanel) {
+					index = parentPanel.Children.IndexOf(current);
+				} else if(parent is ItemsControl parentItemsControl) {
+					index = parentItemsControl.Items.IndexOf(current);
+				}
+				if(index != null) {
+					_ = keyBuilder.Insert(0, $"[{index}]");
+				}
+				_ = keyBuilder.Insert(0, $".{parent.GetType().Name}");
+
+				current = parent;
+			}
+			if(keyBuilder.Length > 1) {
+				keyBuilder.Remove(0, 1);
+			}
+			return keyBuilder.ToString();
 		}
 
 		/// <summary>

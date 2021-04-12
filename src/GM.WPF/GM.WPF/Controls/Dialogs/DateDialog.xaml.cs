@@ -82,6 +82,12 @@ namespace GM.WPF.Controls.Dialogs
 
 		private void Button_OK_Click(object sender, RoutedEventArgs e)
 		{
+			var vm = (DateDialogViewModel)ViewModel;
+			if(vm.Date == null) {
+				_ = _DatePicker.Focus();
+				return;
+			}
+
 			EndDialog();
 		}
 
