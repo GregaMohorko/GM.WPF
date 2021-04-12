@@ -143,6 +143,9 @@
       <DependentUpon>TimePicker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\TimePickerViewModel.cs" />
+    <Compile Include="Controls\WatermarkTextBox.xaml.cs">
+      <DependentUpon>WatermarkTextBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BaseConverter.cs" />
     <Compile Include="Converters\BoolToBoolConverter.cs" />
     <Compile Include="Converters\BoolToScrollBarVisibilityConverter.cs" />
@@ -247,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\TimePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\WatermarkTextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
