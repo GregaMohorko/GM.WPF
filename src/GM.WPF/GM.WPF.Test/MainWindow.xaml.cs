@@ -32,6 +32,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,7 +56,6 @@ namespace GM.WPF.Test
 			InitializeComponent();
 
 			var vm = new MainWindowViewModel();
-			vm.PropertyChanged += Vm_PropertyChanged;
 			ViewModel = vm;
 		}
 
@@ -66,25 +66,27 @@ namespace GM.WPF.Test
 			IsDisposed = true;
 		}
 
-		private void Vm_PropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			var vm = (MainWindowViewModel)ViewModel;
-
-			switch(e.PropertyName) {
-				case nameof(MainWindowViewModel.IsDialogProgressShown):
-					if(vm.IsDialogProgressShown) {
-						var r = new Random();
-						_ProgressDialog.Show("Title content.", "Message content.", r.NextDouble() * 130);
-					} else {
-						_ProgressDialog.Hide();
-					}
-					break;
-			}
-		}
-
 		#region MAINMENU
 
 		#region DIALOGS
+		private async void MenuItem_Dialogs_Progress_Click(object sender, RoutedEventArgs e)
+		{
+			const int msTime = 3000;
+			_ProgressDialog.Show($"Showing for {msTime} milliseconds", null, 0);
+			ProgressUpdater progressUpdater = _ProgressDialog.Updater;
+			await Task.Run(async delegate
+			{
+				int progressSteps = 100;
+				int msStep = (int)Math.Round(msTime / (double)progressSteps);
+				progressUpdater.StartNewLoop(progressSteps);
+				for(int i = 0; i < progressSteps; ++i) {
+					progressUpdater.SetForLoop(i, true);
+					await Task.Delay(msStep);
+				}
+			});
+			_ProgressDialog.Hide();
+		}
+
 		private async void MenuItem_Dialogs_Message_Normal_Click(object sender, RoutedEventArgs e)
 		{
 			// using the DialogPanel
@@ -211,16 +213,19 @@ namespace GM.WPF.Test
 
 		private Random rand = new Random();
 
-		private async Task<List<string>> SearchDialogLoadingFunction(string searchText)
+		private async Task<List<string>> SearchDialogLoadingFunction(string searchText, CancellationToken ct, ProgressUpdater progressUpdater)
 		{
 			// simulate one second of loading
-			await Task.Delay(1000);
+			await Task.Delay(1000, ct);
 
 			// generate some random items
 			int count = rand.Next(2, 30);
 			var items = new List<string>(count);
+			progressUpdater?.StartNewLoop(count);
 			for(int i = count - 1; i >= 0; --i) {
+				progressUpdater?.SetForLoop(i);
 				items.Add($"{rand.Next(100)}-{searchText}");
+				ct.ThrowIfCancellationRequested();
 			}
 			return items;
 		}

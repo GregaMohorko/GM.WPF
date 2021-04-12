@@ -37,6 +37,6 @@ namespace GM.WPF.Test
 {
 	class MainWindowViewModel : ViewModel
 	{
-		public bool IsDialogProgressShown { get; set; }
+
 	}
 }

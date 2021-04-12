@@ -45,7 +45,7 @@ Author: Grega Mohorko
 		<DockPanel>
 			<Menu DockPanel.Dock="Top">
 				<MenuItem Header="_Dialogs">
-					<MenuItem Header="_Progress" IsCheckable="True" IsChecked="{Binding IsDialogProgressShown,Mode=OneWayToSource}" />
+					<MenuItem Header="_Progress" Click="MenuItem_Dialogs_Progress_Click" />
 					<MenuItem Header="_Message">
 						<MenuItem Header="_Normal" Click="MenuItem_Dialogs_Message_Normal_Click" />
 						<MenuItem Header="_Warning" Click="MenuItem_Dialogs_Message_Warning_Click" />
