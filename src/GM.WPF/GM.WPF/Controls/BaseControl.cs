@@ -55,6 +55,19 @@ namespace GM.WPF.Controls
 		/// </summary>
 		protected bool IsInDesignMode => DesignerProperties.GetIsInDesignMode(this);
 
+		/// <summary>
+		/// Creates a new instance of <see cref="BaseControl"/>.
+		/// </summary>
+		public BaseControl()
+		{
+			Type type = GetType();
+
+			// DependencyVMProperty => default values
+			if(dVMp_defaultValues?.ContainsKey(type) == true) {
+				ViewModelChanged += DependencyVMProperty_DefaultValues_ViewModelChanged;
+			}
+		}
+
 		#region VIEWMODEL
 		/// <summary>
 		/// Contains information about changed view models.
@@ -478,6 +491,7 @@ namespace GM.WPF.Controls
 		// could probably use normal Dictionary, since all of this is always run on the main UI thread
 		private static ConcurrentDictionary<BaseControl, SearchForTabItemResult> controlToTabItem;
 		private static ConcurrentDictionary<TabControl, BaseControl> tabControlsWithSingleItems;
+		private static Dictionary<Type, List<(string VMPropertyName, object DefaultValue)>> dVMp_defaultValues;
 
 		private class SearchForTabItemResult
 		{
@@ -635,9 +649,39 @@ namespace GM.WPF.Controls
 
 			if(defaultValue == null) {
 				defaultValue = typeDefaultValue;
+			} else if(defaultValue != typeDefaultValue) {
+				// set default value to the property in VM
+				if(dVMp_defaultValues == null) {
+					dVMp_defaultValues = new Dictionary<Type, List<(string, object)>>();
+				}
+				if(!dVMp_defaultValues.TryGetValue(ownerType, out List<(string, object)> defaultValues)) {
+					defaultValues = new List<(string, object)>();
+					dVMp_defaultValues.Add(ownerType, defaultValues);
+				}
+				defaultValues.Add((viewModelPropertyName, defaultValue));
 			}
 
 			return DependencyProperty.Register(name, propertyType, ownerType, new PropertyMetadata(defaultValue, propertyChangedCallback));
+		}
+
+		private void DependencyVMProperty_DefaultValues_ViewModelChanged(object sender, ViewModelChangedEventArgs e)
+		{
+			ViewModel vm = e.NewViewModel;
+			if(vm == null) {
+				return;
+			}
+			Type vmType = vm.GetType();
+
+			var defaultValues = dVMp_defaultValues[GetType()];
+			foreach((string VMPropertyName, object defaultValue) in defaultValues) {
+				object propertyDefaultValue = vmType.GetPropertyTypeReal(VMPropertyName).GetDefault();
+				object currentVMPropertyValue = vm.GetPropertyValue(VMPropertyName);
+				if(currentVMPropertyValue != propertyDefaultValue) {
+					// don't override if the value is not default, because it was probably manually set somewhere
+					continue;
+				}
+				vm.SetProperty(VMPropertyName, defaultValue);
+			}
 		}
 		#endregion DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTY
 
