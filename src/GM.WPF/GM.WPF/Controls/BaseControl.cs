@@ -480,7 +480,7 @@ namespace GM.WPF.Controls
 		}
 
 		/// <summary>
-		/// Creates a dependency property that, when updated, will also update the value in the view model.
+		/// Creates a dependency property that, when updated, will also update the value of a property in the view model.
 		/// </summary>
 		/// <param name="name">The name of the dependency property.</param>
 		/// <param name="ownerType">The type of the control.</param>
@@ -530,7 +530,7 @@ namespace GM.WPF.Controls
 				void setPropertyWithoutNullifyingWhenParentTabItemIsNotSelected()
 				{
 					// sets the new value of the property to the property in the view model
-					baseControl.ViewModel.SetProperty(viewModelPropertyName, e.NewValue);
+					baseControl.ViewModel?.SetProperty(viewModelPropertyName, e.NewValue);
 				}
 
 				if(!nullifyWhenParentTabItemIsNotSelected) {
