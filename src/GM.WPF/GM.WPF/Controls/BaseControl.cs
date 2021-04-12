@@ -55,6 +55,37 @@ namespace GM.WPF.Controls
 		/// </summary>
 		protected bool IsInDesignMode => DesignerProperties.GetIsInDesignMode(this);
 
+		#region VIEWMODEL
+		/// <summary>
+		/// Contains information about changed view models.
+		/// </summary>
+		public class ViewModelChangedEventArgs : EventArgs
+		{
+			/// <summary>
+			/// Creates a new instance of <see cref="ViewModelChangedEventArgs"/>.
+			/// </summary>
+			/// <param name="oldViewModel">Old view model.</param>
+			/// <param name="newViewModel">New view model.</param>
+			public ViewModelChangedEventArgs(ViewModel oldViewModel, ViewModel newViewModel)
+			{
+				OldViewModel = oldViewModel;
+				NewViewModel = newViewModel;
+			}
+			/// <summary>
+			/// Old view model.
+			/// </summary>
+			public ViewModel OldViewModel { get; }
+			/// <summary>
+			/// New view model.
+			/// </summary>
+			public ViewModel NewViewModel { get; }
+		}
+
+		/// <summary>
+		/// Triggered when the <see cref="ViewModel"/> changes.
+		/// </summary>
+		protected event EventHandler<ViewModelChangedEventArgs> ViewModelChanged;
+
 		/// <summary>
 		/// Gets or sets the view model to the first child of this control. This is to enable DependencyProperty bindings. If setting, the current view model is first disposed.
 		/// <para>
@@ -69,8 +100,11 @@ namespace GM.WPF.Controls
 				if(Content == null) {
 					throw new InvalidOperationException("You cannot set the ViewModel if Content of the control is null.");
 				}
+				ViewModel oldViewModel = ViewModel;
 				DisposeViewModel();
 				((FrameworkElement)Content).DataContext = value;
+				var eventArgs = new ViewModelChangedEventArgs(oldViewModel, value);
+				ViewModelChanged?.Invoke(this, eventArgs);
 			}
 		}
 
@@ -100,6 +134,7 @@ namespace GM.WPF.Controls
 				vmDisposable.Dispose();
 			}
 		}
+#endregion VIEWMODEL
 
 		#region DEPENDENCY PROPERTIES
 
