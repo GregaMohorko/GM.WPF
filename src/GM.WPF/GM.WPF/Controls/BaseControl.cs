@@ -66,6 +66,10 @@ namespace GM.WPF.Controls
 			if(dVMp_defaultValues?.ContainsKey(type) == true) {
 				ViewModelChanged += DependencyVMProperty_DefaultValues_ViewModelChanged;
 			}
+			// DependencyVMPropertyReadOnly
+			if(dVMp_ReadOnly_registeredProperties?.ContainsKey(type) == true) {
+				ViewModelChanged += DependencyVMPropertyReadOnly_ViewModelChanged;
+			}
 		}
 
 		#region VIEWMODEL
@@ -684,6 +688,90 @@ namespace GM.WPF.Controls
 			}
 		}
 		#endregion DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTY
+
+		#region DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTYREADONLY
+		/// <summary>
+		/// Creates a read-only dependency property that, when updated in the view model, will also update it's value.
+		/// </summary>
+		/// <typeparam name="TOwner">The type of the control.</typeparam>
+		/// <typeparam name="TViewModel">The type of the view model.</typeparam>
+		/// <param name="name">The name of the read-only dependency property.</param>
+		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
+		protected static DependencyProperty DependencyVMPropertyReadOnly<TOwner, TViewModel>(string name, string viewModelPropertyName = null)
+		{
+			return DependencyVMPropertyReadOnly(name, typeof(TOwner), typeof(TViewModel), viewModelPropertyName);
+		}
+
+		private static Dictionary<Type, List<(string VMPropertyName, DependencyPropertyKey)>> dVMp_ReadOnly_registeredProperties;
+
+		/// <summary>
+		/// Creates a read-only dependency property that, when updated in the view model, will also update it's value.
+		/// </summary>
+		/// <param name="name">The name of the read-only dependency property.</param>
+		/// <param name="ownerType">The type of the control.</param>
+		/// <param name="viewModelType">The type of the view model.</param>
+		/// <param name="viewModelPropertyName">The name of the property in the view model to bind to. If null, it is considered to be the same as the name of the owner property.</param>
+		protected static DependencyProperty DependencyVMPropertyReadOnly(string name, Type ownerType, Type viewModelType, string viewModelPropertyName = null)
+		{
+			if(viewModelPropertyName == null) {
+				viewModelPropertyName = name;
+			}
+
+			if(!ownerType.IsSubclassOf(typeof(BaseControl))) {
+				throw new ArgumentException($"The owner type must be a child of {nameof(BaseControl)}. {ownerType.Name} is not.", nameof(ownerType));
+			}
+			if(!viewModelType.IsSubclassOf(typeof(ViewModel))) {
+				throw new ArgumentException("The view model type must be a child of ViewModel.", nameof(viewModelType));
+			}
+			if(!viewModelType.HasProperty(viewModelPropertyName, true)) {
+				throw new ArgumentException("A property with the specified view model property name must exist in the specified view model type.", nameof(viewModelPropertyName));
+			}
+
+			Type propertyType = ownerType.GetPropertyTypeReal(name);
+
+			DependencyPropertyKey readOnlyDPropertyKey = DependencyProperty.RegisterReadOnly(name, propertyType, ownerType, new PropertyMetadata());
+
+			// init
+			if(dVMp_ReadOnly_registeredProperties == null) {
+				dVMp_ReadOnly_registeredProperties = new Dictionary<Type, List<(string VMPropertyName, DependencyPropertyKey)>>();
+			}
+			// get for this control type
+			if(!dVMp_ReadOnly_registeredProperties.TryGetValue(ownerType, out List<(string, DependencyPropertyKey)> registeredProperties)) {
+				registeredProperties = new List<(string, DependencyPropertyKey)>();
+				dVMp_ReadOnly_registeredProperties.Add(ownerType, registeredProperties);
+			}
+			// add this property
+			registeredProperties.Add((viewModelPropertyName, readOnlyDPropertyKey));
+
+			return readOnlyDPropertyKey.DependencyProperty;
+		}
+
+		private void DependencyVMPropertyReadOnly_ViewModelChanged(object sender, ViewModelChangedEventArgs e)
+		{
+			// unregister the old view model
+			if(e.OldViewModel != null) {
+				e.NewViewModel.PropertyChanged -= DependencyVMPropertyReadOnly_ViewModel_PropertyChanged;
+			}
+			// register the new view model
+			if(e.NewViewModel != null) {
+				e.NewViewModel.PropertyChanged += DependencyVMPropertyReadOnly_ViewModel_PropertyChanged;
+			}
+		}
+
+		private void DependencyVMPropertyReadOnly_ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			var registeredReadOnlyProperties = dVMp_ReadOnly_registeredProperties[GetType()];
+			foreach((string VMPropertyName, DependencyPropertyKey Key) in registeredReadOnlyProperties) {
+				if(VMPropertyName == e.PropertyName) {
+					// update the read-only dependency property
+					object newValue = sender.GetValue(VMPropertyName);
+					SetValue(Key, newValue);
+
+					// do not break, since there can be multiple read-only dependency properties that are related to the same view model property
+				}
+			}
+		}
+		#endregion DEPENDENCY PROPERTIES - DEPENDENCYVMPROPERTYREADONLY
 
 		#endregion DEPENDENCY PROPERTIES
 	}
