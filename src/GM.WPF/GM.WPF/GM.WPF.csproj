@@ -111,6 +111,18 @@
     </Compile>
     <Compile Include="Controls\StartPageModels.cs" />
     <Compile Include="Controls\StartPageViewModel.cs" />
+    <Compile Include="Controls\TabControlLeft.cs" />
+    <Compile Include="Controls\TabControlLeftResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TabControlLeftResource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TabControlRight.cs" />
+    <Compile Include="Controls\TabControlRightResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TabControlRightResource.resx</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TimeControl.xaml.cs">
       <DependentUpon>TimeControl.xaml</DependentUpon>
     </Compile>
@@ -220,6 +232,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <None Include="Controls\TabControlLeftTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\TabControlRightTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
     <Page Include="Controls\TimeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -253,6 +273,16 @@
     <PackageReference Include="PropertyChanged.Fody">
       <Version>3.3.3</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\TabControlLeftResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TabControlLeftResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TabControlRightResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TabControlRightResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
