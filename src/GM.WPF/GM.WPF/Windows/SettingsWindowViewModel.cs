@@ -32,7 +32,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using GM.WPF.MVVM;
 using GM.WPF.Windows.Model.SettingsWindow;
 
@@ -77,7 +77,7 @@ namespace GM.WPF.Windows
 		{
 			switch(e.PropertyName) {
 				case nameof(Settings.IsDirty):
-					Command_Save.RaiseCanExecuteChanged();
+					Command_Save.NotifyCanExecuteChanged();
 					break;
 			}
 		}

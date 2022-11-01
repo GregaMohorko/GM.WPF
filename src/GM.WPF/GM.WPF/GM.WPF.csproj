@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GM.WPF</RootNamespace>
     <AssemblyName>GM.WPF</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -111,6 +111,18 @@
     </Compile>
     <Compile Include="Controls\StartPageModels.cs" />
     <Compile Include="Controls\StartPageViewModel.cs" />
+    <Compile Include="Controls\TabControlLeft.cs" />
+    <Compile Include="Controls\TabControlLeftResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TabControlLeftResource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TabControlRight.cs" />
+    <Compile Include="Controls\TabControlRightResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TabControlRightResource.resx</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TimeControl.xaml.cs">
       <DependentUpon>TimeControl.xaml</DependentUpon>
     </Compile>
@@ -220,6 +232,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <None Include="Controls\TabControlLeftTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\TabControlRightTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
     <Page Include="Controls\TimeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -241,18 +261,28 @@
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm">
+      <Version>8.0.0</Version>
+    </PackageReference>
     <PackageReference Include="GM.Utility">
-      <Version>1.3.2</Version>
+      <Version>1.4.0</Version>
     </PackageReference>
     <PackageReference Include="GM.Windows.Utility">
       <Version>1.0.5.1</Version>
     </PackageReference>
-    <PackageReference Include="MvvmLightLibs">
-      <Version>5.4.1.1</Version>
+    <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All">
+      <Version>4.0.5</Version>
     </PackageReference>
-    <PackageReference Include="PropertyChanged.Fody">
-      <Version>3.3.3</Version>
-    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\TabControlLeftResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TabControlLeftResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TabControlRightResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TabControlRightResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -291,6 +292,47 @@ namespace GM.WPF
 				}
 				SetMessage(message);
 			}
+		}
+
+		/// <summary>
+		/// Starts a loop on the thread pool that will simulate the progress for the specified amount of time, going from 1% to 100%.
+		/// </summary>
+		/// <param name="estimatedLoadingTime">The estimated loading time. The simulation will be approximately this long.</param>
+		/// <param name="ct">The cancellation token that will cancel this loop. Use it to let this simulation know that the loading has already finished (or has been cancelled).</param>
+		/// <param name="setAsIndeterminateAfter">If true, it will set the progress as indeterminate after the simulation is completed.</param>
+		public void SimulateForKnownLoadingTime(
+			TimeSpan estimatedLoadingTime,
+			CancellationToken ct,
+			bool setAsIndeterminateAfter = true
+			)
+		{
+			_ = Task.Run(async delegate
+			{
+				// calculate delay (in milliseconds) between steps
+				int msDelayPerStep = (int)Math.Round(estimatedLoadingTime.TotalMilliseconds / 100);
+
+				// start at 1
+				SetProgress(1);
+
+				// go from 1 to 100
+				for(int i = 1; i <= 100; ++i) {
+					// wait
+					await Task.Delay(msDelayPerStep);
+					// check if the task already finished (or was cancelled, not important)
+					if(ct.IsCancellationRequested) {
+							break;
+						}
+					// simulate progress
+					SetProgress(i);
+				}
+
+				if(setAsIndeterminateAfter) {
+					await Task.Delay(msDelayPerStep);
+					if(!ct.IsCancellationRequested) {
+						SetProgress(null);
+					}
+				}
+			});
 		}
 
 		/// <summary>

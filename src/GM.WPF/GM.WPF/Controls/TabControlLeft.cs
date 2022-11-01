@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2022 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Project: GM.WPF.Test
-Created: 2018-12-26
-Author: GregaMohorko
+Project: GM.WPF
+Created: 2022-11-1
+Author: Gregor Mohorko
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Input;
-using GM.WPF.MVVM;
+using System.Windows.Controls;
+using System.Windows.Markup;
 
-namespace GM.WPF.Test.Controls.TimePickerTests
+namespace GM.WPF.Controls
 {
-    class TimePickerBindingTestViewModel:ViewModel
-    {
-		public RelayCommand Command_SetValueToCurrentTime { get; private set; }
-		public RelayCommand Command_SetValueToNull { get; private set; }
-
-		public TimeSpan? SelectedTime { get; set; }
-
-		public TimePickerBindingTestViewModel()
+	/// <summary>
+	/// A tab control that has tab items on the left side.
+	/// </summary>
+	public class TabControlLeft : TabControl
+	{
+		/// <summary>
+		/// Creates a new instance of <see cref="TabControlLeft"/>.
+		/// </summary>
+		public TabControlLeft()
 		{
-			if(IsInDesignMode) {
-				SelectedTime = DateTime.Now.TimeOfDay;
-				return;
-			}
+			TabStripPlacement = Dock.Left;
 
-			Command_SetValueToCurrentTime = new RelayCommand(SetValueToCurrentTime);
-			Command_SetValueToNull = new RelayCommand(SetValueToNull);
+			string templateXamlString = TabControlLeftResource.TabControlLeftTemplate;
+			Template = (ControlTemplate)XamlReader.Parse(templateXamlString);
 		}
-
-		private void SetValueToCurrentTime()
-		{
-			SelectedTime = DateTime.Now.TimeOfDay;
-		}
-
-		private void SetValueToNull()
-		{
-			SelectedTime = null;
-		}
-    }
+	}
 }

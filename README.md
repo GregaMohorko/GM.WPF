@@ -22,6 +22,8 @@ You can read the documentation and how-to's under the [Wiki](https://github.com/
  - [GMWrapPanel](src/GM.WPF/GM.WPF/Controls/GMWrapPanel.cs)
  - [ProgressOverlay](src/GM.WPF/GM.WPF/Controls/ProgressOverlay.xaml.cs)
  - [StartPage](src/GM.WPF/GM.WPF/Controls/StartPage.xaml.cs)
+ - [TabControlLeft](src/GM.WPF/GM.WPF/Controls/TabControlLeft.cs)
+ - [TabControlRight](src/GM.WPF/GM.WPF/Controls/TabControlRight.cs)
  - [TimeControl](src/GM.WPF/GM.WPF/Controls/TimeControl.xaml.cs)
  - [TimePicker](src/GM.WPF/GM.WPF/Controls/TimePicker.xaml.cs)
  - [WatermarkTextBox](src/GM.WPF/GM.WPF/Controls/WatermarkTextBox.xaml.cs)

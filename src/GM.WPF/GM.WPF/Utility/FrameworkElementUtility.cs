@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2021 Gregor Mohorko
+Copyright (c) 2022 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,14 @@ Author: Gregor Mohorko
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using GM.Utility;
 
 namespace GM.WPF.Utility
@@ -175,6 +174,49 @@ namespace GM.WPF.Utility
 		public static bool MoveFocusUp(this FrameworkElement element)
 		{
 			return element.MoveFocus(new TraversalRequest(FocusNavigationDirection.Up));
+		}
+
+		/// <summary>
+		/// Removes this element from the parent element.
+		/// </summary>
+		/// <param name="frameworkElement">The element to remove from parent.</param>
+		public static void RemoveFromParent(this FrameworkElement frameworkElement)
+		{
+			DependencyObject parent = frameworkElement.GetParent();
+			if(parent is ContentControl parentContentControl) {
+				parentContentControl.Content = null;
+			} else if(parent is TabControl parentTabControl) {
+				parentTabControl.Items.Remove(frameworkElement);
+			} else if(parent is ContextMenu parentContextMenu) {
+				parentContextMenu.Items.Remove(frameworkElement);
+			} else if(parent is Decorator parentDecorator) {
+				parentDecorator.Child = null;
+			} else if(parent is Panel parentPanel) {
+				try {
+					parentPanel.Children.Remove(frameworkElement);
+				} catch(InvalidOperationException e) when(e.Message == "Cannot explicitly modify Children collection of Panel used as ItemsPanel for ItemsControl. ItemsControl generates child elements for Panel.") {
+					// this panel is simply an ItemsPanel of ItemsControl
+					if(frameworkElement is ContentPresenter contentPresenter) {
+						// it needs to be done AFTER the current rendering (the content is shown for a very short duration (10ms?) and then removed)
+						// if in the future you find a cleaner way to do it ... please do so
+						_ = contentPresenter.Dispatcher.BeginInvoke(DispatcherPriority.Send, (Action)(() =>
+						{
+							contentPresenter.ContentTemplate = null;
+							contentPresenter.Content = null;
+						}));
+					} else {
+						throw new NotImplementedException();
+					}
+				}
+			} else if(parent is ContentPresenter parentContentPresenter) {
+				if(parentContentPresenter.Content == frameworkElement) {
+					parentContentPresenter.Content = null;
+				} else {
+					RemoveFromParent(parentContentPresenter);
+				}
+			} else {
+				throw new NotImplementedException();
+			}
 		}
 
 		/// <summary>

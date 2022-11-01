@@ -26,6 +26,7 @@ Created: 2019-10-08
 Author: Grega Mohorko
 */
 
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +35,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
 
 namespace GM.WPF.Windows.Model.SettingsWindow
 {
@@ -104,7 +104,7 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 		{
 			switch(e.PropertyName) {
 				case nameof(SettingsTab.IsDirty):
-					RaisePropertyChanged(nameof(IsDirty));
+					OnPropertyChanged(nameof(IsDirty));
 					break;
 			}
 		}
@@ -124,7 +124,7 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 			foreach(Action saveAction in saveActions) {
 				saveAction();
 			}
-			RaisePropertyChanged(nameof(IsDirty));
+			OnPropertyChanged(nameof(IsDirty));
 			Saved?.Invoke(this, EventArgs.Empty);
 		}
 

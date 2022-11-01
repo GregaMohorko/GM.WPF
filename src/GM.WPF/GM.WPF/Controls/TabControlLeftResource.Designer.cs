@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GM.WPF.Test.Properties {
+namespace GM.WPF.Controls {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace GM.WPF.Test.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    internal class TabControlLeftResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal TabControlLeftResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace GM.WPF.Test.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GM.WPF.Test.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GM.WPF.Controls.TabControlLeftResource", typeof(TabControlLeftResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,26 @@ namespace GM.WPF.Test.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;ControlTemplate
+        ///		xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        ///		xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        ///		TargetType=&quot;TabControl&quot;
+        ///		&gt;
+        ///	&lt;Grid&gt;
+        ///		&lt;Grid.ColumnDefinitions&gt;
+        ///			&lt;ColumnDefinition Width=&quot;Auto&quot; /&gt;
+        ///			&lt;ColumnDefinition /&gt;
+        ///		&lt;/Grid.ColumnDefinitions&gt;
+        ///		&lt;ScrollViewer HorizontalScrollBarVisibility=&quot;Hidden&quot; VerticalScrollBarVisibility=&quot;Auto&quot; FlowDirection=&quot;RightToLeft&quot;&gt;
+        ///			&lt;TabPanel x:Name=&quot;HeaderPanel&quot; Panel.ZIndex=&quot;0&quot; KeyboardNavigation.TabIndex=&quot;1&quot; IsI [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TabControlLeftTemplate {
+            get {
+                return ResourceManager.GetString("TabControlLeftTemplate", resourceCulture);
             }
         }
     }

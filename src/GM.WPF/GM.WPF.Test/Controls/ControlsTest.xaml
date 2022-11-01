@@ -1,7 +1,7 @@
 ﻿<!--
 MIT License
 
-Copyright (c) 2018 Grega Mohorko
+Copyright (c) 2022 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,32 @@ Author: GregaMohorko
 	<TabControl>
 		<TabItem Header="ProgressOverlay">
 			<local:ProgressOverlayTest />
+		</TabItem>
+		<TabItem Header="TabControlLeft">
+			<controls:TabControlLeft>
+				<TabItem Header="First">
+					<Label Content="Content of first." />
+				</TabItem>
+				<TabItem Header="Second">
+					<Label Content="Content of second." />
+				</TabItem>
+				<TabItem Header="Third">
+					<Label Content="Content of third." />
+				</TabItem>
+			</controls:TabControlLeft>
+		</TabItem>
+		<TabItem Header="TabControlRight">
+			<controls:TabControlRight>
+				<TabItem Header="First">
+					<Label Content="Content of first." />
+				</TabItem>
+				<TabItem Header="Second">
+					<Label Content="Content of second." />
+				</TabItem>
+				<TabItem Header="Third">
+					<Label Content="Content of third." />
+				</TabItem>
+			</controls:TabControlRight>
 		</TabItem>
 		<TabItem Header="TimeControl">
 			<local:TimeControlTest />
