@@ -14,16 +14,10 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>WPF MVVM controls utility extensions dialogs converters behaviors windows</tags>
-	<releaseNotes>Added WatermarkTextBox.
-Added TabControlBehavior.
-Added FrameworkElementUtility.GetUniqueControlKeyByVisualTree.
-Added ProgressUpdater.SetForLoop with support for step message.
-Added converters: EnumToCollectionConverter, ICollectionToCountConverter.
-Added ViewModelChanged event to BaseControl.
-Added DependencyVMPropertyReadOnly to BaseControl.
-Fix: BaseControl: Null reference when view model is null.
-Fix: BaseControl: DependencyVMProperty: default value: Set default value in view model when defined in the property.
-Fix: DateDialog: Allow clicking OK at all times, focus input box when empty.</releaseNotes>
+	<releaseNotes>Replaced dependency on obsolete GalaSoft MvvmLightLibs with CommonToolkit library.
+Added TabControlLeft and TabControlRight.
+Added FrameworkElementUtility.RemoveFromParent.
+Added ProgressUpdater.SimulateForKnownLoadingTime.</releaseNotes>
 	<dependencies>
 		<dependency id="CommunityToolkit.Mvvm" version="8.0.0" />
 		<dependency id="GM.Utility" version="1.4.0" />
