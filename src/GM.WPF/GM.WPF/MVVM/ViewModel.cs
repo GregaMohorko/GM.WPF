@@ -42,7 +42,7 @@ namespace GM.WPF.MVVM
 	/// <summary>
 	/// Base class for the ViewModel in the MVVM pattern.
 	/// <para>For automatic injection of <see cref="INotifyPropertyChanged"/> code into properties at compile time, use PropertyChanged.Fody project from NuGet.</para>
-	/// <para>For commands, use <see cref="RelayCommand"/>.</para>
+	/// <para>For commands, use <see cref="RelayCommand"/> or <see cref="AsyncRelayCommand"/>.</para>
 	/// </summary>
 	public abstract class ViewModel : ObservableRecipient
 	{
