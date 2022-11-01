@@ -26,12 +26,12 @@ Created: 2018-12-26
 Author: GregaMohorko
 */
 
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
 
 namespace GM.WPF.Test.Controls.TimePickerTests
 {

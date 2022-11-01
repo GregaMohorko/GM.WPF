@@ -26,6 +26,8 @@ Created: 2017-10-29
 Author: Gregor Mohorko
 */
 
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,8 +36,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
 
 namespace GM.WPF.MVVM
 {
@@ -44,7 +44,7 @@ namespace GM.WPF.MVVM
 	/// <para>For automatic injection of <see cref="INotifyPropertyChanged"/> code into properties at compile time, use PropertyChanged.Fody project from NuGet.</para>
 	/// <para>For commands, use <see cref="RelayCommand"/>.</para>
 	/// </summary>
-	public abstract class ViewModel : ViewModelBase
+	public abstract class ViewModel : ObservableRecipient
 	{
 		/// <summary>
 		/// Gets a value that indicates whether a debugger is attached to the process.
@@ -53,11 +53,11 @@ namespace GM.WPF.MVVM
 		/// <summary>
 		/// Determines whether the control is in design mode.
 		/// </summary>
-		public new bool IsInDesignMode => IsInDesignModeStatic;
+		public bool IsInDesignMode => IsInDesignModeStatic;
 		/// <summary>
 		/// Determines whether the control is in design mode.
 		/// </summary>
-		public static new bool IsInDesignModeStatic { get; }
+		public static bool IsInDesignModeStatic { get; }
 
 		static ViewModel()
 		{

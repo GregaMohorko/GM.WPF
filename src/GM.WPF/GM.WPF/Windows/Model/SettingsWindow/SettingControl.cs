@@ -26,14 +26,14 @@ Created: 2019-10-08
 Author: Grega Mohorko
 */
 
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
 
 namespace GM.WPF.Windows.Model.SettingsWindow
 {
@@ -148,7 +148,7 @@ namespace GM.WPF.Windows.Model.SettingsWindow
 			}
 			applyMethod(PropertyPath, Value);
 			OriginalValue = Value;
-			RaisePropertyChanged(nameof(IsDirty));
+			OnPropertyChanged(nameof(IsDirty));
 		}
 	}
 }

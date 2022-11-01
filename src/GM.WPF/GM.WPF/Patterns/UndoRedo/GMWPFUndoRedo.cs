@@ -168,7 +168,7 @@ namespace GM.WPF.Patterns.UndoRedo
 		{
 			var ic = (InvertibleCommand)sender;
 			// get the inverted command that represents the undo command
-			UndoRedoAction undoAction = ic.undoRedoAction.GetInvertedUndoRedoAction();
+			UndoRedoAction undoAction = ic.UndoRedoAction.GetInvertedUndoRedoAction();
 			Add(undoAction);
 		}
 

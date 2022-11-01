@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2020 Gregor Mohorko
+Copyright (c) 2022 Gregor Mohorko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,8 @@ Author: Gregor Mohorko
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GalaSoft.MvvmLight.CommandWpf;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using GM.Utility.Patterns.UndoRedo;
 
 namespace GM.WPF.Patterns.UndoRedo
@@ -39,16 +36,22 @@ namespace GM.WPF.Patterns.UndoRedo
 	/// <summary>
 	/// A command that has an invertible command to it. It relays it's functionality to other objects by invoking delegates.
 	/// </summary>
-	public class InvertibleCommand : RelayCommand
+	public class InvertibleCommand : IRelayCommand
 	{
 		/// <summary>
 		/// Invoked when this command has just been executed.
 		/// </summary>
 		public event EventHandler Executed;
+		/// <summary>
+		/// Occurs when changes occur that affect whether or not the command should execute.
+		/// </summary>
+		public event EventHandler CanExecuteChanged;
 
-		internal readonly UndoRedoAction undoRedoAction;
-		private readonly Func<bool> canExecute;
-		private readonly Func<bool> canInvertedExecute;
+		internal UndoRedoAction UndoRedoAction { get; }
+
+		private readonly RelayCommand _command;
+		private readonly Func<bool> _canExecute;
+		private readonly Func<bool> _canInvertedExecute;
 
 		/// <summary>
 		/// Creates a new instance of <see cref="InvertibleCommand"/>.
@@ -56,7 +59,9 @@ namespace GM.WPF.Patterns.UndoRedo
 		/// <param name="description">The description of the command.</param>
 		/// <param name="execute">The action.</param>
 		/// <param name="invertedExecute">The inverted action.</param>
-		public InvertibleCommand(string description, Action execute, Action invertedExecute) : this(new UndoRedoAction(description, execute, invertedExecute)) { }
+		public InvertibleCommand(string description, Action execute, Action invertedExecute)
+			: this(new UndoRedoAction(description, execute, invertedExecute))
+		{ }
 
 		/// <summary>
 		/// Creates a new instance of <see cref="InvertibleCommand"/>.
@@ -66,45 +71,79 @@ namespace GM.WPF.Patterns.UndoRedo
 		/// <param name="canExecute">The execution status logic.</param>
 		/// <param name="invertedExecute">The inverted action.</param>
 		/// <param name="canInvertedExecute">The inverted execution status logic.</param>
-		public InvertibleCommand(string description, Action execute, Func<bool> canExecute, Action invertedExecute, Func<bool> canInvertedExecute) : this(new UndoRedoAction(description, execute, invertedExecute), canExecute, canInvertedExecute) { }
+		public InvertibleCommand(string description, Action execute, Func<bool> canExecute, Action invertedExecute, Func<bool> canInvertedExecute)
+			: this(new UndoRedoAction(description, execute, invertedExecute), canExecute, canInvertedExecute)
+		{ }
 
-		private InvertibleCommand(UndoRedoAction undoRedoAction) : base(undoRedoAction.Action)
+		private InvertibleCommand(UndoRedoAction undoRedoAction)
 		{
-			this.undoRedoAction = undoRedoAction;
+			UndoRedoAction = undoRedoAction;
+			_command = InitializeCommand();
 		}
 
-		private InvertibleCommand(UndoRedoAction undoRedoAction, Func<bool> canExecute, Func<bool> canInvertedExecute) : base(undoRedoAction.Action, canExecute)
+		private InvertibleCommand(UndoRedoAction undoRedoAction, Func<bool> canExecute, Func<bool> canInvertedExecute)
 		{
-			this.undoRedoAction = undoRedoAction;
-			this.canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
-			this.canInvertedExecute = canInvertedExecute ?? throw new ArgumentNullException(nameof(canInvertedExecute));
+			_canExecute = canExecute ?? throw new ArgumentNullException(nameof(canExecute));
+			_canInvertedExecute = canInvertedExecute ?? throw new ArgumentNullException(nameof(canInvertedExecute));
+
+			UndoRedoAction = undoRedoAction;
+			_command = InitializeCommand();
+		}
+
+		private RelayCommand InitializeCommand()
+		{
+			RelayCommand command;
+			if(_canExecute == null) {
+				command = new RelayCommand(UndoRedoAction.Action);
+			} else {
+				command = new RelayCommand(UndoRedoAction.Action, _canExecute);
+			}
+			command.CanExecuteChanged += (sender, e) => CanExecuteChanged?.Invoke(sender, e);
+			return command;
 		}
 
 		/// <summary>
 		/// The description of this command.
 		/// </summary>
-		public string Description => undoRedoAction.Description;
+		public string Description => UndoRedoAction.Description;
 
 		/// <summary>
 		/// Returns a command that inverts the action of this command.
 		/// </summary>
 		public InvertibleCommand GetInvertedCommand()
 		{
-			UndoRedoAction invertedUndoRedoAction = undoRedoAction.GetInvertedUndoRedoAction();
-			if(canExecute == null) {
+			UndoRedoAction invertedUndoRedoAction = UndoRedoAction.GetInvertedUndoRedoAction();
+			if(_canExecute == null) {
 				return new InvertibleCommand(invertedUndoRedoAction);
 			}
-			return new InvertibleCommand(invertedUndoRedoAction, canInvertedExecute, canExecute);
+			return new InvertibleCommand(invertedUndoRedoAction, _canInvertedExecute, _canExecute);
+		}
+
+		/// <summary>
+		/// Defines the method that determines whether the command can execute in its current state.
+		/// </summary>
+		/// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+		public bool CanExecute(object parameter)
+		{
+			return _command.CanExecute(parameter);
 		}
 
 		/// <summary>
 		/// Executes this command and invokes the <see cref="Executed"/> event.
 		/// </summary>
-		/// <param name="parameter">This parameter will always be ignored.</param>
-		public override void Execute(object parameter)
+		/// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+		public void Execute(object parameter)
 		{
-			base.Execute(parameter);
+			_command.Execute(parameter);
 			Executed?.Invoke(this, EventArgs.Empty);
+		}
+
+		/// <summary>
+		/// Notifies that the <see cref="ICommand.CanExecute"/> property has changed.
+		/// </summary>
+		public void NotifyCanExecuteChanged()
+		{
+			_command.NotifyCanExecuteChanged();
 		}
 	}
 }

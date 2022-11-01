@@ -26,13 +26,13 @@ Created: 2019-09-05
 Author: Gregor Mohorko
 */
 
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using GalaSoft.MvvmLight.CommandWpf;
 
 namespace GM.WPF.Controls
 {
